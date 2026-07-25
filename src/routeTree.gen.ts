@@ -9,38 +9,309 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedSelectRoleRouteImport } from './routes/_authenticated.select-role'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as AuthenticatedTeacherSettingsRouteImport } from './routes/_authenticated.teacher.settings'
+import { Route as AuthenticatedTeacherQuizzesRouteImport } from './routes/_authenticated.teacher.quizzes'
+import { Route as AuthenticatedTeacherPlansRouteImport } from './routes/_authenticated.teacher.plans'
+import { Route as AuthenticatedTeacherMyPlanRouteImport } from './routes/_authenticated.teacher.my-plan'
+import { Route as AuthenticatedTeacherDashboardRouteImport } from './routes/_authenticated.teacher.dashboard'
+import { Route as AuthenticatedTeacherContentRouteImport } from './routes/_authenticated.teacher.content'
+import { Route as AuthenticatedTeacherAnalyticsRouteImport } from './routes/_authenticated.teacher.analytics'
+import { Route as AuthenticatedTeacherAdvancedRouteImport } from './routes/_authenticated.teacher.advanced'
+import { Route as AuthenticatedStudentSettingsRouteImport } from './routes/_authenticated.student.settings'
+import { Route as AuthenticatedStudentQuizPracticeRouteImport } from './routes/_authenticated.student.quiz-practice'
+import { Route as AuthenticatedStudentPlansRouteImport } from './routes/_authenticated.student.plans'
+import { Route as AuthenticatedStudentMyPlanRouteImport } from './routes/_authenticated.student.my-plan'
+import { Route as AuthenticatedStudentHomeworkRouteImport } from './routes/_authenticated.student.homework'
+import { Route as AuthenticatedStudentDashboardRouteImport } from './routes/_authenticated.student.dashboard'
+import { Route as AuthenticatedStudentToolSlugRouteImport } from './routes/_authenticated.student.tool.$slug'
+import { Route as AuthenticatedStudentQuizQuizIdRouteImport } from './routes/_authenticated.student.quiz.$quizId'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedSelectRoleRoute = AuthenticatedSelectRoleRouteImport.update({
+  id: '/select-role',
+  path: '/select-role',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTeacherSettingsRoute =
+  AuthenticatedTeacherSettingsRouteImport.update({
+    id: '/teacher/settings',
+    path: '/teacher/settings',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTeacherQuizzesRoute =
+  AuthenticatedTeacherQuizzesRouteImport.update({
+    id: '/teacher/quizzes',
+    path: '/teacher/quizzes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTeacherPlansRoute =
+  AuthenticatedTeacherPlansRouteImport.update({
+    id: '/teacher/plans',
+    path: '/teacher/plans',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTeacherMyPlanRoute =
+  AuthenticatedTeacherMyPlanRouteImport.update({
+    id: '/teacher/my-plan',
+    path: '/teacher/my-plan',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTeacherDashboardRoute =
+  AuthenticatedTeacherDashboardRouteImport.update({
+    id: '/teacher/dashboard',
+    path: '/teacher/dashboard',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTeacherContentRoute =
+  AuthenticatedTeacherContentRouteImport.update({
+    id: '/teacher/content',
+    path: '/teacher/content',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTeacherAnalyticsRoute =
+  AuthenticatedTeacherAnalyticsRouteImport.update({
+    id: '/teacher/analytics',
+    path: '/teacher/analytics',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTeacherAdvancedRoute =
+  AuthenticatedTeacherAdvancedRouteImport.update({
+    id: '/teacher/advanced',
+    path: '/teacher/advanced',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentSettingsRoute =
+  AuthenticatedStudentSettingsRouteImport.update({
+    id: '/student/settings',
+    path: '/student/settings',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentQuizPracticeRoute =
+  AuthenticatedStudentQuizPracticeRouteImport.update({
+    id: '/student/quiz-practice',
+    path: '/student/quiz-practice',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentPlansRoute =
+  AuthenticatedStudentPlansRouteImport.update({
+    id: '/student/plans',
+    path: '/student/plans',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentMyPlanRoute =
+  AuthenticatedStudentMyPlanRouteImport.update({
+    id: '/student/my-plan',
+    path: '/student/my-plan',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentHomeworkRoute =
+  AuthenticatedStudentHomeworkRouteImport.update({
+    id: '/student/homework',
+    path: '/student/homework',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentDashboardRoute =
+  AuthenticatedStudentDashboardRouteImport.update({
+    id: '/student/dashboard',
+    path: '/student/dashboard',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentToolSlugRoute =
+  AuthenticatedStudentToolSlugRouteImport.update({
+    id: '/student/tool/$slug',
+    path: '/student/tool/$slug',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentQuizQuizIdRoute =
+  AuthenticatedStudentQuizQuizIdRouteImport.update({
+    id: '/student/quiz/$quizId',
+    path: '/student/quiz/$quizId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/select-role': typeof AuthenticatedSelectRoleRoute
+  '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
+  '/student/homework': typeof AuthenticatedStudentHomeworkRoute
+  '/student/my-plan': typeof AuthenticatedStudentMyPlanRoute
+  '/student/plans': typeof AuthenticatedStudentPlansRoute
+  '/student/quiz-practice': typeof AuthenticatedStudentQuizPracticeRoute
+  '/student/settings': typeof AuthenticatedStudentSettingsRoute
+  '/teacher/advanced': typeof AuthenticatedTeacherAdvancedRoute
+  '/teacher/analytics': typeof AuthenticatedTeacherAnalyticsRoute
+  '/teacher/content': typeof AuthenticatedTeacherContentRoute
+  '/teacher/dashboard': typeof AuthenticatedTeacherDashboardRoute
+  '/teacher/my-plan': typeof AuthenticatedTeacherMyPlanRoute
+  '/teacher/plans': typeof AuthenticatedTeacherPlansRoute
+  '/teacher/quizzes': typeof AuthenticatedTeacherQuizzesRoute
+  '/teacher/settings': typeof AuthenticatedTeacherSettingsRoute
+  '/student/quiz/$quizId': typeof AuthenticatedStudentQuizQuizIdRoute
+  '/student/tool/$slug': typeof AuthenticatedStudentToolSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/select-role': typeof AuthenticatedSelectRoleRoute
+  '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
+  '/student/homework': typeof AuthenticatedStudentHomeworkRoute
+  '/student/my-plan': typeof AuthenticatedStudentMyPlanRoute
+  '/student/plans': typeof AuthenticatedStudentPlansRoute
+  '/student/quiz-practice': typeof AuthenticatedStudentQuizPracticeRoute
+  '/student/settings': typeof AuthenticatedStudentSettingsRoute
+  '/teacher/advanced': typeof AuthenticatedTeacherAdvancedRoute
+  '/teacher/analytics': typeof AuthenticatedTeacherAnalyticsRoute
+  '/teacher/content': typeof AuthenticatedTeacherContentRoute
+  '/teacher/dashboard': typeof AuthenticatedTeacherDashboardRoute
+  '/teacher/my-plan': typeof AuthenticatedTeacherMyPlanRoute
+  '/teacher/plans': typeof AuthenticatedTeacherPlansRoute
+  '/teacher/quizzes': typeof AuthenticatedTeacherQuizzesRoute
+  '/teacher/settings': typeof AuthenticatedTeacherSettingsRoute
+  '/student/quiz/$quizId': typeof AuthenticatedStudentQuizQuizIdRoute
+  '/student/tool/$slug': typeof AuthenticatedStudentToolSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/select-role': typeof AuthenticatedSelectRoleRoute
+  '/_authenticated/student/dashboard': typeof AuthenticatedStudentDashboardRoute
+  '/_authenticated/student/homework': typeof AuthenticatedStudentHomeworkRoute
+  '/_authenticated/student/my-plan': typeof AuthenticatedStudentMyPlanRoute
+  '/_authenticated/student/plans': typeof AuthenticatedStudentPlansRoute
+  '/_authenticated/student/quiz-practice': typeof AuthenticatedStudentQuizPracticeRoute
+  '/_authenticated/student/settings': typeof AuthenticatedStudentSettingsRoute
+  '/_authenticated/teacher/advanced': typeof AuthenticatedTeacherAdvancedRoute
+  '/_authenticated/teacher/analytics': typeof AuthenticatedTeacherAnalyticsRoute
+  '/_authenticated/teacher/content': typeof AuthenticatedTeacherContentRoute
+  '/_authenticated/teacher/dashboard': typeof AuthenticatedTeacherDashboardRoute
+  '/_authenticated/teacher/my-plan': typeof AuthenticatedTeacherMyPlanRoute
+  '/_authenticated/teacher/plans': typeof AuthenticatedTeacherPlansRoute
+  '/_authenticated/teacher/quizzes': typeof AuthenticatedTeacherQuizzesRoute
+  '/_authenticated/teacher/settings': typeof AuthenticatedTeacherSettingsRoute
+  '/_authenticated/student/quiz/$quizId': typeof AuthenticatedStudentQuizQuizIdRoute
+  '/_authenticated/student/tool/$slug': typeof AuthenticatedStudentToolSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/select-role'
+    | '/student/dashboard'
+    | '/student/homework'
+    | '/student/my-plan'
+    | '/student/plans'
+    | '/student/quiz-practice'
+    | '/student/settings'
+    | '/teacher/advanced'
+    | '/teacher/analytics'
+    | '/teacher/content'
+    | '/teacher/dashboard'
+    | '/teacher/my-plan'
+    | '/teacher/plans'
+    | '/teacher/quizzes'
+    | '/teacher/settings'
+    | '/student/quiz/$quizId'
+    | '/student/tool/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/select-role'
+    | '/student/dashboard'
+    | '/student/homework'
+    | '/student/my-plan'
+    | '/student/plans'
+    | '/student/quiz-practice'
+    | '/student/settings'
+    | '/teacher/advanced'
+    | '/teacher/analytics'
+    | '/teacher/content'
+    | '/teacher/dashboard'
+    | '/teacher/my-plan'
+    | '/teacher/plans'
+    | '/teacher/quizzes'
+    | '/teacher/settings'
+    | '/student/quiz/$quizId'
+    | '/student/tool/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/select-role'
+    | '/_authenticated/student/dashboard'
+    | '/_authenticated/student/homework'
+    | '/_authenticated/student/my-plan'
+    | '/_authenticated/student/plans'
+    | '/_authenticated/student/quiz-practice'
+    | '/_authenticated/student/settings'
+    | '/_authenticated/teacher/advanced'
+    | '/_authenticated/teacher/analytics'
+    | '/_authenticated/teacher/content'
+    | '/_authenticated/teacher/dashboard'
+    | '/_authenticated/teacher/my-plan'
+    | '/_authenticated/teacher/plans'
+    | '/_authenticated/teacher/quizzes'
+    | '/_authenticated/teacher/settings'
+    | '/_authenticated/student/quiz/$quizId'
+    | '/_authenticated/student/tool/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +319,185 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/select-role': {
+      id: '/_authenticated/select-role'
+      path: '/select-role'
+      fullPath: '/select-role'
+      preLoaderRoute: typeof AuthenticatedSelectRoleRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teacher/settings': {
+      id: '/_authenticated/teacher/settings'
+      path: '/teacher/settings'
+      fullPath: '/teacher/settings'
+      preLoaderRoute: typeof AuthenticatedTeacherSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teacher/quizzes': {
+      id: '/_authenticated/teacher/quizzes'
+      path: '/teacher/quizzes'
+      fullPath: '/teacher/quizzes'
+      preLoaderRoute: typeof AuthenticatedTeacherQuizzesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teacher/plans': {
+      id: '/_authenticated/teacher/plans'
+      path: '/teacher/plans'
+      fullPath: '/teacher/plans'
+      preLoaderRoute: typeof AuthenticatedTeacherPlansRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teacher/my-plan': {
+      id: '/_authenticated/teacher/my-plan'
+      path: '/teacher/my-plan'
+      fullPath: '/teacher/my-plan'
+      preLoaderRoute: typeof AuthenticatedTeacherMyPlanRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teacher/dashboard': {
+      id: '/_authenticated/teacher/dashboard'
+      path: '/teacher/dashboard'
+      fullPath: '/teacher/dashboard'
+      preLoaderRoute: typeof AuthenticatedTeacherDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teacher/content': {
+      id: '/_authenticated/teacher/content'
+      path: '/teacher/content'
+      fullPath: '/teacher/content'
+      preLoaderRoute: typeof AuthenticatedTeacherContentRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teacher/analytics': {
+      id: '/_authenticated/teacher/analytics'
+      path: '/teacher/analytics'
+      fullPath: '/teacher/analytics'
+      preLoaderRoute: typeof AuthenticatedTeacherAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teacher/advanced': {
+      id: '/_authenticated/teacher/advanced'
+      path: '/teacher/advanced'
+      fullPath: '/teacher/advanced'
+      preLoaderRoute: typeof AuthenticatedTeacherAdvancedRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/student/settings': {
+      id: '/_authenticated/student/settings'
+      path: '/student/settings'
+      fullPath: '/student/settings'
+      preLoaderRoute: typeof AuthenticatedStudentSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/student/quiz-practice': {
+      id: '/_authenticated/student/quiz-practice'
+      path: '/student/quiz-practice'
+      fullPath: '/student/quiz-practice'
+      preLoaderRoute: typeof AuthenticatedStudentQuizPracticeRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/student/plans': {
+      id: '/_authenticated/student/plans'
+      path: '/student/plans'
+      fullPath: '/student/plans'
+      preLoaderRoute: typeof AuthenticatedStudentPlansRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/student/my-plan': {
+      id: '/_authenticated/student/my-plan'
+      path: '/student/my-plan'
+      fullPath: '/student/my-plan'
+      preLoaderRoute: typeof AuthenticatedStudentMyPlanRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/student/homework': {
+      id: '/_authenticated/student/homework'
+      path: '/student/homework'
+      fullPath: '/student/homework'
+      preLoaderRoute: typeof AuthenticatedStudentHomeworkRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/student/dashboard': {
+      id: '/_authenticated/student/dashboard'
+      path: '/student/dashboard'
+      fullPath: '/student/dashboard'
+      preLoaderRoute: typeof AuthenticatedStudentDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/student/tool/$slug': {
+      id: '/_authenticated/student/tool/$slug'
+      path: '/student/tool/$slug'
+      fullPath: '/student/tool/$slug'
+      preLoaderRoute: typeof AuthenticatedStudentToolSlugRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/student/quiz/$quizId': {
+      id: '/_authenticated/student/quiz/$quizId'
+      path: '/student/quiz/$quizId'
+      fullPath: '/student/quiz/$quizId'
+      preLoaderRoute: typeof AuthenticatedStudentQuizQuizIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSelectRoleRoute: typeof AuthenticatedSelectRoleRoute
+  AuthenticatedStudentDashboardRoute: typeof AuthenticatedStudentDashboardRoute
+  AuthenticatedStudentHomeworkRoute: typeof AuthenticatedStudentHomeworkRoute
+  AuthenticatedStudentMyPlanRoute: typeof AuthenticatedStudentMyPlanRoute
+  AuthenticatedStudentPlansRoute: typeof AuthenticatedStudentPlansRoute
+  AuthenticatedStudentQuizPracticeRoute: typeof AuthenticatedStudentQuizPracticeRoute
+  AuthenticatedStudentSettingsRoute: typeof AuthenticatedStudentSettingsRoute
+  AuthenticatedTeacherAdvancedRoute: typeof AuthenticatedTeacherAdvancedRoute
+  AuthenticatedTeacherAnalyticsRoute: typeof AuthenticatedTeacherAnalyticsRoute
+  AuthenticatedTeacherContentRoute: typeof AuthenticatedTeacherContentRoute
+  AuthenticatedTeacherDashboardRoute: typeof AuthenticatedTeacherDashboardRoute
+  AuthenticatedTeacherMyPlanRoute: typeof AuthenticatedTeacherMyPlanRoute
+  AuthenticatedTeacherPlansRoute: typeof AuthenticatedTeacherPlansRoute
+  AuthenticatedTeacherQuizzesRoute: typeof AuthenticatedTeacherQuizzesRoute
+  AuthenticatedTeacherSettingsRoute: typeof AuthenticatedTeacherSettingsRoute
+  AuthenticatedStudentQuizQuizIdRoute: typeof AuthenticatedStudentQuizQuizIdRoute
+  AuthenticatedStudentToolSlugRoute: typeof AuthenticatedStudentToolSlugRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSelectRoleRoute: AuthenticatedSelectRoleRoute,
+  AuthenticatedStudentDashboardRoute: AuthenticatedStudentDashboardRoute,
+  AuthenticatedStudentHomeworkRoute: AuthenticatedStudentHomeworkRoute,
+  AuthenticatedStudentMyPlanRoute: AuthenticatedStudentMyPlanRoute,
+  AuthenticatedStudentPlansRoute: AuthenticatedStudentPlansRoute,
+  AuthenticatedStudentQuizPracticeRoute: AuthenticatedStudentQuizPracticeRoute,
+  AuthenticatedStudentSettingsRoute: AuthenticatedStudentSettingsRoute,
+  AuthenticatedTeacherAdvancedRoute: AuthenticatedTeacherAdvancedRoute,
+  AuthenticatedTeacherAnalyticsRoute: AuthenticatedTeacherAnalyticsRoute,
+  AuthenticatedTeacherContentRoute: AuthenticatedTeacherContentRoute,
+  AuthenticatedTeacherDashboardRoute: AuthenticatedTeacherDashboardRoute,
+  AuthenticatedTeacherMyPlanRoute: AuthenticatedTeacherMyPlanRoute,
+  AuthenticatedTeacherPlansRoute: AuthenticatedTeacherPlansRoute,
+  AuthenticatedTeacherQuizzesRoute: AuthenticatedTeacherQuizzesRoute,
+  AuthenticatedTeacherSettingsRoute: AuthenticatedTeacherSettingsRoute,
+  AuthenticatedStudentQuizQuizIdRoute: AuthenticatedStudentQuizQuizIdRoute,
+  AuthenticatedStudentToolSlugRoute: AuthenticatedStudentToolSlugRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
