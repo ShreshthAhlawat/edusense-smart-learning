@@ -22,6 +22,10 @@ import { Route as AuthenticatedTeacherDashboardRouteImport } from './routes/_aut
 import { Route as AuthenticatedTeacherContentRouteImport } from './routes/_authenticated.teacher.content'
 import { Route as AuthenticatedTeacherAnalyticsRouteImport } from './routes/_authenticated.teacher.analytics'
 import { Route as AuthenticatedTeacherAdvancedRouteImport } from './routes/_authenticated.teacher.advanced'
+import { Route as AuthenticatedStudentQuizPracticeRouteImport } from './routes/_authenticated.student.quiz-practice'
+import { Route as AuthenticatedStudentHomeworkRouteImport } from './routes/_authenticated.student.homework'
+import { Route as AuthenticatedStudentDashboardRouteImport } from './routes/_authenticated.student.dashboard'
+import { Route as AuthenticatedStudentQuizQuizIdRouteImport } from './routes/_authenticated.student.quiz.$quizId'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -95,12 +99,39 @@ const AuthenticatedTeacherAdvancedRoute =
     path: '/teacher/advanced',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedStudentQuizPracticeRoute =
+  AuthenticatedStudentQuizPracticeRouteImport.update({
+    id: '/student/quiz-practice',
+    path: '/student/quiz-practice',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentHomeworkRoute =
+  AuthenticatedStudentHomeworkRouteImport.update({
+    id: '/student/homework',
+    path: '/student/homework',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentDashboardRoute =
+  AuthenticatedStudentDashboardRouteImport.update({
+    id: '/student/dashboard',
+    path: '/student/dashboard',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentQuizQuizIdRoute =
+  AuthenticatedStudentQuizQuizIdRouteImport.update({
+    id: '/student/quiz/$quizId',
+    path: '/student/quiz/$quizId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/select-role': typeof AuthenticatedSelectRoleRoute
+  '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
+  '/student/homework': typeof AuthenticatedStudentHomeworkRoute
+  '/student/quiz-practice': typeof AuthenticatedStudentQuizPracticeRoute
   '/teacher/advanced': typeof AuthenticatedTeacherAdvancedRoute
   '/teacher/analytics': typeof AuthenticatedTeacherAnalyticsRoute
   '/teacher/content': typeof AuthenticatedTeacherContentRoute
@@ -109,12 +140,16 @@ export interface FileRoutesByFullPath {
   '/teacher/plans': typeof AuthenticatedTeacherPlansRoute
   '/teacher/quizzes': typeof AuthenticatedTeacherQuizzesRoute
   '/teacher/settings': typeof AuthenticatedTeacherSettingsRoute
+  '/student/quiz/$quizId': typeof AuthenticatedStudentQuizQuizIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/select-role': typeof AuthenticatedSelectRoleRoute
+  '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
+  '/student/homework': typeof AuthenticatedStudentHomeworkRoute
+  '/student/quiz-practice': typeof AuthenticatedStudentQuizPracticeRoute
   '/teacher/advanced': typeof AuthenticatedTeacherAdvancedRoute
   '/teacher/analytics': typeof AuthenticatedTeacherAnalyticsRoute
   '/teacher/content': typeof AuthenticatedTeacherContentRoute
@@ -123,6 +158,7 @@ export interface FileRoutesByTo {
   '/teacher/plans': typeof AuthenticatedTeacherPlansRoute
   '/teacher/quizzes': typeof AuthenticatedTeacherQuizzesRoute
   '/teacher/settings': typeof AuthenticatedTeacherSettingsRoute
+  '/student/quiz/$quizId': typeof AuthenticatedStudentQuizQuizIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -131,6 +167,9 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/select-role': typeof AuthenticatedSelectRoleRoute
+  '/_authenticated/student/dashboard': typeof AuthenticatedStudentDashboardRoute
+  '/_authenticated/student/homework': typeof AuthenticatedStudentHomeworkRoute
+  '/_authenticated/student/quiz-practice': typeof AuthenticatedStudentQuizPracticeRoute
   '/_authenticated/teacher/advanced': typeof AuthenticatedTeacherAdvancedRoute
   '/_authenticated/teacher/analytics': typeof AuthenticatedTeacherAnalyticsRoute
   '/_authenticated/teacher/content': typeof AuthenticatedTeacherContentRoute
@@ -139,6 +178,7 @@ export interface FileRoutesById {
   '/_authenticated/teacher/plans': typeof AuthenticatedTeacherPlansRoute
   '/_authenticated/teacher/quizzes': typeof AuthenticatedTeacherQuizzesRoute
   '/_authenticated/teacher/settings': typeof AuthenticatedTeacherSettingsRoute
+  '/_authenticated/student/quiz/$quizId': typeof AuthenticatedStudentQuizQuizIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -147,6 +187,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/select-role'
+    | '/student/dashboard'
+    | '/student/homework'
+    | '/student/quiz-practice'
     | '/teacher/advanced'
     | '/teacher/analytics'
     | '/teacher/content'
@@ -155,12 +198,16 @@ export interface FileRouteTypes {
     | '/teacher/plans'
     | '/teacher/quizzes'
     | '/teacher/settings'
+    | '/student/quiz/$quizId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/dashboard'
     | '/select-role'
+    | '/student/dashboard'
+    | '/student/homework'
+    | '/student/quiz-practice'
     | '/teacher/advanced'
     | '/teacher/analytics'
     | '/teacher/content'
@@ -169,6 +216,7 @@ export interface FileRouteTypes {
     | '/teacher/plans'
     | '/teacher/quizzes'
     | '/teacher/settings'
+    | '/student/quiz/$quizId'
   id:
     | '__root__'
     | '/'
@@ -176,6 +224,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/dashboard'
     | '/_authenticated/select-role'
+    | '/_authenticated/student/dashboard'
+    | '/_authenticated/student/homework'
+    | '/_authenticated/student/quiz-practice'
     | '/_authenticated/teacher/advanced'
     | '/_authenticated/teacher/analytics'
     | '/_authenticated/teacher/content'
@@ -184,6 +235,7 @@ export interface FileRouteTypes {
     | '/_authenticated/teacher/plans'
     | '/_authenticated/teacher/quizzes'
     | '/_authenticated/teacher/settings'
+    | '/_authenticated/student/quiz/$quizId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -285,12 +337,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeacherAdvancedRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/student/quiz-practice': {
+      id: '/_authenticated/student/quiz-practice'
+      path: '/student/quiz-practice'
+      fullPath: '/student/quiz-practice'
+      preLoaderRoute: typeof AuthenticatedStudentQuizPracticeRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/student/homework': {
+      id: '/_authenticated/student/homework'
+      path: '/student/homework'
+      fullPath: '/student/homework'
+      preLoaderRoute: typeof AuthenticatedStudentHomeworkRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/student/dashboard': {
+      id: '/_authenticated/student/dashboard'
+      path: '/student/dashboard'
+      fullPath: '/student/dashboard'
+      preLoaderRoute: typeof AuthenticatedStudentDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/student/quiz/$quizId': {
+      id: '/_authenticated/student/quiz/$quizId'
+      path: '/student/quiz/$quizId'
+      fullPath: '/student/quiz/$quizId'
+      preLoaderRoute: typeof AuthenticatedStudentQuizQuizIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedSelectRoleRoute: typeof AuthenticatedSelectRoleRoute
+  AuthenticatedStudentDashboardRoute: typeof AuthenticatedStudentDashboardRoute
+  AuthenticatedStudentHomeworkRoute: typeof AuthenticatedStudentHomeworkRoute
+  AuthenticatedStudentQuizPracticeRoute: typeof AuthenticatedStudentQuizPracticeRoute
   AuthenticatedTeacherAdvancedRoute: typeof AuthenticatedTeacherAdvancedRoute
   AuthenticatedTeacherAnalyticsRoute: typeof AuthenticatedTeacherAnalyticsRoute
   AuthenticatedTeacherContentRoute: typeof AuthenticatedTeacherContentRoute
@@ -299,11 +382,15 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTeacherPlansRoute: typeof AuthenticatedTeacherPlansRoute
   AuthenticatedTeacherQuizzesRoute: typeof AuthenticatedTeacherQuizzesRoute
   AuthenticatedTeacherSettingsRoute: typeof AuthenticatedTeacherSettingsRoute
+  AuthenticatedStudentQuizQuizIdRoute: typeof AuthenticatedStudentQuizQuizIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedSelectRoleRoute: AuthenticatedSelectRoleRoute,
+  AuthenticatedStudentDashboardRoute: AuthenticatedStudentDashboardRoute,
+  AuthenticatedStudentHomeworkRoute: AuthenticatedStudentHomeworkRoute,
+  AuthenticatedStudentQuizPracticeRoute: AuthenticatedStudentQuizPracticeRoute,
   AuthenticatedTeacherAdvancedRoute: AuthenticatedTeacherAdvancedRoute,
   AuthenticatedTeacherAnalyticsRoute: AuthenticatedTeacherAnalyticsRoute,
   AuthenticatedTeacherContentRoute: AuthenticatedTeacherContentRoute,
@@ -312,6 +399,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedTeacherPlansRoute: AuthenticatedTeacherPlansRoute,
   AuthenticatedTeacherQuizzesRoute: AuthenticatedTeacherQuizzesRoute,
   AuthenticatedTeacherSettingsRoute: AuthenticatedTeacherSettingsRoute,
+  AuthenticatedStudentQuizQuizIdRoute: AuthenticatedStudentQuizQuizIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
