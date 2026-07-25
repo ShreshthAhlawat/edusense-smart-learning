@@ -9,38 +9,205 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedSelectRoleRouteImport } from './routes/_authenticated.select-role'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as AuthenticatedTeacherSettingsRouteImport } from './routes/_authenticated.teacher.settings'
+import { Route as AuthenticatedTeacherQuizzesRouteImport } from './routes/_authenticated.teacher.quizzes'
+import { Route as AuthenticatedTeacherPlansRouteImport } from './routes/_authenticated.teacher.plans'
+import { Route as AuthenticatedTeacherMyPlanRouteImport } from './routes/_authenticated.teacher.my-plan'
+import { Route as AuthenticatedTeacherDashboardRouteImport } from './routes/_authenticated.teacher.dashboard'
+import { Route as AuthenticatedTeacherContentRouteImport } from './routes/_authenticated.teacher.content'
+import { Route as AuthenticatedTeacherAnalyticsRouteImport } from './routes/_authenticated.teacher.analytics'
+import { Route as AuthenticatedTeacherAdvancedRouteImport } from './routes/_authenticated.teacher.advanced'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedSelectRoleRoute = AuthenticatedSelectRoleRouteImport.update({
+  id: '/select-role',
+  path: '/select-role',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTeacherSettingsRoute =
+  AuthenticatedTeacherSettingsRouteImport.update({
+    id: '/teacher/settings',
+    path: '/teacher/settings',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTeacherQuizzesRoute =
+  AuthenticatedTeacherQuizzesRouteImport.update({
+    id: '/teacher/quizzes',
+    path: '/teacher/quizzes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTeacherPlansRoute =
+  AuthenticatedTeacherPlansRouteImport.update({
+    id: '/teacher/plans',
+    path: '/teacher/plans',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTeacherMyPlanRoute =
+  AuthenticatedTeacherMyPlanRouteImport.update({
+    id: '/teacher/my-plan',
+    path: '/teacher/my-plan',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTeacherDashboardRoute =
+  AuthenticatedTeacherDashboardRouteImport.update({
+    id: '/teacher/dashboard',
+    path: '/teacher/dashboard',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTeacherContentRoute =
+  AuthenticatedTeacherContentRouteImport.update({
+    id: '/teacher/content',
+    path: '/teacher/content',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTeacherAnalyticsRoute =
+  AuthenticatedTeacherAnalyticsRouteImport.update({
+    id: '/teacher/analytics',
+    path: '/teacher/analytics',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTeacherAdvancedRoute =
+  AuthenticatedTeacherAdvancedRouteImport.update({
+    id: '/teacher/advanced',
+    path: '/teacher/advanced',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/select-role': typeof AuthenticatedSelectRoleRoute
+  '/teacher/advanced': typeof AuthenticatedTeacherAdvancedRoute
+  '/teacher/analytics': typeof AuthenticatedTeacherAnalyticsRoute
+  '/teacher/content': typeof AuthenticatedTeacherContentRoute
+  '/teacher/dashboard': typeof AuthenticatedTeacherDashboardRoute
+  '/teacher/my-plan': typeof AuthenticatedTeacherMyPlanRoute
+  '/teacher/plans': typeof AuthenticatedTeacherPlansRoute
+  '/teacher/quizzes': typeof AuthenticatedTeacherQuizzesRoute
+  '/teacher/settings': typeof AuthenticatedTeacherSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/select-role': typeof AuthenticatedSelectRoleRoute
+  '/teacher/advanced': typeof AuthenticatedTeacherAdvancedRoute
+  '/teacher/analytics': typeof AuthenticatedTeacherAnalyticsRoute
+  '/teacher/content': typeof AuthenticatedTeacherContentRoute
+  '/teacher/dashboard': typeof AuthenticatedTeacherDashboardRoute
+  '/teacher/my-plan': typeof AuthenticatedTeacherMyPlanRoute
+  '/teacher/plans': typeof AuthenticatedTeacherPlansRoute
+  '/teacher/quizzes': typeof AuthenticatedTeacherQuizzesRoute
+  '/teacher/settings': typeof AuthenticatedTeacherSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/select-role': typeof AuthenticatedSelectRoleRoute
+  '/_authenticated/teacher/advanced': typeof AuthenticatedTeacherAdvancedRoute
+  '/_authenticated/teacher/analytics': typeof AuthenticatedTeacherAnalyticsRoute
+  '/_authenticated/teacher/content': typeof AuthenticatedTeacherContentRoute
+  '/_authenticated/teacher/dashboard': typeof AuthenticatedTeacherDashboardRoute
+  '/_authenticated/teacher/my-plan': typeof AuthenticatedTeacherMyPlanRoute
+  '/_authenticated/teacher/plans': typeof AuthenticatedTeacherPlansRoute
+  '/_authenticated/teacher/quizzes': typeof AuthenticatedTeacherQuizzesRoute
+  '/_authenticated/teacher/settings': typeof AuthenticatedTeacherSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/select-role'
+    | '/teacher/advanced'
+    | '/teacher/analytics'
+    | '/teacher/content'
+    | '/teacher/dashboard'
+    | '/teacher/my-plan'
+    | '/teacher/plans'
+    | '/teacher/quizzes'
+    | '/teacher/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/select-role'
+    | '/teacher/advanced'
+    | '/teacher/analytics'
+    | '/teacher/content'
+    | '/teacher/dashboard'
+    | '/teacher/my-plan'
+    | '/teacher/plans'
+    | '/teacher/quizzes'
+    | '/teacher/settings'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/select-role'
+    | '/_authenticated/teacher/advanced'
+    | '/_authenticated/teacher/analytics'
+    | '/_authenticated/teacher/content'
+    | '/_authenticated/teacher/dashboard'
+    | '/_authenticated/teacher/my-plan'
+    | '/_authenticated/teacher/plans'
+    | '/_authenticated/teacher/quizzes'
+    | '/_authenticated/teacher/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +215,114 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/select-role': {
+      id: '/_authenticated/select-role'
+      path: '/select-role'
+      fullPath: '/select-role'
+      preLoaderRoute: typeof AuthenticatedSelectRoleRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teacher/settings': {
+      id: '/_authenticated/teacher/settings'
+      path: '/teacher/settings'
+      fullPath: '/teacher/settings'
+      preLoaderRoute: typeof AuthenticatedTeacherSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teacher/quizzes': {
+      id: '/_authenticated/teacher/quizzes'
+      path: '/teacher/quizzes'
+      fullPath: '/teacher/quizzes'
+      preLoaderRoute: typeof AuthenticatedTeacherQuizzesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teacher/plans': {
+      id: '/_authenticated/teacher/plans'
+      path: '/teacher/plans'
+      fullPath: '/teacher/plans'
+      preLoaderRoute: typeof AuthenticatedTeacherPlansRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teacher/my-plan': {
+      id: '/_authenticated/teacher/my-plan'
+      path: '/teacher/my-plan'
+      fullPath: '/teacher/my-plan'
+      preLoaderRoute: typeof AuthenticatedTeacherMyPlanRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teacher/dashboard': {
+      id: '/_authenticated/teacher/dashboard'
+      path: '/teacher/dashboard'
+      fullPath: '/teacher/dashboard'
+      preLoaderRoute: typeof AuthenticatedTeacherDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teacher/content': {
+      id: '/_authenticated/teacher/content'
+      path: '/teacher/content'
+      fullPath: '/teacher/content'
+      preLoaderRoute: typeof AuthenticatedTeacherContentRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teacher/analytics': {
+      id: '/_authenticated/teacher/analytics'
+      path: '/teacher/analytics'
+      fullPath: '/teacher/analytics'
+      preLoaderRoute: typeof AuthenticatedTeacherAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teacher/advanced': {
+      id: '/_authenticated/teacher/advanced'
+      path: '/teacher/advanced'
+      fullPath: '/teacher/advanced'
+      preLoaderRoute: typeof AuthenticatedTeacherAdvancedRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSelectRoleRoute: typeof AuthenticatedSelectRoleRoute
+  AuthenticatedTeacherAdvancedRoute: typeof AuthenticatedTeacherAdvancedRoute
+  AuthenticatedTeacherAnalyticsRoute: typeof AuthenticatedTeacherAnalyticsRoute
+  AuthenticatedTeacherContentRoute: typeof AuthenticatedTeacherContentRoute
+  AuthenticatedTeacherDashboardRoute: typeof AuthenticatedTeacherDashboardRoute
+  AuthenticatedTeacherMyPlanRoute: typeof AuthenticatedTeacherMyPlanRoute
+  AuthenticatedTeacherPlansRoute: typeof AuthenticatedTeacherPlansRoute
+  AuthenticatedTeacherQuizzesRoute: typeof AuthenticatedTeacherQuizzesRoute
+  AuthenticatedTeacherSettingsRoute: typeof AuthenticatedTeacherSettingsRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSelectRoleRoute: AuthenticatedSelectRoleRoute,
+  AuthenticatedTeacherAdvancedRoute: AuthenticatedTeacherAdvancedRoute,
+  AuthenticatedTeacherAnalyticsRoute: AuthenticatedTeacherAnalyticsRoute,
+  AuthenticatedTeacherContentRoute: AuthenticatedTeacherContentRoute,
+  AuthenticatedTeacherDashboardRoute: AuthenticatedTeacherDashboardRoute,
+  AuthenticatedTeacherMyPlanRoute: AuthenticatedTeacherMyPlanRoute,
+  AuthenticatedTeacherPlansRoute: AuthenticatedTeacherPlansRoute,
+  AuthenticatedTeacherQuizzesRoute: AuthenticatedTeacherQuizzesRoute,
+  AuthenticatedTeacherSettingsRoute: AuthenticatedTeacherSettingsRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
