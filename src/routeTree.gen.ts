@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PaymentSuccessRouteImport } from './routes/payment-success'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
@@ -32,6 +33,11 @@ import { Route as AuthenticatedStudentDashboardRouteImport } from './routes/_aut
 import { Route as AuthenticatedStudentToolSlugRouteImport } from './routes/_authenticated.student.tool.$slug'
 import { Route as AuthenticatedStudentQuizQuizIdRouteImport } from './routes/_authenticated.student.quiz.$quizId'
 
+const PaymentSuccessRoute = PaymentSuccessRouteImport.update({
+  id: '/payment-success',
+  path: '/payment-success',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -161,6 +167,7 @@ const AuthenticatedStudentQuizQuizIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/payment-success': typeof PaymentSuccessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/select-role': typeof AuthenticatedSelectRoleRoute
   '/content/$id': typeof ContentIdRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/payment-success': typeof PaymentSuccessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/select-role': typeof AuthenticatedSelectRoleRoute
   '/content/$id': typeof ContentIdRoute
@@ -209,6 +217,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
+  '/payment-success': typeof PaymentSuccessRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/select-role': typeof AuthenticatedSelectRoleRoute
   '/content/$id': typeof ContentIdRoute
@@ -234,6 +243,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/payment-success'
     | '/dashboard'
     | '/select-role'
     | '/content/$id'
@@ -257,6 +267,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/payment-success'
     | '/dashboard'
     | '/select-role'
     | '/content/$id'
@@ -281,6 +292,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/payment-success'
     | '/_authenticated/dashboard'
     | '/_authenticated/select-role'
     | '/content/$id'
@@ -306,11 +318,19 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
+  PaymentSuccessRoute: typeof PaymentSuccessRoute
   ContentIdRoute: typeof ContentIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/payment-success': {
+      id: '/payment-success'
+      path: '/payment-success'
+      fullPath: '/payment-success'
+      preLoaderRoute: typeof PaymentSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -518,6 +538,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
+  PaymentSuccessRoute: PaymentSuccessRoute,
   ContentIdRoute: ContentIdRoute,
 }
 export const routeTree = rootRouteImport
