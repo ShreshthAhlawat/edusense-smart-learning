@@ -12,10 +12,10 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "EduSense — Privacy-first AI classroom for teachers & students" },
+      { title: "EduSense" },
       { name: "description", content: "Create quizzes, spot struggling topics, and give students personalized practice with EduSense — the premium AI-assisted classroom platform." },
-      { property: "og:title", content: "EduSense — Privacy-first AI classroom" },
-      { property: "og:description", content: "Create quizzes, spot struggling topics, and give students personalized practice." },
+      { property: "og:title", content: "EduSense" },
+      { property: "og:description", content: "Create quizzes, spot struggling topics, and give students personalized practice with EduSense — the premium AI-assisted classroom platform." },
     ],
   }),
   component: Landing,
