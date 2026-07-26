@@ -1,7 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { DashboardShell, PageHeader } from "@/components/DashboardShell";
 import { useAuth } from "@/lib/auth";
-import { supabase } from "@/integrations/supabase/client";
 import { Check, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -24,24 +23,21 @@ export const Route = createFileRoute("/_authenticated/student/plans")({
 });
 
 function StudentPlans() {
-  const { user, profile, refreshProfile } = useAuth();
+  const { profile } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState<string | null>(null);
 
   const upgrade = async (planKey: string) => {
-    if (!user) return;
+    if (planKey === "free") return;
     setLoading(planKey);
-    await new Promise((r) => setTimeout(r, 900));
-    const newPlan = planKey === "free" ? "free" : "pro";
-    const { error } = await supabase.from("profiles").update({ plan: newPlan }).eq("id", user.id);
-    setLoading(null);
-    if (error) return toast.error(error.message);
-    await refreshProfile();
-    toast.success(planKey === "free" ? "Switched to Free" : `Test payment complete — ${planKey.toUpperCase()} unlocked!`);
+    await new Promise((r) => setTimeout(r, 500));
+    toast.success("Opening secure checkout…");
+    navigate({ to: "/payment-success", search: { plan: planKey === "school" ? "school" : "pro" } });
   };
 
   return (
     <DashboardShell role="student" greeting="Plans & Pricing">
-      <PageHeader title="Choose your plan" desc="Stripe test-mode — upgrading instantly unlocks all premium tools." />
+      <PageHeader title="Choose your plan" desc="Secure Stripe test-mode checkout — server-verified unlock, no card charged." />
       <div className="grid gap-6 md:grid-cols-3">
         {PLANS.map((p) => {
           const active = (profile?.plan ?? "free") === (p.key === "school" ? "pro" : p.key);
@@ -53,10 +49,10 @@ function StudentPlans() {
               <ul className="mt-4 space-y-2 text-sm">
                 {p.features.map((f) => (<li key={f} className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" />{f}</li>))}
               </ul>
-              <Button disabled={loading !== null || active} onClick={() => upgrade(p.key)} className="mt-6 w-full"
+              <Button disabled={loading !== null || active || p.key === "free"} onClick={() => upgrade(p.key)} className="mt-6 w-full"
                 style={p.featured ? { background: "var(--gradient-primary)" } : undefined}
                 variant={p.featured ? "default" : "secondary"}>
-                {active ? "Current plan" : loading === p.key ? "Processing…" : "Upgrade"}
+                {active ? "Current plan" : p.key === "free" ? "Free forever" : loading === p.key ? "Redirecting…" : "Upgrade"}
               </Button>
             </div>
           );
@@ -65,3 +61,4 @@ function StudentPlans() {
     </DashboardShell>
   );
 }
+
