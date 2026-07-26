@@ -184,6 +184,45 @@ export type Database = {
         }
         Relationships: []
       }
+      teacher_content: {
+        Row: {
+          class_level: string | null
+          content_markdown: string
+          created_at: string
+          id: string
+          kind: string
+          language: string | null
+          teacher_id: string
+          title: string
+          topic: string
+          updated_at: string
+        }
+        Insert: {
+          class_level?: string | null
+          content_markdown: string
+          created_at?: string
+          id?: string
+          kind: string
+          language?: string | null
+          teacher_id: string
+          title: string
+          topic: string
+          updated_at?: string
+        }
+        Update: {
+          class_level?: string | null
+          content_markdown?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          language?: string | null
+          teacher_id?: string
+          title?: string
+          topic?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
