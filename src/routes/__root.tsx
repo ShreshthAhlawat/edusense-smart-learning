@@ -79,8 +79,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "EduSense" },
       { name: "twitter:description", content: "Create quizzes, spot struggling topics, and give students personalized practice with EduSense — the premium AI-assisted classroom platform." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/5e5fbf13-827f-4ec4-9747-a51fa404c2bc" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/5e5fbf13-827f-4ec4-9747-a51fa404c2bc" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/mhp60WENcPeqU58oMDy9kuqD5mC2/social-images/social-1785056128788-Modern_education_logo_with_icons.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/mhp60WENcPeqU58oMDy9kuqD5mC2/social-images/social-1785056128788-Modern_education_logo_with_icons.webp" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
