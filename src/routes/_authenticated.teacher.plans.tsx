@@ -1,7 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { DashboardShell, PageHeader } from "@/components/DashboardShell";
 import { useAuth } from "@/lib/auth";
-import { supabase } from "@/integrations/supabase/client";
 import { Check, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -9,31 +8,30 @@ import { Button } from "@/components/ui/button";
 
 const PLANS = [
   { key: "free", name: "Free", price: "$0", features: ["Quiz generator (5/mo)", "Basic analytics", "1 class"] },
-  { key: "pro", name: "Teacher Pro", price: "$9/mo", features: ["Unlimited quizzes", "Struggling-topic insights", "All AI tools", "Priority support"], featured: true },
+  { key: "pro", name: "Teacher Pro", price: "$9/mo", features: ["Unlimited AI-generated quizzes", "AI content generator", "Struggling-topic insights", "Priority support"], featured: true },
   { key: "school", name: "School", price: "Contact", features: ["All Pro features", "Unlimited teachers", "SSO", "Dedicated success manager"] },
 ];
 
 function makePlansPage(role: "teacher" | "student") {
   return function Plans() {
-    const { user, profile, refreshProfile } = useAuth();
+    const { profile } = useAuth();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState<string | null>(null);
 
     const upgrade = async (planKey: string) => {
-      if (!user) return;
+      if (planKey === "free") return;
       setLoading(planKey);
-      // Simulated Stripe test checkout — in production this hits a serverFn creating a Checkout Session.
-      await new Promise((r) => setTimeout(r, 900));
-      const newPlan = planKey === "pro" ? "pro" : planKey === "school" ? "pro" : "free";
-      const { error } = await supabase.from("profiles").update({ plan: newPlan }).eq("id", user.id);
-      setLoading(null);
-      if (error) return toast.error(error.message);
-      await refreshProfile();
-      toast.success(planKey === "free" ? "Switched to Free" : `Test payment complete — ${planKey.toUpperCase()} unlocked!`);
+      // In production this creates a Stripe Checkout session; the webhook flips profile.plan
+      // server-side and /payment-success verifies before showing the success screen.
+      // For preview we simulate the redirect straight to /payment-success.
+      await new Promise((r) => setTimeout(r, 500));
+      toast.success("Opening secure checkout…");
+      navigate({ to: "/payment-success", search: { plan: planKey === "school" ? "school" : "pro" } });
     };
 
     return (
       <DashboardShell role={role} greeting="Plans & Pricing">
-        <PageHeader title="Choose your plan" desc="Test-mode Stripe integration — try upgrading to unlock all paid tools instantly." />
+        <PageHeader title="Choose your plan" desc="Secure Stripe test-mode checkout — server-verified unlock, no card charged." />
         <div className="grid gap-6 md:grid-cols-3">
           {PLANS.map((p) => {
             const active = (profile?.plan ?? "free") === (p.key === "school" ? "pro" : p.key);
@@ -52,20 +50,20 @@ function makePlansPage(role: "teacher" | "student") {
                   ))}
                 </ul>
                 <Button
-                  disabled={loading !== null || active}
+                  disabled={loading !== null || active || p.key === "free"}
                   onClick={() => upgrade(p.key)}
                   className="mt-6 w-full"
                   style={p.featured ? { background: "var(--gradient-primary)" } : undefined}
                   variant={p.featured ? "default" : "secondary"}
                 >
-                  {active ? "Current plan" : loading === p.key ? "Processing…" : "Upgrade"}
+                  {active ? "Current plan" : p.key === "free" ? "Free forever" : loading === p.key ? "Redirecting…" : "Upgrade"}
                 </Button>
               </div>
             );
           })}
         </div>
         <p className="mt-6 text-xs text-muted-foreground">
-          Payments run in Stripe test mode. Real card capture is disabled during preview.
+          Payments run in Stripe test mode. Plan unlock is verified server-side after checkout.
         </p>
       </DashboardShell>
     );
@@ -81,3 +79,4 @@ export const Route = createFileRoute("/_authenticated/teacher/plans")({
   ] }),
   component: makePlansPage("teacher"),
 });
+

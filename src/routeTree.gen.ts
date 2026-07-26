@@ -9,9 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PaymentSuccessRouteImport } from './routes/payment-success'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ContentIdRouteImport } from './routes/content.$id'
 import { Route as AuthenticatedSelectRoleRouteImport } from './routes/_authenticated.select-role'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedTeacherSettingsRouteImport } from './routes/_authenticated.teacher.settings'
@@ -31,6 +33,11 @@ import { Route as AuthenticatedStudentDashboardRouteImport } from './routes/_aut
 import { Route as AuthenticatedStudentToolSlugRouteImport } from './routes/_authenticated.student.tool.$slug'
 import { Route as AuthenticatedStudentQuizQuizIdRouteImport } from './routes/_authenticated.student.quiz.$quizId'
 
+const PaymentSuccessRoute = PaymentSuccessRouteImport.update({
+  id: '/payment-success',
+  path: '/payment-success',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -43,6 +50,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContentIdRoute = ContentIdRouteImport.update({
+  id: '/content/$id',
+  path: '/content/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedSelectRoleRoute = AuthenticatedSelectRoleRouteImport.update({
@@ -155,8 +167,10 @@ const AuthenticatedStudentQuizQuizIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/payment-success': typeof PaymentSuccessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/select-role': typeof AuthenticatedSelectRoleRoute
+  '/content/$id': typeof ContentIdRoute
   '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
   '/student/homework': typeof AuthenticatedStudentHomeworkRoute
   '/student/my-plan': typeof AuthenticatedStudentMyPlanRoute
@@ -177,8 +191,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/payment-success': typeof PaymentSuccessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/select-role': typeof AuthenticatedSelectRoleRoute
+  '/content/$id': typeof ContentIdRoute
   '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
   '/student/homework': typeof AuthenticatedStudentHomeworkRoute
   '/student/my-plan': typeof AuthenticatedStudentMyPlanRoute
@@ -201,8 +217,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
+  '/payment-success': typeof PaymentSuccessRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/select-role': typeof AuthenticatedSelectRoleRoute
+  '/content/$id': typeof ContentIdRoute
   '/_authenticated/student/dashboard': typeof AuthenticatedStudentDashboardRoute
   '/_authenticated/student/homework': typeof AuthenticatedStudentHomeworkRoute
   '/_authenticated/student/my-plan': typeof AuthenticatedStudentMyPlanRoute
@@ -225,8 +243,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/payment-success'
     | '/dashboard'
     | '/select-role'
+    | '/content/$id'
     | '/student/dashboard'
     | '/student/homework'
     | '/student/my-plan'
@@ -247,8 +267,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/payment-success'
     | '/dashboard'
     | '/select-role'
+    | '/content/$id'
     | '/student/dashboard'
     | '/student/homework'
     | '/student/my-plan'
@@ -270,8 +292,10 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/payment-success'
     | '/_authenticated/dashboard'
     | '/_authenticated/select-role'
+    | '/content/$id'
     | '/_authenticated/student/dashboard'
     | '/_authenticated/student/homework'
     | '/_authenticated/student/my-plan'
@@ -294,10 +318,19 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
+  PaymentSuccessRoute: typeof PaymentSuccessRoute
+  ContentIdRoute: typeof ContentIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/payment-success': {
+      id: '/payment-success'
+      path: '/payment-success'
+      fullPath: '/payment-success'
+      preLoaderRoute: typeof PaymentSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -317,6 +350,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/content/$id': {
+      id: '/content/$id'
+      path: '/content/$id'
+      fullPath: '/content/$id'
+      preLoaderRoute: typeof ContentIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/select-role': {
@@ -498,17 +538,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
+  PaymentSuccessRoute: PaymentSuccessRoute,
+  ContentIdRoute: ContentIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

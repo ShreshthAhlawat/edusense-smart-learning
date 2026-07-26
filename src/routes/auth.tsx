@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Loader2, Mail, Lock } from "lucide-react";
+import { Loader2, Mail, Lock, User } from "lucide-react";
 
 const searchSchema = z.object({ mode: z.enum(["signup", "signin"]).optional() });
 
@@ -32,6 +32,7 @@ function AuthPage() {
   const [mode, setMode] = useState<"signin" | "signup">(initialMode === "signup" ? "signup" : "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const { user, profile } = useAuth();
   const navigate = useNavigate();
@@ -48,9 +49,13 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
+        if (!username.trim()) throw new Error("Please choose a username");
         const { error } = await supabase.auth.signUp({
           email, password,
-          options: { emailRedirectTo: window.location.origin + "/select-role" },
+          options: {
+            emailRedirectTo: window.location.origin + "/select-role",
+            data: { full_name: username.trim() },
+          },
         });
         if (error) throw error;
         toast.success("Account created! Redirecting…");
@@ -108,6 +113,15 @@ function AuthPage() {
           </div>
 
           <form onSubmit={submit} className="space-y-4">
+            {mode === "signup" && (
+              <div>
+                <Label htmlFor="username">Username</Label>
+                <div className="relative mt-1">
+                  <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input id="username" type="text" required minLength={2} value={username} onChange={(e) => setUsername(e.target.value)} className="pl-9" placeholder="Your name" />
+                </div>
+              </div>
+            )}
             <div>
               <Label htmlFor="email">Email</Label>
               <div className="relative mt-1">

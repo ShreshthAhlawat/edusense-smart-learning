@@ -3,9 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { DashboardShell, PageHeader, StatCard } from "@/components/DashboardShell";
-import { Users, FileQuestion, Activity, Crown, AlertTriangle, Check, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { Users, FileQuestion, Activity, Crown, AlertTriangle } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/teacher/dashboard")({
   head: () => ({ meta: [
@@ -40,26 +38,29 @@ function TeacherDashboard() {
     enabled: !!quizzes.data,
   });
 
-  const struggling = useQuery({
-    queryKey: ["struggling", user?.id],
-    queryFn: async () => {
-      const { data } = await supabase.from("struggling_topics").select("*").eq("teacher_id", user!.id).eq("status", "pending");
-      return data ?? [];
-    },
-    enabled: !!user,
-  });
+  // Real struggling topics: aggregate subtopic_breakdown across all attempts on this teacher's quizzes.
+  const struggling = (() => {
+    const agg: Record<string, { subject: string; correct: number; total: number }> = {};
+    (attempts.data ?? []).forEach((a: any) => {
+      const b = (a.subtopic_breakdown ?? {}) as Record<string, { correct: number; total: number }>;
+      Object.entries(b).forEach(([sub, v]) => {
+        const key = `${a.subject}::${sub}`;
+        if (!agg[key]) agg[key] = { subject: a.subject, correct: 0, total: 0 };
+        agg[key].correct += Number(v.correct ?? 0);
+        agg[key].total += Number(v.total ?? 0);
+      });
+    });
+    return Object.entries(agg)
+      .filter(([, v]) => v.total > 0)
+      .map(([key, v]) => ({ subject: v.subject, subtopic: key.split("::")[1], avg: Math.round((v.correct / v.total) * 100) }))
+      .sort((a, b) => a.avg - b.avg)
+      .slice(0, 4);
+  })();
 
   const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  const weekly = (attempts.data ?? []).filter((a) => new Date(a.taken_at).getTime() > weekAgo);
+  const weekly = (attempts.data ?? []).filter((a: any) => new Date(a.taken_at).getTime() > weekAgo);
   const activeClasses = new Set((quizzes.data ?? []).map((q) => q.subject)).size;
   const engagement = attempts.data && attempts.data.length ? Math.round((weekly.length / attempts.data.length) * 100) : 0;
-
-  const setStatus = async (id: string, status: "confirmed" | "dismissed") => {
-    const { error } = await supabase.from("struggling_topics").update({ status }).eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success(status === "confirmed" ? "Marked for follow-up" : "Dismissed");
-    struggling.refetch();
-  };
 
   return (
     <DashboardShell role="teacher" greeting="Teacher Dashboard">
@@ -77,23 +78,22 @@ function TeacherDashboard() {
             <AlertTriangle className="h-5 w-5 text-primary" />
             <h2 className="font-semibold">Struggling Topics</h2>
           </div>
-          {struggling.data && struggling.data.length > 0 ? (
+          {struggling.length > 0 ? (
             <ul className="space-y-3">
-              {struggling.data.map((s: any) => (
-                <li key={s.id} className="flex items-center justify-between rounded-lg bg-secondary/40 border border-border p-3">
-                  <div>
-                    <div className="text-sm font-medium">{s.subtopic}</div>
-                    <div className="text-xs text-muted-foreground">{s.subject} · avg score {Math.round(Number(s.avg_score))}%</div>
+              {struggling.map((s) => (
+                <li key={s.subject + s.subtopic} className="rounded-lg bg-secondary/40 border border-border p-3">
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="font-medium">{s.subtopic} <span className="text-muted-foreground text-xs">· {s.subject}</span></span>
+                    <span className={s.avg < 45 ? "text-destructive" : s.avg < 75 ? "text-yellow-400" : "text-green-400"}>{s.avg}%</span>
                   </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="secondary" onClick={() => setStatus(s.id, "confirmed")}><Check className="h-4 w-4" /></Button>
-                    <Button size="sm" variant="ghost" onClick={() => setStatus(s.id, "dismissed")}><X className="h-4 w-4" /></Button>
+                  <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+                    <div className="h-full" style={{ width: `${s.avg}%`, background: s.avg < 45 ? "oklch(0.65 0.24 25)" : s.avg < 75 ? "oklch(0.78 0.17 80)" : "oklch(0.75 0.18 155)" }} />
                   </div>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-muted-foreground">No insights yet. Once students take your quizzes, AI-flagged weak topics will appear here.</p>
+            <p className="text-sm text-muted-foreground">No insights yet. Once students take your quizzes, weak subtopics will appear here ranked by average score.</p>
           )}
         </div>
 
