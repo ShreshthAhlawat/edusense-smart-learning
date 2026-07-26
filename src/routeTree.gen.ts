@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ContentIdRouteImport } from './routes/content.$id'
 import { Route as AuthenticatedSelectRoleRouteImport } from './routes/_authenticated.select-role'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedTeacherSettingsRouteImport } from './routes/_authenticated.teacher.settings'
@@ -43,6 +44,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContentIdRoute = ContentIdRouteImport.update({
+  id: '/content/$id',
+  path: '/content/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedSelectRoleRoute = AuthenticatedSelectRoleRouteImport.update({
@@ -157,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/select-role': typeof AuthenticatedSelectRoleRoute
+  '/content/$id': typeof ContentIdRoute
   '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
   '/student/homework': typeof AuthenticatedStudentHomeworkRoute
   '/student/my-plan': typeof AuthenticatedStudentMyPlanRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/select-role': typeof AuthenticatedSelectRoleRoute
+  '/content/$id': typeof ContentIdRoute
   '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
   '/student/homework': typeof AuthenticatedStudentHomeworkRoute
   '/student/my-plan': typeof AuthenticatedStudentMyPlanRoute
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/select-role': typeof AuthenticatedSelectRoleRoute
+  '/content/$id': typeof ContentIdRoute
   '/_authenticated/student/dashboard': typeof AuthenticatedStudentDashboardRoute
   '/_authenticated/student/homework': typeof AuthenticatedStudentHomeworkRoute
   '/_authenticated/student/my-plan': typeof AuthenticatedStudentMyPlanRoute
@@ -227,6 +236,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/select-role'
+    | '/content/$id'
     | '/student/dashboard'
     | '/student/homework'
     | '/student/my-plan'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/select-role'
+    | '/content/$id'
     | '/student/dashboard'
     | '/student/homework'
     | '/student/my-plan'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/dashboard'
     | '/_authenticated/select-role'
+    | '/content/$id'
     | '/_authenticated/student/dashboard'
     | '/_authenticated/student/homework'
     | '/_authenticated/student/my-plan'
@@ -294,6 +306,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ContentIdRoute: typeof ContentIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -317,6 +330,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/content/$id': {
+      id: '/content/$id'
+      path: '/content/$id'
+      fullPath: '/content/$id'
+      preLoaderRoute: typeof ContentIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/select-role': {
@@ -498,6 +518,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
+  ContentIdRoute: ContentIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
