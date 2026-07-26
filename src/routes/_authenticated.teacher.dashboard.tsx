@@ -40,26 +40,24 @@ function TeacherDashboard() {
     enabled: !!quizzes.data,
   });
 
-  const struggling = useQuery({
-    queryKey: ["struggling", user?.id],
-    queryFn: async () => {
-      const { data } = await supabase.from("struggling_topics").select("*").eq("teacher_id", user!.id).eq("status", "pending");
-      return data ?? [];
-    },
-    enabled: !!user,
-  });
-
-  const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  const weekly = (attempts.data ?? []).filter((a) => new Date(a.taken_at).getTime() > weekAgo);
-  const activeClasses = new Set((quizzes.data ?? []).map((q) => q.subject)).size;
-  const engagement = attempts.data && attempts.data.length ? Math.round((weekly.length / attempts.data.length) * 100) : 0;
-
-  const setStatus = async (id: string, status: "confirmed" | "dismissed") => {
-    const { error } = await supabase.from("struggling_topics").update({ status }).eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success(status === "confirmed" ? "Marked for follow-up" : "Dismissed");
-    struggling.refetch();
-  };
+  // Real struggling topics: aggregate subtopic_breakdown across all attempts on this teacher's quizzes.
+  const struggling = (() => {
+    const agg: Record<string, { subject: string; correct: number; total: number }> = {};
+    (attempts.data ?? []).forEach((a: any) => {
+      const b = (a.subtopic_breakdown ?? {}) as Record<string, { correct: number; total: number }>;
+      Object.entries(b).forEach(([sub, v]) => {
+        const key = `${a.subject}::${sub}`;
+        if (!agg[key]) agg[key] = { subject: a.subject, correct: 0, total: 0 };
+        agg[key].correct += Number(v.correct ?? 0);
+        agg[key].total += Number(v.total ?? 0);
+      });
+    });
+    return Object.entries(agg)
+      .filter(([, v]) => v.total > 0)
+      .map(([key, v]) => ({ subject: v.subject, subtopic: key.split("::")[1], avg: Math.round((v.correct / v.total) * 100) }))
+      .sort((a, b) => a.avg - b.avg)
+      .slice(0, 4);
+  })();
 
   return (
     <DashboardShell role="teacher" greeting="Teacher Dashboard">

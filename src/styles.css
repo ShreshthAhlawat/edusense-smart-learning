@@ -209,3 +209,28 @@
 .animate-float { animation: float 6s ease-in-out infinite; }
 .animate-pulse-glow { animation: pulse-glow 4s ease-in-out infinite; }
 .animate-fade-in-up { animation: fade-in-up 0.6s ease-out both; }
+
+@keyframes checkmark-draw {
+  0% { stroke-dashoffset: 100; opacity: 0; }
+  30% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+@keyframes success-burst {
+  0% { transform: scale(0.6); opacity: 0; box-shadow: 0 0 0 0 oklch(0.65 0.22 280 / 0.6); }
+  60% { transform: scale(1.05); opacity: 1; box-shadow: 0 0 0 30px oklch(0.65 0.22 280 / 0); }
+  100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 oklch(0.65 0.22 280 / 0); }
+}
+.animate-checkmark { stroke-dasharray: 100; animation: checkmark-draw 0.7s ease-out 0.2s both; }
+.animate-success-burst { animation: success-burst 0.9s ease-out both; }
+
+@media print {
+  body { background: white !important; color: black !important; }
+  .no-print, header, aside, nav, footer { display: none !important; }
+  .glass, .glass-strong { background: white !important; border: none !important; box-shadow: none !important; backdrop-filter: none !important; }
+  .print-area, .print-area * { color: black !important; }
+  .print-only { display: block !important; }
+  main { padding: 0 !important; }
+  article.prose { color: black !important; }
+  article.prose * { color: black !important; }
+}
+.print-only { display: none; }
