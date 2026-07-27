@@ -13,7 +13,9 @@ import { Route as PaymentSuccessRouteImport } from './routes/payment-success'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as QuizQuizIdRouteImport } from './routes/quiz.$quizId'
 import { Route as ContentIdRouteImport } from './routes/content.$id'
+import { Route as AuthenticatedVrLearningRouteImport } from './routes/_authenticated.vr-learning'
 import { Route as AuthenticatedSelectRoleRouteImport } from './routes/_authenticated.select-role'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedTeacherSettingsRouteImport } from './routes/_authenticated.teacher.settings'
@@ -30,6 +32,7 @@ import { Route as AuthenticatedStudentPlansRouteImport } from './routes/_authent
 import { Route as AuthenticatedStudentMyPlanRouteImport } from './routes/_authenticated.student.my-plan'
 import { Route as AuthenticatedStudentHomeworkRouteImport } from './routes/_authenticated.student.homework'
 import { Route as AuthenticatedStudentDashboardRouteImport } from './routes/_authenticated.student.dashboard'
+import { Route as AuthenticatedAdminCodesRouteImport } from './routes/_authenticated.admin.codes'
 import { Route as AuthenticatedStudentToolSlugRouteImport } from './routes/_authenticated.student.tool.$slug'
 import { Route as AuthenticatedStudentQuizQuizIdRouteImport } from './routes/_authenticated.student.quiz.$quizId'
 
@@ -52,10 +55,20 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QuizQuizIdRoute = QuizQuizIdRouteImport.update({
+  id: '/quiz/$quizId',
+  path: '/quiz/$quizId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContentIdRoute = ContentIdRouteImport.update({
   id: '/content/$id',
   path: '/content/$id',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedVrLearningRoute = AuthenticatedVrLearningRouteImport.update({
+  id: '/vr-learning',
+  path: '/vr-learning',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedSelectRoleRoute = AuthenticatedSelectRoleRouteImport.update({
   id: '/select-role',
@@ -151,6 +164,11 @@ const AuthenticatedStudentDashboardRoute =
     path: '/student/dashboard',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAdminCodesRoute = AuthenticatedAdminCodesRouteImport.update({
+  id: '/admin/codes',
+  path: '/admin/codes',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedStudentToolSlugRoute =
   AuthenticatedStudentToolSlugRouteImport.update({
     id: '/student/tool/$slug',
@@ -170,7 +188,10 @@ export interface FileRoutesByFullPath {
   '/payment-success': typeof PaymentSuccessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/select-role': typeof AuthenticatedSelectRoleRoute
+  '/vr-learning': typeof AuthenticatedVrLearningRoute
   '/content/$id': typeof ContentIdRoute
+  '/quiz/$quizId': typeof QuizQuizIdRoute
+  '/admin/codes': typeof AuthenticatedAdminCodesRoute
   '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
   '/student/homework': typeof AuthenticatedStudentHomeworkRoute
   '/student/my-plan': typeof AuthenticatedStudentMyPlanRoute
@@ -194,7 +215,10 @@ export interface FileRoutesByTo {
   '/payment-success': typeof PaymentSuccessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/select-role': typeof AuthenticatedSelectRoleRoute
+  '/vr-learning': typeof AuthenticatedVrLearningRoute
   '/content/$id': typeof ContentIdRoute
+  '/quiz/$quizId': typeof QuizQuizIdRoute
+  '/admin/codes': typeof AuthenticatedAdminCodesRoute
   '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
   '/student/homework': typeof AuthenticatedStudentHomeworkRoute
   '/student/my-plan': typeof AuthenticatedStudentMyPlanRoute
@@ -220,7 +244,10 @@ export interface FileRoutesById {
   '/payment-success': typeof PaymentSuccessRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/select-role': typeof AuthenticatedSelectRoleRoute
+  '/_authenticated/vr-learning': typeof AuthenticatedVrLearningRoute
   '/content/$id': typeof ContentIdRoute
+  '/quiz/$quizId': typeof QuizQuizIdRoute
+  '/_authenticated/admin/codes': typeof AuthenticatedAdminCodesRoute
   '/_authenticated/student/dashboard': typeof AuthenticatedStudentDashboardRoute
   '/_authenticated/student/homework': typeof AuthenticatedStudentHomeworkRoute
   '/_authenticated/student/my-plan': typeof AuthenticatedStudentMyPlanRoute
@@ -246,7 +273,10 @@ export interface FileRouteTypes {
     | '/payment-success'
     | '/dashboard'
     | '/select-role'
+    | '/vr-learning'
     | '/content/$id'
+    | '/quiz/$quizId'
+    | '/admin/codes'
     | '/student/dashboard'
     | '/student/homework'
     | '/student/my-plan'
@@ -270,7 +300,10 @@ export interface FileRouteTypes {
     | '/payment-success'
     | '/dashboard'
     | '/select-role'
+    | '/vr-learning'
     | '/content/$id'
+    | '/quiz/$quizId'
+    | '/admin/codes'
     | '/student/dashboard'
     | '/student/homework'
     | '/student/my-plan'
@@ -295,7 +328,10 @@ export interface FileRouteTypes {
     | '/payment-success'
     | '/_authenticated/dashboard'
     | '/_authenticated/select-role'
+    | '/_authenticated/vr-learning'
     | '/content/$id'
+    | '/quiz/$quizId'
+    | '/_authenticated/admin/codes'
     | '/_authenticated/student/dashboard'
     | '/_authenticated/student/homework'
     | '/_authenticated/student/my-plan'
@@ -320,6 +356,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   PaymentSuccessRoute: typeof PaymentSuccessRoute
   ContentIdRoute: typeof ContentIdRoute
+  QuizQuizIdRoute: typeof QuizQuizIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -352,12 +389,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/quiz/$quizId': {
+      id: '/quiz/$quizId'
+      path: '/quiz/$quizId'
+      fullPath: '/quiz/$quizId'
+      preLoaderRoute: typeof QuizQuizIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/content/$id': {
       id: '/content/$id'
       path: '/content/$id'
       fullPath: '/content/$id'
       preLoaderRoute: typeof ContentIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/vr-learning': {
+      id: '/_authenticated/vr-learning'
+      path: '/vr-learning'
+      fullPath: '/vr-learning'
+      preLoaderRoute: typeof AuthenticatedVrLearningRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/select-role': {
       id: '/_authenticated/select-role'
@@ -471,6 +522,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin/codes': {
+      id: '/_authenticated/admin/codes'
+      path: '/admin/codes'
+      fullPath: '/admin/codes'
+      preLoaderRoute: typeof AuthenticatedAdminCodesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/student/tool/$slug': {
       id: '/_authenticated/student/tool/$slug'
       path: '/student/tool/$slug'
@@ -491,6 +549,8 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedSelectRoleRoute: typeof AuthenticatedSelectRoleRoute
+  AuthenticatedVrLearningRoute: typeof AuthenticatedVrLearningRoute
+  AuthenticatedAdminCodesRoute: typeof AuthenticatedAdminCodesRoute
   AuthenticatedStudentDashboardRoute: typeof AuthenticatedStudentDashboardRoute
   AuthenticatedStudentHomeworkRoute: typeof AuthenticatedStudentHomeworkRoute
   AuthenticatedStudentMyPlanRoute: typeof AuthenticatedStudentMyPlanRoute
@@ -512,6 +572,8 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedSelectRoleRoute: AuthenticatedSelectRoleRoute,
+  AuthenticatedVrLearningRoute: AuthenticatedVrLearningRoute,
+  AuthenticatedAdminCodesRoute: AuthenticatedAdminCodesRoute,
   AuthenticatedStudentDashboardRoute: AuthenticatedStudentDashboardRoute,
   AuthenticatedStudentHomeworkRoute: AuthenticatedStudentHomeworkRoute,
   AuthenticatedStudentMyPlanRoute: AuthenticatedStudentMyPlanRoute,
@@ -540,6 +602,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   PaymentSuccessRoute: PaymentSuccessRoute,
   ContentIdRoute: ContentIdRoute,
+  QuizQuizIdRoute: QuizQuizIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

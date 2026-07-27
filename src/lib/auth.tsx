@@ -9,7 +9,7 @@ export type Profile = {
   username: string | null;
   email: string | null;
   role: "teacher" | "student" | null;
-  plan: "free" | "pro" | "admin";
+  plan: "free" | "pro" | "admin" | "school-pro";
   calendar_notes: Record<string, string>;
 };
 
