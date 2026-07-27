@@ -18,11 +18,13 @@ const teacherGroups: NavGroup[] = [
     { to: "/teacher/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "/teacher/quizzes", label: "Quiz Generator", icon: FileQuestion },
     { to: "/teacher/content", label: "Content Generators", icon: Sparkles },
+    { to: "/vr-learning", label: "VR Learning", icon: Glasses },
     { to: "/teacher/analytics", label: "Engagement Analytics", icon: BarChart3 },
     { to: "/teacher/advanced", label: "Advanced Analytics", icon: TrendingUp },
     { to: "/teacher/plans", label: "Plans & Pricing", icon: CreditCard },
     { to: "/teacher/my-plan", label: "My Active Plan", icon: UserCircle },
     { to: "/teacher/settings", label: "Settings", icon: Settings },
+    { to: "/admin/codes", label: "Admin — Codes", icon: Shield, adminOnly: true },
   ]},
 ];
 
