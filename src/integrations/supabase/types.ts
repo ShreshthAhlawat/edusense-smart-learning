@@ -77,36 +77,42 @@ export type Database = {
       quiz_attempts: {
         Row: {
           correct_count: number
+          guest_name: string | null
           id: string
           quiz_id: string | null
           score: number
-          student_id: string
+          student_id: string | null
           subject: string
           subtopic_breakdown: Json
           taken_at: string
           total_count: number
+          written_answers: Json
         }
         Insert: {
           correct_count?: number
+          guest_name?: string | null
           id?: string
           quiz_id?: string | null
           score?: number
-          student_id: string
+          student_id?: string | null
           subject: string
           subtopic_breakdown?: Json
           taken_at?: string
           total_count?: number
+          written_answers?: Json
         }
         Update: {
           correct_count?: number
+          guest_name?: string | null
           id?: string
           quiz_id?: string | null
           score?: number
-          student_id?: string
+          student_id?: string | null
           subject?: string
           subtopic_breakdown?: Json
           taken_at?: string
           total_count?: number
+          written_answers?: Json
         }
         Relationships: [
           {
@@ -151,6 +157,75 @@ export type Database = {
           subject?: string
           teacher_id?: string
           title?: string
+        }
+        Relationships: []
+      }
+      saved_models: {
+        Row: {
+          created_at: string
+          creator_name: string | null
+          id: string
+          license_type: string | null
+          sketchfab_uid: string
+          teacher_id: string
+          thumbnail_url: string | null
+          title: string
+          topic_name: string
+        }
+        Insert: {
+          created_at?: string
+          creator_name?: string | null
+          id?: string
+          license_type?: string | null
+          sketchfab_uid: string
+          teacher_id: string
+          thumbnail_url?: string | null
+          title: string
+          topic_name: string
+        }
+        Update: {
+          created_at?: string
+          creator_name?: string | null
+          id?: string
+          license_type?: string | null
+          sketchfab_uid?: string
+          teacher_id?: string
+          thumbnail_url?: string | null
+          title?: string
+          topic_name?: string
+        }
+        Relationships: []
+      }
+      school_licenses: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          id: string
+          max_students: number
+          max_teachers: number
+          students_redeemed: number
+          teachers_redeemed: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          id?: string
+          max_students?: number
+          max_teachers?: number
+          students_redeemed?: number
+          teachers_redeemed?: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          id?: string
+          max_students?: number
+          max_teachers?: number
+          students_redeemed?: number
+          teachers_redeemed?: number
         }
         Relationships: []
       }
@@ -228,10 +303,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      redeem_school_code: { Args: { _code: string }; Returns: Json }
     }
     Enums: {
-      user_plan: "free" | "pro" | "admin"
+      user_plan: "free" | "pro" | "admin" | "school-pro"
       user_role: "teacher" | "student"
     }
     CompositeTypes: {
@@ -360,7 +435,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      user_plan: ["free", "pro", "admin"],
+      user_plan: ["free", "pro", "admin", "school-pro"],
       user_role: ["teacher", "student"],
     },
   },
