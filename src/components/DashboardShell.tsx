@@ -24,7 +24,7 @@ const teacherGroups: NavGroup[] = [
     { to: "/teacher/plans", label: "Plans & Pricing", icon: CreditCard },
     { to: "/teacher/my-plan", label: "My Active Plan", icon: UserCircle },
     { to: "/teacher/settings", label: "Settings", icon: Settings },
-    { to: "/admin/codes", label: "Admin — Codes", icon: Shield, adminOnly: true },
+    { to: "/admin/codes", label: "Admin — Codes", icon: LayoutDashboard },
   ]},
 ];
 
