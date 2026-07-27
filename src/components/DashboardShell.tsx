@@ -33,6 +33,7 @@ const studentGroups: NavGroup[] = [
     { to: "/student/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "/student/quiz-practice", label: "Quiz Practice", icon: BookOpen },
     { to: "/student/homework", label: "Homework", icon: ListChecks },
+    { to: "/vr-learning", label: "VR Learning", icon: Glasses },
   ]},
   { label: "Paid Features", items: [
     { to: "/student/tool/chatbot", label: "Chatbot", icon: MessageSquare, locked: true },
