@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DashboardShell, PageHeader } from "@/components/DashboardShell";
+import { DashboardShell, PageHeader, isPaidPlan } from "@/components/DashboardShell";
 import { useAuth } from "@/lib/auth";
 import { Crown, Zap } from "lucide-react";
 import { Link } from "@tanstack/react-router";
@@ -8,7 +8,7 @@ function makeMyPlan(role: "teacher" | "student") {
   return function MyPlan() {
     const { profile } = useAuth();
     const plan = profile?.plan ?? "free";
-    const isPro = plan === "pro" || plan === "admin";
+    const isPro = isPaidPlan(plan);
     return (
       <DashboardShell role={role} greeting="My Active Plan">
         <PageHeader title="My Active Plan" />

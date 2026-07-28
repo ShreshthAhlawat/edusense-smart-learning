@@ -38,9 +38,9 @@ function PaymentSuccess() {
         await new Promise((r) => setTimeout(r, 400));
         await refreshProfile();
         tries += 1;
-        if (profile?.plan === "pro" || profile?.plan === "admin") break;
+        if (profile?.plan === "pro" || profile?.plan === "school-pro") break;
       }
-      if (!cancelled && profile?.plan !== "pro" && profile?.plan !== "admin") {
+      if (!cancelled && profile?.plan !== "pro" && profile?.plan !== "school-pro") {
         await supabase.from("profiles").update({ plan: "pro" }).eq("id", user.id);
         await refreshProfile();
       }

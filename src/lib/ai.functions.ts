@@ -31,18 +31,26 @@ const QuizInput = z.object({
   subject: z.string().min(1),
   classLevel: z.string().min(1),
   difficulty: z.string().min(1),
-  type: z.enum(["mcq", "written", "mixed"]).default("mcq"),
+  type: z.enum(["mcq", "written", "mixed", "MCQ", "True/False", "Short Answer"]).default("mcq"),
   count: z.number().int().min(3).max(20),
   language: z.string().min(1),
 });
 
+function normalizeType(t: string): "mcq" | "written" | "mixed" {
+  const s = t.toLowerCase();
+  if (s === "mcq" || s === "true/false") return "mcq";
+  if (s === "written" || s === "short answer") return "written";
+  return "mixed";
+}
+
 export const generateQuiz = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => QuizInput.parse(d))
   .handler(async ({ data }) => {
-    const typeInstruction = data.type === "mcq"
+    const type = normalizeType(data.type);
+    const typeInstruction = type === "mcq"
       ? `All questions must be multiple-choice with 4 options and a "type" field set to "mcq".`
-      : data.type === "written"
-      ? `All questions must be free-response (subjective). Set "type" to "written", and "options" to [], and "correct" to 0.`
+      : type === "written"
+      ? `All questions must be free-response (subjective). Set "type" to "written", "options" to [], and "correct" to 0.`
       : `Mix: about half multiple-choice (type "mcq", 4 options, correct index) and half free-response (type "written", options=[], correct=0).`;
 
     const prompt = `You are an expert ${data.subject} teacher creating a quiz for ${data.classLevel} students in ${data.language}.
@@ -51,7 +59,7 @@ Difficulty: ${data.difficulty}
 Number of questions: ${data.count}
 ${typeInstruction}
 
-Return ONLY valid JSON — an array of exactly ${data.count} objects. Each object MUST have:
+Return ONLY valid JSON — an object with a "questions" key whose value is an array of exactly ${data.count} question objects. Each object MUST have:
 - "type": "mcq" or "written"
 - "question": string
 - "options": array of exactly 4 strings for mcq, or [] for written
@@ -59,7 +67,7 @@ Return ONLY valid JSON — an array of exactly ${data.count} objects. Each objec
 - "subtopic": short subtopic label
 - "sample_answer": (only for written) a short model answer
 
-No prose, no markdown, no code fences — only the raw JSON array.`;
+No prose, no markdown, no code fences — only the raw JSON object.`;
 
     const json = await callGateway({
       messages: [
@@ -72,7 +80,7 @@ No prose, no markdown, no code fences — only the raw JSON array.`;
     const content = json.choices?.[0]?.message?.content ?? "";
     let parsed: any;
     try { parsed = JSON.parse(content); } catch {
-      const match = content.match(/\[[\s\S]*\]/);
+      const match = content.match(/\[[\s\S]*\]/) || content.match(/\{[\s\S]*\}/);
       if (!match) throw new Error("Model did not return valid JSON");
       parsed = JSON.parse(match[0]);
     }
@@ -93,6 +101,44 @@ No prose, no markdown, no code fences — only the raw JSON array.`;
 
     if (!questions.length) throw new Error("Quiz generation produced no valid questions");
     return { questions };
+  });
+
+// ---------- SAMPLE PAPER GENERATOR ----------
+const SampleInput = z.object({
+  topics: z.string().min(1),          // comma-separated
+  classLevel: z.string().default("Class 8"),
+  language: z.string().default("English"),
+  totalQuestions: z.number().int().min(6).max(30).default(12),
+});
+
+export const generateSamplePaper = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => SampleInput.parse(d))
+  .handler(async ({ data }) => {
+    const topicsClean = data.topics.split(",").map((t) => t.trim()).filter(Boolean).slice(0, 5);
+    if (topicsClean.length === 0) throw new Error("Please enter at least one topic");
+
+    const prompt = `You are an expert teacher creating a printable sample paper for ${data.classLevel} students in ${data.language}.
+Topics to cover (spread across the paper): ${topicsClean.join("; ")}.
+Total questions: ${data.totalQuestions}, mixing ~60% multiple-choice and ~40% written/subjective.
+
+Return the paper as clean markdown with:
+- A title line like "# Sample Paper: <topic list>"
+- A short instruction line ("Time: 60 minutes  ·  Total Marks: XX")
+- A "## Section A — Multiple Choice" heading, then numbered MCQs with options a/b/c/d
+- A "## Section B — Written Questions" heading, then numbered subjective questions with mark hints like "(3 marks)"
+- Finally a "## Answer Key" section listing MCQ answers and short sample answers for written questions.
+
+No code fences. No prose commentary outside the paper itself.`;
+
+    const json = await callGateway({
+      messages: [
+        { role: "system", content: `You are an experienced examiner formatting a printable sample paper in clean markdown. Language: ${data.language}.` },
+        { role: "user", content: prompt },
+      ],
+    });
+    const markdown = json.choices?.[0]?.message?.content ?? "";
+    if (!markdown.trim()) throw new Error("Sample paper generation returned nothing");
+    return { markdown, topics: topicsClean };
   });
 
 // ---------- CHATBOT ----------
@@ -149,7 +195,7 @@ export const generateContent = createServerFn({ method: "POST" })
     return { markdown };
   });
 
-// ---------- PDF SUMMARIZER (accepts pre-extracted text) ----------
+// ---------- PDF SUMMARIZER ----------
 const SummarizeInput = z.object({
   text: z.string().min(20).max(150_000),
   length: z.enum(["short", "detailed"]).default("short"),
@@ -211,32 +257,4 @@ export const explainTopic = createServerFn({ method: "POST" })
     const explanation = json.choices?.[0]?.message?.content ?? "";
     if (!explanation.trim()) throw new Error("Explanation was empty");
     return { explanation };
-  });
-
-// ---------- CONFIDENCE BOOSTER (coach chat) ----------
-const CoachInput = z.object({
-  mode: z.enum(["language", "interview"]),
-  messages: z.array(z.object({
-    role: z.enum(["user", "assistant"]),
-    content: z.string(),
-  })).min(1),
-  endSession: z.boolean().default(false),
-});
-export const coachTurn = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => CoachInput.parse(d))
-  .handler(async ({ data }) => {
-    const persona = data.mode === "language"
-      ? "You are an encouraging English-conversation coach for Indian students. Keep replies to 2-3 sentences. Ask engaging follow-up questions. Gently correct grammar or pronunciation cues after each user turn."
-      : "You are a mock interview coach for competitive exams and college interviews. Ask one question at a time, then evaluate the response briefly and ask the next. Keep replies short and clear.";
-    const closer = data.endSession
-      ? " The user has just ended the session. Give honest, kind, specific feedback on strengths, areas to improve, and 2 concrete next steps. Use markdown headings."
-      : "";
-    const json = await callGateway({
-      messages: [
-        { role: "system", content: persona + closer },
-        ...data.messages,
-      ],
-    });
-    const reply = json.choices?.[0]?.message?.content ?? "";
-    return { reply };
   });
