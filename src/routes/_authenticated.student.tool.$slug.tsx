@@ -2,22 +2,23 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/lib/auth";
-import { chatWithTutor, summarizeText, generateStory, explainTopic, coachTurn } from "@/lib/ai.functions";
-import { DashboardShell, PageHeader } from "@/components/DashboardShell";
+import { chatWithTutor, summarizeText, generateStory, explainTopic } from "@/lib/ai.functions";
+import { DashboardShell, PageHeader, isPaidPlan } from "@/components/DashboardShell";
+import { ConfidenceOrb } from "@/components/ConfidenceOrb";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import {
   Lock, MessageSquare, FileText, BookMarked, Rocket, Compass, Glasses, Send,
-  Loader2, Sparkles, Copy, Upload, Mic, MicOff, Volume2, StopCircle,
+  Loader2, Sparkles, Copy, Upload,
 } from "lucide-react";
 
 const TOOLS: Record<string, { title: string; desc: string; icon: any }> = {
   chatbot: { title: "AI Chatbot", desc: "Ask any doubt — get a friendly, curriculum-aware answer.", icon: MessageSquare },
   "pdf-summarizer": { title: "PDF Summarizer", desc: "Drop a PDF and get key concepts in seconds.", icon: FileText },
   "story-generator": { title: "Story Generator", desc: "Turn any concept into a memorable short story.", icon: BookMarked },
-  "confidence-booster": { title: "Confidence Booster", desc: "Voice-based coach for language and interview practice.", icon: Rocket },
+  "confidence-booster": { title: "Confidence Booster", desc: "Realtime voice conversation with your AI coach.", icon: Rocket },
   "topic-explainer": { title: "Topic Explainer", desc: "Get any concept explained at your level.", icon: Compass },
   "ar-learning": { title: "VR / AR Learning", desc: "Immersive 3D experiences.", icon: Glasses },
 };
@@ -36,11 +37,10 @@ function ToolPage() {
   const { slug } = Route.useParams();
   const { profile } = useAuth();
   const tool = TOOLS[slug];
-  const unlocked = profile?.plan === "pro" || profile?.plan === "admin" || profile?.plan === "school-pro";
+  const unlocked = isPaidPlan(profile?.plan);
 
   if (!tool) return <DashboardShell role="student"><PageHeader title="Tool not found" /></DashboardShell>;
   if (slug === "ar-learning") {
-    // Redirect intent: point students to the shared VR page.
     return (
       <DashboardShell role="student" greeting={tool.title}>
         <PageHeader title={tool.title} desc={tool.desc} />
@@ -74,7 +74,7 @@ function ToolPage() {
         : slug === "pdf-summarizer" ? <PdfSummarizer />
         : slug === "story-generator" ? <StoryGen />
         : slug === "topic-explainer" ? <Explainer />
-        : slug === "confidence-booster" ? <Coach />
+        : slug === "confidence-booster" ? <ConfidenceOrb />
         : (
           <div className="glass rounded-2xl p-10 text-center max-w-lg mx-auto">
             <Icon className="h-6 w-6 text-primary mx-auto" />
@@ -85,7 +85,6 @@ function ToolPage() {
   );
 }
 
-/* ---------- CHATBOT ---------- */
 type Msg = { role: "user" | "assistant"; content: string };
 function Chatbot() {
   const runChat = useServerFn(chatWithTutor);
@@ -127,9 +126,7 @@ function Chatbot() {
               </div>
             </div>
           )}
-          {messages.map((m, i) => (
-            <MessageBubble key={i} m={m} />
-          ))}
+          {messages.map((m, i) => (<MessageBubble key={i} m={m} />))}
           {busy && (
             <div className="flex justify-start">
               <div className="rounded-2xl px-4 py-2.5 bg-secondary/60 border border-border flex items-center gap-2 text-sm text-muted-foreground">
@@ -161,7 +158,6 @@ function MessageBubble({ m }: { m: Msg }) {
   );
 }
 
-/* ---------- PDF SUMMARIZER ---------- */
 function PdfSummarizer() {
   const run = useServerFn(summarizeText);
   const [text, setText] = useState("");
@@ -173,11 +169,7 @@ function PdfSummarizer() {
 
   const onFile = async (f: File) => {
     setFile(f.name);
-    if (f.type === "text/plain") {
-      setText(await f.text());
-      return;
-    }
-    // Extract PDF text on the client using pdfjs-dist via CDN.
+    if (f.type === "text/plain") { setText(await f.text()); return; }
     try {
       const pdfjs: any = await import(/* @vite-ignore */ "https://esm.sh/pdfjs-dist@4.7.76/build/pdf.mjs" as any);
       pdfjs.GlobalWorkerOptions.workerSrc = "https://esm.sh/pdfjs-dist@4.7.76/build/pdf.worker.mjs";
@@ -191,7 +183,7 @@ function PdfSummarizer() {
       }
       setText(out.slice(0, 120_000));
     } catch (e: any) {
-      toast.error("Could not read PDF: " + (e.message ?? "unknown error") + " — you can paste the text below instead.");
+      toast.error("Could not read PDF — paste text instead.");
     }
   };
 
@@ -250,7 +242,6 @@ function PdfSummarizer() {
   );
 }
 
-/* ---------- STORY GENERATOR ---------- */
 function StoryGen() {
   const run = useServerFn(generateStory);
   const [topic, setTopic] = useState("");
@@ -291,7 +282,6 @@ function StoryGen() {
   );
 }
 
-/* ---------- TOPIC EXPLAINER ---------- */
 function Explainer() {
   const run = useServerFn(explainTopic);
   const [text, setText] = useState("");
@@ -314,7 +304,7 @@ function Explainer() {
         s += c.items.map((it: any) => it.str).join(" ") + "\n\n";
       }
       setText(s.slice(0, 120_000));
-    } catch (e: any) { toast.error("Could not read PDF"); }
+    } catch { toast.error("Could not read PDF"); }
   };
 
   const go = async () => {
@@ -354,117 +344,6 @@ function Explainer() {
         <h3 className="font-semibold mb-3">Explanation</h3>
         {out ? <article className="prose prose-sm max-w-none"><ReactMarkdown>{out}</ReactMarkdown></article>
           : <p className="text-sm text-muted-foreground">Your conversational explanation will appear here.</p>}
-      </div>
-    </div>
-  );
-}
-
-/* ---------- CONFIDENCE BOOSTER (voice coach) ---------- */
-function Coach() {
-  const run = useServerFn(coachTurn);
-  const [mode, setMode] = useState<"language" | "interview" | null>(null);
-  const [messages, setMessages] = useState<Msg[]>([]);
-  const [input, setInput] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [listening, setListening] = useState(false);
-  const [voice, setVoice] = useState<SpeechSynthesisVoice | null>(null);
-  const recogRef = useRef<any>(null);
-
-  useEffect(() => {
-    const pick = () => {
-      const voices = window.speechSynthesis?.getVoices() ?? [];
-      setVoice(voices.find((v) => v.lang === "en-IN") ?? voices.find((v) => v.lang.startsWith("en")) ?? null);
-    };
-    pick();
-    window.speechSynthesis?.addEventListener("voiceschanged", pick);
-    return () => window.speechSynthesis?.removeEventListener("voiceschanged", pick);
-  }, []);
-
-  const speak = (text: string) => {
-    if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text.replace(/[*_#`>]/g, ""));
-    if (voice) u.voice = voice;
-    u.rate = 1; u.pitch = 1;
-    window.speechSynthesis.speak(u);
-  };
-
-  const startListen = () => {
-    const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SR) return toast.info("Voice input isn't supported in this browser — please type below.");
-    const r = new SR();
-    r.lang = "en-IN"; r.interimResults = false; r.maxAlternatives = 1;
-    r.onresult = (e: any) => setInput((prev) => (prev + " " + e.results[0][0].transcript).trim());
-    r.onend = () => setListening(false);
-    r.onerror = () => setListening(false);
-    r.start();
-    recogRef.current = r;
-    setListening(true);
-  };
-  const stopListen = () => { recogRef.current?.stop(); setListening(false); };
-
-  const startSession = async (m: "language" | "interview") => {
-    setMode(m);
-    setMessages([]);
-    setBusy(true);
-    try {
-      const { reply } = await run({ data: { mode: m, messages: [{ role: "user", content: "Start the session with an opening line." }] } });
-      const msgs: Msg[] = [{ role: "assistant", content: reply }];
-      setMessages(msgs);
-      speak(reply);
-    } catch (e: any) { toast.error(e.message); } finally { setBusy(false); }
-  };
-
-  const send = async (endSession = false) => {
-    if (!mode) return;
-    const text = input.trim();
-    if (!text && !endSession) return;
-    const next: Msg[] = endSession ? [...messages, { role: "user", content: "(end session — give me your feedback)" }] : [...messages, { role: "user", content: text }];
-    setMessages(next); setInput(""); setBusy(true);
-    try {
-      const { reply } = await run({ data: { mode, messages: next, endSession } });
-      const done: Msg[] = [...next, { role: "assistant", content: reply }];
-      setMessages(done); speak(reply);
-      if (endSession) setMode(null);
-    } catch (e: any) { toast.error(e.message); } finally { setBusy(false); }
-  };
-
-  if (!mode) return (
-    <div className="grid gap-6 md:grid-cols-2 max-w-3xl mx-auto">
-      {[
-        { key: "language", title: "Language practice", desc: "Casual English conversation with gentle corrections.", icon: MessageSquare },
-        { key: "interview", title: "Mock interview / competition", desc: "Practice interviews and competitive exams with feedback.", icon: Rocket },
-      ].map((c) => (
-        <button key={c.key} onClick={() => startSession(c.key as any)}
-          className="glass rounded-2xl p-6 text-left hover:-translate-y-0.5 hover:glow transition-all">
-          <c.icon className="h-6 w-6 text-primary" />
-          <h3 className="mt-3 font-semibold">{c.title}</h3>
-          <p className="mt-1 text-sm text-muted-foreground">{c.desc}</p>
-        </button>
-      ))}
-    </div>
-  );
-
-  return (
-    <div className="max-w-3xl mx-auto">
-      <div className="glass rounded-2xl flex flex-col h-[70vh]">
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          {messages.map((m, i) => <MessageBubble key={i} m={m} />)}
-          {busy && <div className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Coach is thinking…</div>}
-        </div>
-        <div className="border-t border-border p-3 flex flex-col gap-2">
-          <div className="flex gap-2">
-            <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type or use the mic…" disabled={busy} onKeyDown={(e) => e.key === "Enter" && send()} />
-            <Button type="button" variant="secondary" onClick={() => listening ? stopListen() : startListen()} disabled={busy}>
-              {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-            </Button>
-            <Button onClick={() => send()} disabled={busy || !input.trim()} style={{ background: "var(--gradient-primary)" }} className="glow"><Send className="h-4 w-4" /></Button>
-          </div>
-          <div className="flex justify-between text-xs">
-            <button onClick={() => window.speechSynthesis?.cancel()} className="text-muted-foreground hover:text-foreground flex items-center gap-1"><Volume2 className="h-3 w-3" /> Stop speaking</button>
-            <button onClick={() => send(true)} className="text-primary hover:underline flex items-center gap-1"><StopCircle className="h-3 w-3" /> End session & get feedback</button>
-          </div>
-        </div>
       </div>
     </div>
   );
