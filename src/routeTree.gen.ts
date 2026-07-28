@@ -17,8 +17,10 @@ import { Route as QuizQuizIdRouteImport } from './routes/quiz.$quizId'
 import { Route as ContentIdRouteImport } from './routes/content.$id'
 import { Route as AuthenticatedVrLearningRouteImport } from './routes/_authenticated.vr-learning'
 import { Route as AuthenticatedSelectRoleRouteImport } from './routes/_authenticated.select-role'
+import { Route as AuthenticatedOwnerDashboardRouteImport } from './routes/_authenticated.owner-dashboard'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedTeacherSettingsRouteImport } from './routes/_authenticated.teacher.settings'
+import { Route as AuthenticatedTeacherSamplePaperRouteImport } from './routes/_authenticated.teacher.sample-paper'
 import { Route as AuthenticatedTeacherQuizzesRouteImport } from './routes/_authenticated.teacher.quizzes'
 import { Route as AuthenticatedTeacherPlansRouteImport } from './routes/_authenticated.teacher.plans'
 import { Route as AuthenticatedTeacherMyPlanRouteImport } from './routes/_authenticated.teacher.my-plan'
@@ -27,12 +29,13 @@ import { Route as AuthenticatedTeacherContentRouteImport } from './routes/_authe
 import { Route as AuthenticatedTeacherAnalyticsRouteImport } from './routes/_authenticated.teacher.analytics'
 import { Route as AuthenticatedTeacherAdvancedRouteImport } from './routes/_authenticated.teacher.advanced'
 import { Route as AuthenticatedStudentSettingsRouteImport } from './routes/_authenticated.student.settings'
+import { Route as AuthenticatedStudentSamplePaperRouteImport } from './routes/_authenticated.student.sample-paper'
 import { Route as AuthenticatedStudentQuizPracticeRouteImport } from './routes/_authenticated.student.quiz-practice'
+import { Route as AuthenticatedStudentQuizGeneratorRouteImport } from './routes/_authenticated.student.quiz-generator'
 import { Route as AuthenticatedStudentPlansRouteImport } from './routes/_authenticated.student.plans'
 import { Route as AuthenticatedStudentMyPlanRouteImport } from './routes/_authenticated.student.my-plan'
 import { Route as AuthenticatedStudentHomeworkRouteImport } from './routes/_authenticated.student.homework'
 import { Route as AuthenticatedStudentDashboardRouteImport } from './routes/_authenticated.student.dashboard'
-import { Route as AuthenticatedAdminCodesRouteImport } from './routes/_authenticated.admin.codes'
 import { Route as AuthenticatedStudentToolSlugRouteImport } from './routes/_authenticated.student.tool.$slug'
 import { Route as AuthenticatedStudentQuizQuizIdRouteImport } from './routes/_authenticated.student.quiz.$quizId'
 
@@ -75,6 +78,12 @@ const AuthenticatedSelectRoleRoute = AuthenticatedSelectRoleRouteImport.update({
   path: '/select-role',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedOwnerDashboardRoute =
+  AuthenticatedOwnerDashboardRouteImport.update({
+    id: '/owner-dashboard',
+    path: '/owner-dashboard',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -84,6 +93,12 @@ const AuthenticatedTeacherSettingsRoute =
   AuthenticatedTeacherSettingsRouteImport.update({
     id: '/teacher/settings',
     path: '/teacher/settings',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTeacherSamplePaperRoute =
+  AuthenticatedTeacherSamplePaperRouteImport.update({
+    id: '/teacher/sample-paper',
+    path: '/teacher/sample-paper',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedTeacherQuizzesRoute =
@@ -134,10 +149,22 @@ const AuthenticatedStudentSettingsRoute =
     path: '/student/settings',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedStudentSamplePaperRoute =
+  AuthenticatedStudentSamplePaperRouteImport.update({
+    id: '/student/sample-paper',
+    path: '/student/sample-paper',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedStudentQuizPracticeRoute =
   AuthenticatedStudentQuizPracticeRouteImport.update({
     id: '/student/quiz-practice',
     path: '/student/quiz-practice',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentQuizGeneratorRoute =
+  AuthenticatedStudentQuizGeneratorRouteImport.update({
+    id: '/student/quiz-generator',
+    path: '/student/quiz-generator',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedStudentPlansRoute =
@@ -164,11 +191,6 @@ const AuthenticatedStudentDashboardRoute =
     path: '/student/dashboard',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedAdminCodesRoute = AuthenticatedAdminCodesRouteImport.update({
-  id: '/admin/codes',
-  path: '/admin/codes',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedStudentToolSlugRoute =
   AuthenticatedStudentToolSlugRouteImport.update({
     id: '/student/tool/$slug',
@@ -187,16 +209,18 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/payment-success': typeof PaymentSuccessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/owner-dashboard': typeof AuthenticatedOwnerDashboardRoute
   '/select-role': typeof AuthenticatedSelectRoleRoute
   '/vr-learning': typeof AuthenticatedVrLearningRoute
   '/content/$id': typeof ContentIdRoute
   '/quiz/$quizId': typeof QuizQuizIdRoute
-  '/admin/codes': typeof AuthenticatedAdminCodesRoute
   '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
   '/student/homework': typeof AuthenticatedStudentHomeworkRoute
   '/student/my-plan': typeof AuthenticatedStudentMyPlanRoute
   '/student/plans': typeof AuthenticatedStudentPlansRoute
+  '/student/quiz-generator': typeof AuthenticatedStudentQuizGeneratorRoute
   '/student/quiz-practice': typeof AuthenticatedStudentQuizPracticeRoute
+  '/student/sample-paper': typeof AuthenticatedStudentSamplePaperRoute
   '/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/teacher/advanced': typeof AuthenticatedTeacherAdvancedRoute
   '/teacher/analytics': typeof AuthenticatedTeacherAnalyticsRoute
@@ -205,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/teacher/my-plan': typeof AuthenticatedTeacherMyPlanRoute
   '/teacher/plans': typeof AuthenticatedTeacherPlansRoute
   '/teacher/quizzes': typeof AuthenticatedTeacherQuizzesRoute
+  '/teacher/sample-paper': typeof AuthenticatedTeacherSamplePaperRoute
   '/teacher/settings': typeof AuthenticatedTeacherSettingsRoute
   '/student/quiz/$quizId': typeof AuthenticatedStudentQuizQuizIdRoute
   '/student/tool/$slug': typeof AuthenticatedStudentToolSlugRoute
@@ -214,16 +239,18 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/payment-success': typeof PaymentSuccessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/owner-dashboard': typeof AuthenticatedOwnerDashboardRoute
   '/select-role': typeof AuthenticatedSelectRoleRoute
   '/vr-learning': typeof AuthenticatedVrLearningRoute
   '/content/$id': typeof ContentIdRoute
   '/quiz/$quizId': typeof QuizQuizIdRoute
-  '/admin/codes': typeof AuthenticatedAdminCodesRoute
   '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
   '/student/homework': typeof AuthenticatedStudentHomeworkRoute
   '/student/my-plan': typeof AuthenticatedStudentMyPlanRoute
   '/student/plans': typeof AuthenticatedStudentPlansRoute
+  '/student/quiz-generator': typeof AuthenticatedStudentQuizGeneratorRoute
   '/student/quiz-practice': typeof AuthenticatedStudentQuizPracticeRoute
+  '/student/sample-paper': typeof AuthenticatedStudentSamplePaperRoute
   '/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/teacher/advanced': typeof AuthenticatedTeacherAdvancedRoute
   '/teacher/analytics': typeof AuthenticatedTeacherAnalyticsRoute
@@ -232,6 +259,7 @@ export interface FileRoutesByTo {
   '/teacher/my-plan': typeof AuthenticatedTeacherMyPlanRoute
   '/teacher/plans': typeof AuthenticatedTeacherPlansRoute
   '/teacher/quizzes': typeof AuthenticatedTeacherQuizzesRoute
+  '/teacher/sample-paper': typeof AuthenticatedTeacherSamplePaperRoute
   '/teacher/settings': typeof AuthenticatedTeacherSettingsRoute
   '/student/quiz/$quizId': typeof AuthenticatedStudentQuizQuizIdRoute
   '/student/tool/$slug': typeof AuthenticatedStudentToolSlugRoute
@@ -243,16 +271,18 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/payment-success': typeof PaymentSuccessRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/owner-dashboard': typeof AuthenticatedOwnerDashboardRoute
   '/_authenticated/select-role': typeof AuthenticatedSelectRoleRoute
   '/_authenticated/vr-learning': typeof AuthenticatedVrLearningRoute
   '/content/$id': typeof ContentIdRoute
   '/quiz/$quizId': typeof QuizQuizIdRoute
-  '/_authenticated/admin/codes': typeof AuthenticatedAdminCodesRoute
   '/_authenticated/student/dashboard': typeof AuthenticatedStudentDashboardRoute
   '/_authenticated/student/homework': typeof AuthenticatedStudentHomeworkRoute
   '/_authenticated/student/my-plan': typeof AuthenticatedStudentMyPlanRoute
   '/_authenticated/student/plans': typeof AuthenticatedStudentPlansRoute
+  '/_authenticated/student/quiz-generator': typeof AuthenticatedStudentQuizGeneratorRoute
   '/_authenticated/student/quiz-practice': typeof AuthenticatedStudentQuizPracticeRoute
+  '/_authenticated/student/sample-paper': typeof AuthenticatedStudentSamplePaperRoute
   '/_authenticated/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/_authenticated/teacher/advanced': typeof AuthenticatedTeacherAdvancedRoute
   '/_authenticated/teacher/analytics': typeof AuthenticatedTeacherAnalyticsRoute
@@ -261,6 +291,7 @@ export interface FileRoutesById {
   '/_authenticated/teacher/my-plan': typeof AuthenticatedTeacherMyPlanRoute
   '/_authenticated/teacher/plans': typeof AuthenticatedTeacherPlansRoute
   '/_authenticated/teacher/quizzes': typeof AuthenticatedTeacherQuizzesRoute
+  '/_authenticated/teacher/sample-paper': typeof AuthenticatedTeacherSamplePaperRoute
   '/_authenticated/teacher/settings': typeof AuthenticatedTeacherSettingsRoute
   '/_authenticated/student/quiz/$quizId': typeof AuthenticatedStudentQuizQuizIdRoute
   '/_authenticated/student/tool/$slug': typeof AuthenticatedStudentToolSlugRoute
@@ -272,16 +303,18 @@ export interface FileRouteTypes {
     | '/auth'
     | '/payment-success'
     | '/dashboard'
+    | '/owner-dashboard'
     | '/select-role'
     | '/vr-learning'
     | '/content/$id'
     | '/quiz/$quizId'
-    | '/admin/codes'
     | '/student/dashboard'
     | '/student/homework'
     | '/student/my-plan'
     | '/student/plans'
+    | '/student/quiz-generator'
     | '/student/quiz-practice'
+    | '/student/sample-paper'
     | '/student/settings'
     | '/teacher/advanced'
     | '/teacher/analytics'
@@ -290,6 +323,7 @@ export interface FileRouteTypes {
     | '/teacher/my-plan'
     | '/teacher/plans'
     | '/teacher/quizzes'
+    | '/teacher/sample-paper'
     | '/teacher/settings'
     | '/student/quiz/$quizId'
     | '/student/tool/$slug'
@@ -299,16 +333,18 @@ export interface FileRouteTypes {
     | '/auth'
     | '/payment-success'
     | '/dashboard'
+    | '/owner-dashboard'
     | '/select-role'
     | '/vr-learning'
     | '/content/$id'
     | '/quiz/$quizId'
-    | '/admin/codes'
     | '/student/dashboard'
     | '/student/homework'
     | '/student/my-plan'
     | '/student/plans'
+    | '/student/quiz-generator'
     | '/student/quiz-practice'
+    | '/student/sample-paper'
     | '/student/settings'
     | '/teacher/advanced'
     | '/teacher/analytics'
@@ -317,6 +353,7 @@ export interface FileRouteTypes {
     | '/teacher/my-plan'
     | '/teacher/plans'
     | '/teacher/quizzes'
+    | '/teacher/sample-paper'
     | '/teacher/settings'
     | '/student/quiz/$quizId'
     | '/student/tool/$slug'
@@ -327,16 +364,18 @@ export interface FileRouteTypes {
     | '/auth'
     | '/payment-success'
     | '/_authenticated/dashboard'
+    | '/_authenticated/owner-dashboard'
     | '/_authenticated/select-role'
     | '/_authenticated/vr-learning'
     | '/content/$id'
     | '/quiz/$quizId'
-    | '/_authenticated/admin/codes'
     | '/_authenticated/student/dashboard'
     | '/_authenticated/student/homework'
     | '/_authenticated/student/my-plan'
     | '/_authenticated/student/plans'
+    | '/_authenticated/student/quiz-generator'
     | '/_authenticated/student/quiz-practice'
+    | '/_authenticated/student/sample-paper'
     | '/_authenticated/student/settings'
     | '/_authenticated/teacher/advanced'
     | '/_authenticated/teacher/analytics'
@@ -345,6 +384,7 @@ export interface FileRouteTypes {
     | '/_authenticated/teacher/my-plan'
     | '/_authenticated/teacher/plans'
     | '/_authenticated/teacher/quizzes'
+    | '/_authenticated/teacher/sample-paper'
     | '/_authenticated/teacher/settings'
     | '/_authenticated/student/quiz/$quizId'
     | '/_authenticated/student/tool/$slug'
@@ -417,6 +457,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSelectRoleRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/owner-dashboard': {
+      id: '/_authenticated/owner-dashboard'
+      path: '/owner-dashboard'
+      fullPath: '/owner-dashboard'
+      preLoaderRoute: typeof AuthenticatedOwnerDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -429,6 +476,13 @@ declare module '@tanstack/react-router' {
       path: '/teacher/settings'
       fullPath: '/teacher/settings'
       preLoaderRoute: typeof AuthenticatedTeacherSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teacher/sample-paper': {
+      id: '/_authenticated/teacher/sample-paper'
+      path: '/teacher/sample-paper'
+      fullPath: '/teacher/sample-paper'
+      preLoaderRoute: typeof AuthenticatedTeacherSamplePaperRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/teacher/quizzes': {
@@ -487,11 +541,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentSettingsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/student/sample-paper': {
+      id: '/_authenticated/student/sample-paper'
+      path: '/student/sample-paper'
+      fullPath: '/student/sample-paper'
+      preLoaderRoute: typeof AuthenticatedStudentSamplePaperRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/student/quiz-practice': {
       id: '/_authenticated/student/quiz-practice'
       path: '/student/quiz-practice'
       fullPath: '/student/quiz-practice'
       preLoaderRoute: typeof AuthenticatedStudentQuizPracticeRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/student/quiz-generator': {
+      id: '/_authenticated/student/quiz-generator'
+      path: '/student/quiz-generator'
+      fullPath: '/student/quiz-generator'
+      preLoaderRoute: typeof AuthenticatedStudentQuizGeneratorRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/student/plans': {
@@ -522,13 +590,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/admin/codes': {
-      id: '/_authenticated/admin/codes'
-      path: '/admin/codes'
-      fullPath: '/admin/codes'
-      preLoaderRoute: typeof AuthenticatedAdminCodesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/student/tool/$slug': {
       id: '/_authenticated/student/tool/$slug'
       path: '/student/tool/$slug'
@@ -548,14 +609,16 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedOwnerDashboardRoute: typeof AuthenticatedOwnerDashboardRoute
   AuthenticatedSelectRoleRoute: typeof AuthenticatedSelectRoleRoute
   AuthenticatedVrLearningRoute: typeof AuthenticatedVrLearningRoute
-  AuthenticatedAdminCodesRoute: typeof AuthenticatedAdminCodesRoute
   AuthenticatedStudentDashboardRoute: typeof AuthenticatedStudentDashboardRoute
   AuthenticatedStudentHomeworkRoute: typeof AuthenticatedStudentHomeworkRoute
   AuthenticatedStudentMyPlanRoute: typeof AuthenticatedStudentMyPlanRoute
   AuthenticatedStudentPlansRoute: typeof AuthenticatedStudentPlansRoute
+  AuthenticatedStudentQuizGeneratorRoute: typeof AuthenticatedStudentQuizGeneratorRoute
   AuthenticatedStudentQuizPracticeRoute: typeof AuthenticatedStudentQuizPracticeRoute
+  AuthenticatedStudentSamplePaperRoute: typeof AuthenticatedStudentSamplePaperRoute
   AuthenticatedStudentSettingsRoute: typeof AuthenticatedStudentSettingsRoute
   AuthenticatedTeacherAdvancedRoute: typeof AuthenticatedTeacherAdvancedRoute
   AuthenticatedTeacherAnalyticsRoute: typeof AuthenticatedTeacherAnalyticsRoute
@@ -564,6 +627,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTeacherMyPlanRoute: typeof AuthenticatedTeacherMyPlanRoute
   AuthenticatedTeacherPlansRoute: typeof AuthenticatedTeacherPlansRoute
   AuthenticatedTeacherQuizzesRoute: typeof AuthenticatedTeacherQuizzesRoute
+  AuthenticatedTeacherSamplePaperRoute: typeof AuthenticatedTeacherSamplePaperRoute
   AuthenticatedTeacherSettingsRoute: typeof AuthenticatedTeacherSettingsRoute
   AuthenticatedStudentQuizQuizIdRoute: typeof AuthenticatedStudentQuizQuizIdRoute
   AuthenticatedStudentToolSlugRoute: typeof AuthenticatedStudentToolSlugRoute
@@ -571,14 +635,17 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedOwnerDashboardRoute: AuthenticatedOwnerDashboardRoute,
   AuthenticatedSelectRoleRoute: AuthenticatedSelectRoleRoute,
   AuthenticatedVrLearningRoute: AuthenticatedVrLearningRoute,
-  AuthenticatedAdminCodesRoute: AuthenticatedAdminCodesRoute,
   AuthenticatedStudentDashboardRoute: AuthenticatedStudentDashboardRoute,
   AuthenticatedStudentHomeworkRoute: AuthenticatedStudentHomeworkRoute,
   AuthenticatedStudentMyPlanRoute: AuthenticatedStudentMyPlanRoute,
   AuthenticatedStudentPlansRoute: AuthenticatedStudentPlansRoute,
+  AuthenticatedStudentQuizGeneratorRoute:
+    AuthenticatedStudentQuizGeneratorRoute,
   AuthenticatedStudentQuizPracticeRoute: AuthenticatedStudentQuizPracticeRoute,
+  AuthenticatedStudentSamplePaperRoute: AuthenticatedStudentSamplePaperRoute,
   AuthenticatedStudentSettingsRoute: AuthenticatedStudentSettingsRoute,
   AuthenticatedTeacherAdvancedRoute: AuthenticatedTeacherAdvancedRoute,
   AuthenticatedTeacherAnalyticsRoute: AuthenticatedTeacherAnalyticsRoute,
@@ -587,6 +654,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedTeacherMyPlanRoute: AuthenticatedTeacherMyPlanRoute,
   AuthenticatedTeacherPlansRoute: AuthenticatedTeacherPlansRoute,
   AuthenticatedTeacherQuizzesRoute: AuthenticatedTeacherQuizzesRoute,
+  AuthenticatedTeacherSamplePaperRoute: AuthenticatedTeacherSamplePaperRoute,
   AuthenticatedTeacherSettingsRoute: AuthenticatedTeacherSettingsRoute,
   AuthenticatedStudentQuizQuizIdRoute: AuthenticatedStudentQuizQuizIdRoute,
   AuthenticatedStudentToolSlugRoute: AuthenticatedStudentToolSlugRoute,
@@ -607,13 +675,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

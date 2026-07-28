@@ -2,7 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
-// Test-mode UPI VPA used for demo QR when real Razorpay keys are not configured.
 const DEMO_VPA = "edusense@upi";
 
 const OrderInput = z.object({
@@ -46,7 +45,6 @@ export const createRazorpayOrder = createServerFn({ method: "POST" })
       }
     }
 
-    // UPI intent (deep-link) — most UPI apps recognize this. Amount in INR.
     const upiIntent =
       `upi://pay?pa=${encodeURIComponent(DEMO_VPA)}` +
       `&pn=${encodeURIComponent("EduSense")}` +
@@ -58,8 +56,6 @@ export const createRazorpayOrder = createServerFn({ method: "POST" })
     return { orderId, amountInr, mode, upiIntent, qrUrl, plan: data.plan };
   });
 
-// Test-mode simulated verification: flips the caller's plan server-side.
-// In production the Razorpay webhook would do this instead.
 const VerifyInput = z.object({
   orderId: z.string().min(1),
   plan: z.enum(["student-pro", "teacher-pro"]),
@@ -68,7 +64,6 @@ export const confirmDemoPayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => VerifyInput.parse(d))
   .handler(async ({ data, context }) => {
-    // Only flip demo orders here — real Razorpay orders should be verified by webhook.
     if (!data.orderId.startsWith("demo_")) {
       return { ok: false, error: "This order requires webhook verification." };
     }
@@ -80,7 +75,6 @@ export const confirmDemoPayment = createServerFn({ method: "POST" })
     return { ok: true, plan: "pro" };
   });
 
-// Redeem a school license code via the security-definer SQL function.
 const RedeemInput = z.object({ code: z.string().min(3).max(64) });
 export const redeemSchoolCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -89,4 +83,50 @@ export const redeemSchoolCode = createServerFn({ method: "POST" })
     const { data: res, error } = await context.supabase.rpc("redeem_school_code", { _code: data.code.trim().toUpperCase() });
     if (error) return { ok: false, error: error.message };
     return res as { ok: boolean; error?: string; plan?: string };
+  });
+
+// ---------- SCHOOL LICENSE REQUEST (public form) ----------
+const SchoolReqInput = z.object({
+  school_name: z.string().min(2).max(200),
+  contact_person: z.string().min(2).max(200),
+  contact_email: z.string().email(),
+  contact_phone: z.string().max(50).optional().nullable(),
+  estimated_students: z.number().int().min(0).optional().nullable(),
+  estimated_teachers: z.number().int().min(0).optional().nullable(),
+  notes: z.string().max(2000).optional().nullable(),
+});
+
+export const submitSchoolRequest = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => SchoolReqInput.parse(d))
+  .handler(async ({ data }) => {
+    // Use the server publishable client — the policy allows anon INSERTs when
+    // basic fields are present, so we do not require an authenticated caller.
+    const { createClient } = await import("@supabase/supabase-js");
+    const url = process.env.SUPABASE_URL!;
+    const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
+    const client = createClient(url, key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: {
+        fetch: (input, init) => {
+          const h = new Headers(init?.headers);
+          if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+          h.set("apikey", key);
+          return fetch(input, { ...init, headers: h });
+        },
+      },
+    });
+    const { error } = await client.from("school_requests").insert({
+      school_name: data.school_name,
+      contact_person: data.contact_person,
+      contact_email: data.contact_email,
+      contact_phone: data.contact_phone ?? null,
+      estimated_students: data.estimated_students ?? null,
+      estimated_teachers: data.estimated_teachers ?? null,
+      notes: data.notes ?? null,
+    });
+    if (error) {
+      console.error("[school_requests insert]", error);
+      return { ok: false, error: "We couldn't submit your request. Please email us instead." };
+    }
+    return { ok: true };
   });

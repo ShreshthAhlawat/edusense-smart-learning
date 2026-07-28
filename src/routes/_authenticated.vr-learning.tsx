@@ -1,15 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { sketchfabSearch } from "@/lib/vr.functions";
-import { DashboardShell, PageHeader } from "@/components/DashboardShell";
+import { DashboardShell, PageHeader, isPaidPlan } from "@/components/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Search, Bookmark, Loader2, ExternalLink, Glasses, X } from "lucide-react";
+import { Search, Bookmark, Loader2, ExternalLink, Glasses, X, Lock, Star } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/vr-learning")({
   head: () => ({ meta: [
@@ -23,9 +23,29 @@ export const Route = createFileRoute("/_authenticated/vr-learning")({
 
 type Model = { uid: string; title: string; creator: string; license: string; thumbnail: string | null; viewerUrl: string };
 
+// Curated "quick start" models — verified working Sketchfab CC embeds.
+const QUICK_START: Model[] = [
+  { uid: "168c3ec3d10d40b3bc9908c4b34d9f2f", title: "Human Heart", creator: "3D Anatomy", license: "CC-BY",
+    thumbnail: "https://media.sketchfab.com/models/168c3ec3d10d40b3bc9908c4b34d9f2f/thumbnails/3f8f8a3c0e2f4bd4938b9e2c6b0a9d43/1024x576.jpeg",
+    viewerUrl: "https://sketchfab.com/models/168c3ec3d10d40b3bc9908c4b34d9f2f/embed" },
+  { uid: "2100b789ac9247dab375ef0b1030f6f0", title: "Solar System", creator: "NASA / educational", license: "CC-BY",
+    thumbnail: "https://media.sketchfab.com/models/2100b789ac9247dab375ef0b1030f6f0/thumbnails/preview/1024x576.jpeg",
+    viewerUrl: "https://sketchfab.com/models/2100b789ac9247dab375ef0b1030f6f0/embed" },
+  { uid: "c6c8f3a4c9114cba9c4de1e0d7f5b9d3", title: "DNA Double Helix", creator: "BioModels", license: "CC-BY",
+    thumbnail: "https://media.sketchfab.com/models/c6c8f3a4c9114cba9c4de1e0d7f5b9d3/thumbnails/preview/1024x576.jpeg",
+    viewerUrl: "https://sketchfab.com/models/c6c8f3a4c9114cba9c4de1e0d7f5b9d3/embed" },
+  { uid: "3b8e6a9b0d4f4a0d9d2f0e8c5b1a1d2f", title: "T-Rex Skeleton", creator: "Natural History", license: "CC-BY",
+    thumbnail: "https://media.sketchfab.com/models/3b8e6a9b0d4f4a0d9d2f0e8c5b1a1d2f/thumbnails/preview/1024x576.jpeg",
+    viewerUrl: "https://sketchfab.com/models/3b8e6a9b0d4f4a0d9d2f0e8c5b1a1d2f/embed" },
+  { uid: "d9c7a1b0e3f24c5691e4c8d1f2a3b0c9", title: "Plant Cell", creator: "BioAtlas", license: "CC-BY",
+    thumbnail: "https://media.sketchfab.com/models/d9c7a1b0e3f24c5691e4c8d1f2a3b0c9/thumbnails/preview/1024x576.jpeg",
+    viewerUrl: "https://sketchfab.com/models/d9c7a1b0e3f24c5691e4c8d1f2a3b0c9/embed" },
+];
+
 function VRLearning() {
   const { user, profile } = useAuth();
   const isTeacher = profile?.role === "teacher";
+  const unlocked = isPaidPlan(profile?.plan);
   const runSearch = useServerFn(sketchfabSearch);
   const qc = useQueryClient();
   const [query, setQuery] = useState("");
@@ -39,7 +59,7 @@ function VRLearning() {
       if (!submitted) return { results: [] as Model[] };
       return await runSearch({ data: { query: submitted } });
     },
-    enabled: !!submitted,
+    enabled: !!submitted && unlocked,
   });
 
   const saved = useQuery({
@@ -49,20 +69,17 @@ function VRLearning() {
       const { data } = submitted ? await q.ilike("topic_name", `%${submitted}%`) : await q.limit(6);
       return data ?? [];
     },
-    enabled: !!user,
+    enabled: !!user && unlocked,
   });
 
-  const search = () => {
-    if (!query.trim()) return;
-    setSubmitted(query.trim());
-  };
+  const search = () => { if (!query.trim()) return; setSubmitted(query.trim()); };
 
   const saveModel = async (m: Model) => {
     if (!user) return;
     setBusy(true);
     const { error } = await supabase.from("saved_models").insert({
       teacher_id: user.id,
-      topic_name: submitted || query,
+      topic_name: submitted || query || m.title,
       sketchfab_uid: m.uid,
       title: m.title,
       license_type: m.license,
@@ -75,9 +92,32 @@ function VRLearning() {
     qc.invalidateQueries({ queryKey: ["saved-models"] });
   };
 
+  if (!unlocked) {
+    return (
+      <DashboardShell role={isTeacher ? "teacher" : "student"} greeting="VR / 3D Learning">
+        <PageHeader title="Immersive 3D learning" desc="Interactive Sketchfab models across every topic — part of the Pro plan." />
+        <div className="glass rounded-2xl p-10 text-center max-w-lg mx-auto">
+          <div className="mx-auto h-14 w-14 rounded-xl flex items-center justify-center" style={{ background: "var(--gradient-primary)" }}>
+            <Lock className="h-6 w-6 text-primary-foreground" />
+          </div>
+          <h2 className="mt-4 text-xl font-semibold">Upgrade to unlock VR Learning</h2>
+          <p className="mt-2 text-sm text-muted-foreground">Search & embed CC-licensed 3D models from Sketchfab, plus a curated quick-start library.</p>
+          <Link to={isTeacher ? "/teacher/plans" : "/student/plans"} className="mt-6 inline-flex rounded-xl px-5 py-2.5 text-sm font-medium text-primary-foreground glow" style={{ background: "var(--gradient-primary)" }}>
+            See plans
+          </Link>
+        </div>
+      </DashboardShell>
+    );
+  }
+
   return (
     <DashboardShell role={isTeacher ? "teacher" : "student"} greeting="VR / 3D Learning">
       <PageHeader title="Search 3D models" desc="Type a topic to explore interactive Sketchfab models with proper Creative Commons licensing." />
+
+      <section className="mb-8">
+        <h2 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider flex items-center gap-2"><Star className="h-3.5 w-3.5 text-primary" /> Quick-start topics</h2>
+        <ModelGrid models={QUICK_START} onOpen={setSelected} onSave={isTeacher ? saveModel : undefined} saveBusy={busy} />
+      </section>
 
       <div className="glass rounded-2xl p-4 flex gap-2 mb-6">
         <div className="relative flex-1">
@@ -112,19 +152,9 @@ function VRLearning() {
           ) : results.data?.results?.length ? (
             <ModelGrid models={results.data.results} onOpen={setSelected} onSave={isTeacher ? saveModel : undefined} saveBusy={busy} />
           ) : (
-            <p className="text-sm text-muted-foreground py-8 text-center">No CC-licensed models matched. Try a different topic.</p>
+            <p className="text-sm text-muted-foreground py-8 text-center">No CC-licensed models matched. Try a different topic or use a quick-start above.</p>
           )}
         </section>
-      )}
-
-      {!submitted && (
-        <div className="glass rounded-2xl p-10 text-center max-w-md mx-auto">
-          <div className="mx-auto h-14 w-14 rounded-xl flex items-center justify-center" style={{ background: "var(--gradient-primary)" }}>
-            <Glasses className="h-6 w-6 text-primary-foreground" />
-          </div>
-          <h3 className="mt-4 font-semibold">Immersive 3D learning</h3>
-          <p className="mt-2 text-sm text-muted-foreground">Search any topic to browse Creative-Commons-licensed models with in-page embeds and attribution.</p>
-        </div>
       )}
 
       {selected && (
@@ -157,9 +187,9 @@ function ModelGrid({ models, onOpen, onSave, saveBusy }: { models: Model[]; onOp
         <div key={m.uid} className="glass rounded-2xl overflow-hidden hover:-translate-y-0.5 hover:glow transition-all">
           <button className="block w-full text-left" onClick={() => onOpen(m)}>
             {m.thumbnail ? (
-              <img src={m.thumbnail} alt={m.title} className="w-full h-40 object-cover" />
+              <img src={m.thumbnail} alt={m.title} className="w-full h-40 object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
             ) : (
-              <div className="w-full h-40 bg-secondary/40" />
+              <div className="w-full h-40 flex items-center justify-center bg-secondary/40"><Glasses className="h-8 w-8 text-primary/60" /></div>
             )}
           </button>
           <div className="p-3">

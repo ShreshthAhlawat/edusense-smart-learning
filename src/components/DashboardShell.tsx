@@ -7,7 +7,7 @@ import {
   LayoutDashboard, FileQuestion, Sparkles, BarChart3, CreditCard,
   UserCircle, Settings, LogOut, TrendingUp, BookOpen, ListChecks,
   MessageSquare, FileText, BookMarked, Rocket, Compass, Glasses,
-  Lock, Sun, Moon, Globe, Zap,
+  Lock, Sun, Moon, Globe, Zap, ScrollText, Wand2,
 } from "lucide-react";
 
 type NavItem = { to: string; label: string; icon: any; locked?: boolean };
@@ -17,14 +17,14 @@ const teacherGroups: NavGroup[] = [
   { items: [
     { to: "/teacher/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "/teacher/quizzes", label: "Quiz Generator", icon: FileQuestion },
+    { to: "/teacher/sample-paper", label: "Sample Paper", icon: ScrollText },
     { to: "/teacher/content", label: "Content Generators", icon: Sparkles },
-    { to: "/vr-learning", label: "VR Learning", icon: Glasses },
+    { to: "/vr-learning", label: "VR Learning", icon: Glasses, locked: true },
     { to: "/teacher/analytics", label: "Engagement Analytics", icon: BarChart3 },
     { to: "/teacher/advanced", label: "Advanced Analytics", icon: TrendingUp },
     { to: "/teacher/plans", label: "Plans & Pricing", icon: CreditCard },
     { to: "/teacher/my-plan", label: "My Active Plan", icon: UserCircle },
     { to: "/teacher/settings", label: "Settings", icon: Settings },
-    { to: "/admin/codes", label: "Admin — Codes", icon: LayoutDashboard },
   ]},
 ];
 
@@ -32,8 +32,9 @@ const studentGroups: NavGroup[] = [
   { label: "Free Features", items: [
     { to: "/student/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "/student/quiz-practice", label: "Quiz Practice", icon: BookOpen },
+    { to: "/student/quiz-generator", label: "Quiz Generator", icon: Wand2 },
+    { to: "/student/sample-paper", label: "Sample Paper", icon: ScrollText },
     { to: "/student/homework", label: "Homework", icon: ListChecks },
-    { to: "/vr-learning", label: "VR Learning", icon: Glasses },
   ]},
   { label: "Paid Features", items: [
     { to: "/student/tool/chatbot", label: "Chatbot", icon: MessageSquare, locked: true },
@@ -41,7 +42,7 @@ const studentGroups: NavGroup[] = [
     { to: "/student/tool/story-generator", label: "Story Generator", icon: BookMarked, locked: true },
     { to: "/student/tool/confidence-booster", label: "Confidence Booster", icon: Rocket, locked: true },
     { to: "/student/tool/topic-explainer", label: "Topic Explainer", icon: Compass, locked: true },
-    { to: "/student/tool/ar-learning", label: "AR Learning", icon: Glasses, locked: true },
+    { to: "/vr-learning", label: "VR Learning", icon: Glasses, locked: true },
   ]},
   { label: "Account", items: [
     { to: "/student/plans", label: "Plans & Pricing", icon: CreditCard },
@@ -49,6 +50,10 @@ const studentGroups: NavGroup[] = [
     { to: "/student/settings", label: "Settings", icon: Settings },
   ]},
 ];
+
+export function isPaidPlan(plan: Profile["plan"] | undefined | null) {
+  return plan === "pro" || plan === "school-pro";
+}
 
 export function DashboardShell({
   role, greeting, children,
@@ -58,7 +63,7 @@ export function DashboardShell({
   const { profile, signOut } = useAuth();
   const { theme, toggle } = useTheme();
   const navigate = useNavigate();
-  const isPro = profile?.plan === "pro" || profile?.plan === "admin";
+  const isPro = isPaidPlan(profile?.plan);
 
   return (
     <div className="flex min-h-screen w-full">
@@ -132,7 +137,7 @@ export function DashboardShell({
               <div className="hidden sm:block leading-tight">
                 <div className="text-xs font-medium">{profile?.username ?? "You"}</div>
                 <div className="text-[10px] text-muted-foreground capitalize flex items-center gap-1">
-                  {profile?.plan === "pro" && <Zap className="h-3 w-3 text-primary" />}
+                  {isPro && <Zap className="h-3 w-3 text-primary" />}
                   {profile?.plan}
                 </div>
               </div>
@@ -172,6 +177,5 @@ export function PageHeader({ title, desc }: { title: string; desc?: string }) {
 }
 
 export function useRequirePlan(profile: Profile | null, required: "pro" = "pro") {
-  const has = profile?.plan === "pro" || profile?.plan === "admin";
-  return { unlocked: has, required };
+  return { unlocked: isPaidPlan(profile?.plan), required };
 }

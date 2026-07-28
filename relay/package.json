@@ -1,0 +1,14 @@
+{
+  "name": "edusense-gemini-live-relay",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Tiny WebSocket relay bridging the browser to Google Gemini Live API for EduSense's Confidence Booster.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

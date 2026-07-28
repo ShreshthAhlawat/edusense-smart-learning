@@ -9,7 +9,7 @@ export type Profile = {
   username: string | null;
   email: string | null;
   role: "teacher" | "student" | null;
-  plan: "free" | "pro" | "admin" | "school-pro";
+  plan: "free" | "pro" | "school-pro";
   calendar_notes: Record<string, string>;
 };
 
@@ -82,4 +82,9 @@ export function useAuth() {
   const v = useContext(Ctx);
   if (!v) throw new Error("useAuth must be used inside AuthProvider");
   return v;
+}
+
+export const OWNER_EMAIL = "shreshthahlawat2012@gmail.com";
+export function isOwner(user: { email?: string | null } | null | undefined) {
+  return !!user?.email && user.email.toLowerCase() === OWNER_EMAIL;
 }
