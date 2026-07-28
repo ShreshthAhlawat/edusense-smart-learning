@@ -229,6 +229,45 @@ export type Database = {
         }
         Relationships: []
       }
+      school_requests: {
+        Row: {
+          contact_email: string
+          contact_person: string
+          contact_phone: string | null
+          created_at: string
+          estimated_students: number | null
+          estimated_teachers: number | null
+          id: string
+          notes: string | null
+          school_name: string
+          status: string
+        }
+        Insert: {
+          contact_email: string
+          contact_person: string
+          contact_phone?: string | null
+          created_at?: string
+          estimated_students?: number | null
+          estimated_teachers?: number | null
+          id?: string
+          notes?: string | null
+          school_name: string
+          status?: string
+        }
+        Update: {
+          contact_email?: string
+          contact_person?: string
+          contact_phone?: string | null
+          created_at?: string
+          estimated_students?: number | null
+          estimated_teachers?: number | null
+          id?: string
+          notes?: string | null
+          school_name?: string
+          status?: string
+        }
+        Relationships: []
+      }
       struggling_topics: {
         Row: {
           avg_score: number
@@ -306,7 +345,7 @@ export type Database = {
       redeem_school_code: { Args: { _code: string }; Returns: Json }
     }
     Enums: {
-      user_plan: "free" | "pro" | "admin" | "school-pro"
+      user_plan: "free" | "pro" | "school-pro"
       user_role: "teacher" | "student"
     }
     CompositeTypes: {
@@ -435,7 +474,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      user_plan: ["free", "pro", "admin", "school-pro"],
+      user_plan: ["free", "pro", "school-pro"],
       user_role: ["teacher", "student"],
     },
   },
