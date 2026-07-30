@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      content_shares: {
+        Row: {
+          content_id: string
+          content_type: string
+          id: string
+          shared_at: string
+          shared_by: string
+          team_id: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          id?: string
+          shared_at?: string
+          shared_by: string
+          team_id: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          id?: string
+          shared_at?: string
+          shared_by?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_shares_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       homework: {
         Row: {
           completed: boolean
@@ -337,11 +372,73 @@ export type Database = {
         }
         Relationships: []
       }
+      team_members: {
+        Row: {
+          id: string
+          joined_at: string
+          student_id: string
+          team_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          student_id: string
+          team_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          student_id?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          created_at: string
+          id: string
+          join_code: string
+          name: string
+          teacher_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          join_code: string
+          name: string
+          teacher_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          join_code?: string
+          name?: string
+          teacher_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      is_team_member: {
+        Args: { _team_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_team_owner: {
+        Args: { _team_id: string; _user_id: string }
+        Returns: boolean
+      }
+      join_team_by_code: { Args: { _code: string }; Returns: Json }
       redeem_school_code: { Args: { _code: string }; Returns: Json }
     }
     Enums: {

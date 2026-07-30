@@ -148,23 +148,59 @@ const ChatInput = z.object({
     content: z.string(),
   })).min(1),
   system: z.string().optional(),
+  persona: z.enum(["student", "teacher"]).default("student"),
 });
+
+const PERSONAS = {
+  student: "You are EduSense Tutor — a friendly, patient, encouraging tutor for K-12 students. Explain concepts step-by-step in simple language. Use markdown formatting (bold, lists) when helpful. Write any mathematics in LaTeX using $...$ for inline and $$...$$ for display equations. Keep answers focused and age-appropriate.",
+  teacher: "You are EduSense Teaching Assistant — a knowledgeable co-teacher supporting a school teacher. Help with lesson planning, learning objectives, classroom activities, differentiation, rubrics, marking schemes, explaining subject concepts, and handling classroom challenges. Be practical and concrete: give structures, timings and examples the teacher can use tomorrow. Use markdown. Write any mathematics in LaTeX using $...$ inline and $$...$$ display.",
+} as const;
 
 export const chatWithTutor = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => ChatInput.parse(d))
   .handler(async ({ data }) => {
     const json = await callGateway({
       messages: [
-        {
-          role: "system",
-          content: data.system ?? "You are EduSense Tutor — a friendly, patient, encouraging tutor for K-12 students. Explain concepts step-by-step in simple language. Use markdown formatting (bold, lists, code) when helpful. Keep answers focused and age-appropriate.",
-        },
+        { role: "system", content: data.system ?? PERSONAS[data.persona] },
         ...data.messages,
       ],
     });
     const reply = json.choices?.[0]?.message?.content ?? "";
     return { reply };
   });
+
+// ---------- TOPIC EXPLORER (AI-generated overview) ----------
+const TopicOverviewInput = z.object({
+  topic: z.string().min(1),
+  subject: z.string().min(1),
+  classLevel: z.string().min(1),
+});
+
+export const topicOverview = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => TopicOverviewInput.parse(d))
+  .handler(async ({ data }) => {
+    const json = await callGateway({
+      messages: [
+        { role: "system", content: "You write compact Q&A-style study summaries for school students. Output clean markdown. Write any mathematics in LaTeX using $...$ inline and $$...$$ display equations — never raw brackets." },
+        { role: "user", content: `Create a short study summary for the topic "${data.topic}" (${data.subject}, ${data.classLevel}).
+Structure it as:
+## Quick overview
+2-3 sentences.
+## Key points
+4-6 bullets with the essential facts/formulas.
+## Common questions
+5 question-and-answer pairs in the form **Q:** … followed by **A:** …
+## One worked example
+A single short worked example.
+
+No preamble, no closing commentary.` },
+      ],
+    });
+    const markdown = json.choices?.[0]?.message?.content ?? "";
+    if (!markdown.trim()) throw new Error("Could not generate an overview — please try again.");
+    return { markdown };
+  });
+
 
 // ---------- CONTENT GENERATOR ----------
 const ContentInput = z.object({
@@ -195,9 +231,56 @@ export const generateContent = createServerFn({ method: "POST" })
     return { markdown };
   });
 
+// ---------- CHUNKING HELPERS (full-document processing) ----------
+const CHUNK_CHARS = 28_000;
+
+/** Splits long text on paragraph boundaries so nothing is truncated away. */
+function chunkText(text: string, size = CHUNK_CHARS): string[] {
+  if (text.length <= size) return [text];
+  const paras = text.split(/\n{2,}/);
+  const chunks: string[] = [];
+  let cur = "";
+  for (const p of paras) {
+    if (cur.length + p.length + 2 > size && cur) { chunks.push(cur); cur = ""; }
+    if (p.length > size) {
+      // Single enormous paragraph — hard split it.
+      for (let i = 0; i < p.length; i += size) chunks.push(p.slice(i, i + size));
+    } else {
+      cur += (cur ? "\n\n" : "") + p;
+    }
+  }
+  if (cur) chunks.push(cur);
+  return chunks;
+}
+
+async function completeText(system: string, user: string) {
+  const json = await callGateway({ messages: [{ role: "system", content: system }, { role: "user", content: user }] });
+  return (json.choices?.[0]?.message?.content ?? "").trim();
+}
+
+/**
+ * Processes an arbitrarily long document: each chunk is handled in sequence,
+ * then the partial outputs are merged into one coherent result.
+ */
+async function processLongDocument(opts: {
+  text: string;
+  system: string;
+  chunkInstruction: (part: string, i: number, n: number) => string;
+  mergeInstruction: (joined: string) => string;
+}) {
+  const chunks = chunkText(opts.text);
+  if (chunks.length === 1) return completeText(opts.system, opts.chunkInstruction(chunks[0], 0, 1));
+
+  const partials: string[] = [];
+  for (let i = 0; i < chunks.length; i++) {
+    partials.push(await completeText(opts.system, opts.chunkInstruction(chunks[i], i, chunks.length)));
+  }
+  return completeText(opts.system, opts.mergeInstruction(partials.map((p, i) => `--- Section ${i + 1} ---\n${p}`).join("\n\n")));
+}
+
 // ---------- PDF SUMMARIZER ----------
 const SummarizeInput = z.object({
-  text: z.string().min(20).max(150_000),
+  text: z.string().min(20).max(600_000),
   length: z.enum(["short", "detailed"]).default("short"),
   format: z.enum(["bullets", "paragraph"]).default("bullets"),
 });
@@ -207,13 +290,19 @@ export const summarizeText = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const lenNote = data.length === "short" ? "concise (about 5-8 lines)" : "detailed but well-structured";
     const fmtNote = data.format === "bullets" ? "as clear bullet points" : "as flowing paragraphs";
-    const json = await callGateway({
-      messages: [
-        { role: "system", content: "You are a study assistant. Summarize the following document for a student in clean markdown." },
-        { role: "user", content: `Please give me a ${lenNote} summary, ${fmtNote}, of this document:\n\n${data.text}` },
-      ],
+    const system = "You are a study assistant. Summarize documents for students in clean markdown. Write any mathematics in LaTeX using $...$ inline and $$...$$ display equations.";
+
+    const summary = await processLongDocument({
+      text: data.text,
+      system,
+      chunkInstruction: (part, i, n) =>
+        n === 1
+          ? `Please give me a ${lenNote} summary, ${fmtNote}, of this document:\n\n${part}`
+          : `This is part ${i + 1} of ${n} of a longer document. Summarize ONLY this part, capturing every important point (no preamble):\n\n${part}`,
+      mergeInstruction: (joined) =>
+        `Below are sequential summaries of every part of one long document. Merge them into a single ${lenNote} summary of the WHOLE document, ${fmtNote}, removing repetition and keeping the original order of ideas:\n\n${joined}`,
     });
-    const summary = json.choices?.[0]?.message?.content ?? "";
+
     if (!summary.trim()) throw new Error("Summary was empty");
     return { summary };
   });
@@ -226,10 +315,16 @@ const StoryInput = z.object({
 export const generateStory = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => StoryInput.parse(d))
   .handler(async ({ data }) => {
+    const topic = data.topic.length > CHUNK_CHARS
+      ? await completeText(
+          "You distil source material into a single clear concept statement.",
+          `In two sentences, state the core concept taught by this material:\n\n${data.topic.slice(0, CHUNK_CHARS)}`,
+        )
+      : data.topic;
     const json = await callGateway({
       messages: [
-        { role: "system", content: "You are a gifted storyteller who teaches concepts through short (3–5 paragraph) engaging stories with memorable characters and vivid detail. Output markdown." },
-        { role: "user", content: `Write a short story that teaches the concept: "${data.topic}". Make version #${data.variant + 1} — vary the setting and characters if writing a new version.` },
+        { role: "system", content: "You are a gifted storyteller who teaches concepts through short (3–5 paragraph) engaging stories with memorable characters and vivid detail. Output markdown. Write any mathematics in LaTeX using $...$ inline and $$...$$ display." },
+        { role: "user", content: `Write a short story that teaches the concept: "${topic}". Make version #${data.variant + 1} — vary the setting and characters if writing a new version.` },
       ],
     });
     const story = json.choices?.[0]?.message?.content ?? "";
@@ -239,7 +334,7 @@ export const generateStory = createServerFn({ method: "POST" })
 
 // ---------- TOPIC EXPLAINER ----------
 const ExplainInput = z.object({
-  text: z.string().min(5).max(150_000),
+  text: z.string().min(5).max(600_000),
   language: z.enum(["English", "Hindi"]).default("English"),
 });
 export const explainTopic = createServerFn({ method: "POST" })
@@ -248,13 +343,20 @@ export const explainTopic = createServerFn({ method: "POST" })
     const langLine = data.language === "Hindi"
       ? "Respond in simple conversational Hindi (Devanagari script). Use short paragraphs."
       : "Respond in simple conversational English. Use short paragraphs.";
-    const json = await callGateway({
-      messages: [
-        { role: "system", content: `You are a friendly tutor explaining topics as if speaking to a curious student. ${langLine} Use markdown.` },
-        { role: "user", content: `Explain this material clearly, step by step, with an example at the end:\n\n${data.text}` },
-      ],
+    const system = `You are a friendly tutor explaining topics as if speaking to a curious student. ${langLine} Use markdown. Write any mathematics in LaTeX using $...$ inline and $$...$$ display equations.`;
+
+    const explanation = await processLongDocument({
+      text: data.text,
+      system,
+      chunkInstruction: (part, i, n) =>
+        n === 1
+          ? `Explain this material clearly, step by step, with an example at the end:\n\n${part}`
+          : `This is part ${i + 1} of ${n} of a longer document. Explain ONLY this part clearly and step by step:\n\n${part}`,
+      mergeInstruction: (joined) =>
+        `Below are explanations of every part of one long document, in order. Weave them into one flowing, non-repetitive explanation of the whole document, ending with a single example:\n\n${joined}`,
     });
-    const explanation = json.choices?.[0]?.message?.content ?? "";
+
     if (!explanation.trim()) throw new Error("Explanation was empty");
     return { explanation };
   });
+

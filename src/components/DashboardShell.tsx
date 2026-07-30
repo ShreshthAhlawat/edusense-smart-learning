@@ -7,21 +7,28 @@ import {
   LayoutDashboard, FileQuestion, Sparkles, BarChart3, CreditCard,
   UserCircle, Settings, LogOut, TrendingUp, BookOpen, ListChecks,
   MessageSquare, FileText, BookMarked, Rocket, Compass, Glasses,
-  Lock, Sun, Moon, Globe, Zap, ScrollText, Wand2,
+  Lock, Sun, Moon, Globe, Zap, ScrollText, Wand2, Users2, Telescope,
 } from "lucide-react";
 
 type NavItem = { to: string; label: string; icon: any; locked?: boolean };
 type NavGroup = { label?: string; items: NavItem[] };
 
+// Every teacher tool requires an active paid Teacher plan.
 const teacherGroups: NavGroup[] = [
   { items: [
     { to: "/teacher/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { to: "/teacher/quizzes", label: "Quiz Generator", icon: FileQuestion },
-    { to: "/teacher/sample-paper", label: "Sample Paper", icon: ScrollText },
-    { to: "/teacher/content", label: "Content Generators", icon: Sparkles },
-    { to: "/vr-learning", label: "VR Learning", icon: Glasses, locked: true },
-    { to: "/teacher/analytics", label: "Engagement Analytics", icon: BarChart3 },
+  ]},
+  { label: "Teacher Tools", items: [
+    { to: "/teacher/quizzes", label: "Quiz Generator", icon: FileQuestion, locked: true },
+    { to: "/teacher/sample-paper", label: "Sample Paper", icon: ScrollText, locked: true },
+    { to: "/teacher/content", label: "Content Generators", icon: Sparkles, locked: true },
+    { to: "/teacher/chatbot", label: "AI Assistant", icon: MessageSquare, locked: true },
+    { to: "/teacher/topic-explorer", label: "Topic Explorer", icon: Telescope, locked: true },
+    { to: "/teacher/teams", label: "My Teams", icon: Users2, locked: true },
+    { to: "/teacher/analytics", label: "Engagement Analytics", icon: BarChart3, locked: true },
     { to: "/teacher/advanced", label: "Advanced Analytics", icon: TrendingUp },
+  ]},
+  { label: "Account", items: [
     { to: "/teacher/plans", label: "Plans & Pricing", icon: CreditCard },
     { to: "/teacher/my-plan", label: "My Active Plan", icon: UserCircle },
     { to: "/teacher/settings", label: "Settings", icon: Settings },
@@ -35,6 +42,7 @@ const studentGroups: NavGroup[] = [
     { to: "/student/quiz-generator", label: "Quiz Generator", icon: Wand2 },
     { to: "/student/sample-paper", label: "Sample Paper", icon: ScrollText },
     { to: "/student/homework", label: "Homework", icon: ListChecks },
+    { to: "/student/teams", label: "My Teams", icon: Users2 },
   ]},
   { label: "Paid Features", items: [
     { to: "/student/tool/chatbot", label: "Chatbot", icon: MessageSquare, locked: true },
@@ -42,6 +50,7 @@ const studentGroups: NavGroup[] = [
     { to: "/student/tool/story-generator", label: "Story Generator", icon: BookMarked, locked: true },
     { to: "/student/tool/confidence-booster", label: "Confidence Booster", icon: Rocket, locked: true },
     { to: "/student/tool/topic-explainer", label: "Topic Explainer", icon: Compass, locked: true },
+    { to: "/student/topic-explorer", label: "Topic Explorer", icon: Telescope, locked: true },
     { to: "/vr-learning", label: "VR Learning", icon: Glasses, locked: true },
   ]},
   { label: "Account", items: [
@@ -50,6 +59,7 @@ const studentGroups: NavGroup[] = [
     { to: "/student/settings", label: "Settings", icon: Settings },
   ]},
 ];
+
 
 export function isPaidPlan(plan: Profile["plan"] | undefined | null) {
   return plan === "pro" || plan === "school-pro";
@@ -179,3 +189,26 @@ export function PageHeader({ title, desc }: { title: string; desc?: string }) {
 export function useRequirePlan(profile: Profile | null, required: "pro" = "pro") {
   return { unlocked: isPaidPlan(profile?.plan), required };
 }
+
+/** Standard "upgrade to access" screen shown in place of a paid feature. */
+export function PaidGate({ role, feature }: { role: "teacher" | "student"; feature: string }) {
+  return (
+    <div className="max-w-lg mx-auto glass rounded-2xl p-10 text-center animate-in fade-in zoom-in-95 duration-300">
+      <div className="mx-auto h-14 w-14 rounded-2xl flex items-center justify-center" style={{ background: "var(--gradient-primary)" }}>
+        <Lock className="h-6 w-6 text-primary-foreground" />
+      </div>
+      <h2 className="mt-5 text-xl font-semibold">{feature} is a paid feature</h2>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Upgrade your plan to unlock {feature.toLowerCase()} and every other {role === "teacher" ? "teacher" : "premium"} tool in EduSense.
+      </p>
+      <Link
+        to={role === "teacher" ? "/teacher/plans" : "/student/plans"}
+        className="mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium text-primary-foreground glow transition-transform hover:-translate-y-0.5"
+        style={{ background: "var(--gradient-primary)" }}
+      >
+        <CreditCard className="h-4 w-4" /> View plans
+      </Link>
+    </div>
+  );
+}
+
