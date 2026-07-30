@@ -27,6 +27,7 @@ import { Route as AuthenticatedTeacherPlansRouteImport } from './routes/_authent
 import { Route as AuthenticatedTeacherMyPlanRouteImport } from './routes/_authenticated.teacher.my-plan'
 import { Route as AuthenticatedTeacherDashboardRouteImport } from './routes/_authenticated.teacher.dashboard'
 import { Route as AuthenticatedTeacherContentRouteImport } from './routes/_authenticated.teacher.content'
+import { Route as AuthenticatedTeacherChatbotRouteImport } from './routes/_authenticated.teacher.chatbot'
 import { Route as AuthenticatedTeacherAnalyticsRouteImport } from './routes/_authenticated.teacher.analytics'
 import { Route as AuthenticatedTeacherAdvancedRouteImport } from './routes/_authenticated.teacher.advanced'
 import { Route as AuthenticatedStudentSettingsRouteImport } from './routes/_authenticated.student.settings'
@@ -138,6 +139,12 @@ const AuthenticatedTeacherContentRoute =
     path: '/teacher/content',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedTeacherChatbotRoute =
+  AuthenticatedTeacherChatbotRouteImport.update({
+    id: '/teacher/chatbot',
+    path: '/teacher/chatbot',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedTeacherAnalyticsRoute =
   AuthenticatedTeacherAnalyticsRouteImport.update({
     id: '/teacher/analytics',
@@ -231,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/teacher/advanced': typeof AuthenticatedTeacherAdvancedRoute
   '/teacher/analytics': typeof AuthenticatedTeacherAnalyticsRoute
+  '/teacher/chatbot': typeof AuthenticatedTeacherChatbotRoute
   '/teacher/content': typeof AuthenticatedTeacherContentRoute
   '/teacher/dashboard': typeof AuthenticatedTeacherDashboardRoute
   '/teacher/my-plan': typeof AuthenticatedTeacherMyPlanRoute
@@ -262,6 +270,7 @@ export interface FileRoutesByTo {
   '/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/teacher/advanced': typeof AuthenticatedTeacherAdvancedRoute
   '/teacher/analytics': typeof AuthenticatedTeacherAnalyticsRoute
+  '/teacher/chatbot': typeof AuthenticatedTeacherChatbotRoute
   '/teacher/content': typeof AuthenticatedTeacherContentRoute
   '/teacher/dashboard': typeof AuthenticatedTeacherDashboardRoute
   '/teacher/my-plan': typeof AuthenticatedTeacherMyPlanRoute
@@ -295,6 +304,7 @@ export interface FileRoutesById {
   '/_authenticated/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/_authenticated/teacher/advanced': typeof AuthenticatedTeacherAdvancedRoute
   '/_authenticated/teacher/analytics': typeof AuthenticatedTeacherAnalyticsRoute
+  '/_authenticated/teacher/chatbot': typeof AuthenticatedTeacherChatbotRoute
   '/_authenticated/teacher/content': typeof AuthenticatedTeacherContentRoute
   '/_authenticated/teacher/dashboard': typeof AuthenticatedTeacherDashboardRoute
   '/_authenticated/teacher/my-plan': typeof AuthenticatedTeacherMyPlanRoute
@@ -328,6 +338,7 @@ export interface FileRouteTypes {
     | '/student/settings'
     | '/teacher/advanced'
     | '/teacher/analytics'
+    | '/teacher/chatbot'
     | '/teacher/content'
     | '/teacher/dashboard'
     | '/teacher/my-plan'
@@ -359,6 +370,7 @@ export interface FileRouteTypes {
     | '/student/settings'
     | '/teacher/advanced'
     | '/teacher/analytics'
+    | '/teacher/chatbot'
     | '/teacher/content'
     | '/teacher/dashboard'
     | '/teacher/my-plan'
@@ -391,6 +403,7 @@ export interface FileRouteTypes {
     | '/_authenticated/student/settings'
     | '/_authenticated/teacher/advanced'
     | '/_authenticated/teacher/analytics'
+    | '/_authenticated/teacher/chatbot'
     | '/_authenticated/teacher/content'
     | '/_authenticated/teacher/dashboard'
     | '/_authenticated/teacher/my-plan'
@@ -540,6 +553,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeacherContentRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/teacher/chatbot': {
+      id: '/_authenticated/teacher/chatbot'
+      path: '/teacher/chatbot'
+      fullPath: '/teacher/chatbot'
+      preLoaderRoute: typeof AuthenticatedTeacherChatbotRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/teacher/analytics': {
       id: '/_authenticated/teacher/analytics'
       path: '/teacher/analytics'
@@ -642,6 +662,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedStudentSettingsRoute: typeof AuthenticatedStudentSettingsRoute
   AuthenticatedTeacherAdvancedRoute: typeof AuthenticatedTeacherAdvancedRoute
   AuthenticatedTeacherAnalyticsRoute: typeof AuthenticatedTeacherAnalyticsRoute
+  AuthenticatedTeacherChatbotRoute: typeof AuthenticatedTeacherChatbotRoute
   AuthenticatedTeacherContentRoute: typeof AuthenticatedTeacherContentRoute
   AuthenticatedTeacherDashboardRoute: typeof AuthenticatedTeacherDashboardRoute
   AuthenticatedTeacherMyPlanRoute: typeof AuthenticatedTeacherMyPlanRoute
@@ -670,6 +691,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedStudentSettingsRoute: AuthenticatedStudentSettingsRoute,
   AuthenticatedTeacherAdvancedRoute: AuthenticatedTeacherAdvancedRoute,
   AuthenticatedTeacherAnalyticsRoute: AuthenticatedTeacherAnalyticsRoute,
+  AuthenticatedTeacherChatbotRoute: AuthenticatedTeacherChatbotRoute,
   AuthenticatedTeacherContentRoute: AuthenticatedTeacherContentRoute,
   AuthenticatedTeacherDashboardRoute: AuthenticatedTeacherDashboardRoute,
   AuthenticatedTeacherMyPlanRoute: AuthenticatedTeacherMyPlanRoute,
