@@ -148,23 +148,59 @@ const ChatInput = z.object({
     content: z.string(),
   })).min(1),
   system: z.string().optional(),
+  persona: z.enum(["student", "teacher"]).default("student"),
 });
+
+const PERSONAS = {
+  student: "You are EduSense Tutor — a friendly, patient, encouraging tutor for K-12 students. Explain concepts step-by-step in simple language. Use markdown formatting (bold, lists) when helpful. Write any mathematics in LaTeX using $...$ for inline and $$...$$ for display equations. Keep answers focused and age-appropriate.",
+  teacher: "You are EduSense Teaching Assistant — a knowledgeable co-teacher supporting a school teacher. Help with lesson planning, learning objectives, classroom activities, differentiation, rubrics, marking schemes, explaining subject concepts, and handling classroom challenges. Be practical and concrete: give structures, timings and examples the teacher can use tomorrow. Use markdown. Write any mathematics in LaTeX using $...$ inline and $$...$$ display.",
+} as const;
 
 export const chatWithTutor = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => ChatInput.parse(d))
   .handler(async ({ data }) => {
     const json = await callGateway({
       messages: [
-        {
-          role: "system",
-          content: data.system ?? "You are EduSense Tutor — a friendly, patient, encouraging tutor for K-12 students. Explain concepts step-by-step in simple language. Use markdown formatting (bold, lists, code) when helpful. Keep answers focused and age-appropriate.",
-        },
+        { role: "system", content: data.system ?? PERSONAS[data.persona] },
         ...data.messages,
       ],
     });
     const reply = json.choices?.[0]?.message?.content ?? "";
     return { reply };
   });
+
+// ---------- TOPIC EXPLORER (AI-generated overview) ----------
+const TopicOverviewInput = z.object({
+  topic: z.string().min(1),
+  subject: z.string().min(1),
+  classLevel: z.string().min(1),
+});
+
+export const topicOverview = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => TopicOverviewInput.parse(d))
+  .handler(async ({ data }) => {
+    const json = await callGateway({
+      messages: [
+        { role: "system", content: "You write compact Q&A-style study summaries for school students. Output clean markdown. Write any mathematics in LaTeX using $...$ inline and $$...$$ display equations — never raw brackets." },
+        { role: "user", content: `Create a short study summary for the topic "${data.topic}" (${data.subject}, ${data.classLevel}).
+Structure it as:
+## Quick overview
+2-3 sentences.
+## Key points
+4-6 bullets with the essential facts/formulas.
+## Common questions
+5 question-and-answer pairs in the form **Q:** … followed by **A:** …
+## One worked example
+A single short worked example.
+
+No preamble, no closing commentary.` },
+      ],
+    });
+    const markdown = json.choices?.[0]?.message?.content ?? "";
+    if (!markdown.trim()) throw new Error("Could not generate an overview — please try again.");
+    return { markdown };
+  });
+
 
 // ---------- CONTENT GENERATOR ----------
 const ContentInput = z.object({
