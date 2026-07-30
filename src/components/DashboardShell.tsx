@@ -189,3 +189,26 @@ export function PageHeader({ title, desc }: { title: string; desc?: string }) {
 export function useRequirePlan(profile: Profile | null, required: "pro" = "pro") {
   return { unlocked: isPaidPlan(profile?.plan), required };
 }
+
+/** Standard "upgrade to access" screen shown in place of a paid feature. */
+export function PaidGate({ role, feature }: { role: "teacher" | "student"; feature: string }) {
+  return (
+    <div className="max-w-lg mx-auto glass rounded-2xl p-10 text-center animate-in fade-in zoom-in-95 duration-300">
+      <div className="mx-auto h-14 w-14 rounded-2xl flex items-center justify-center" style={{ background: "var(--gradient-primary)" }}>
+        <Lock className="h-6 w-6 text-primary-foreground" />
+      </div>
+      <h2 className="mt-5 text-xl font-semibold">{feature} is a paid feature</h2>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Upgrade your plan to unlock {feature.toLowerCase()} and every other {role === "teacher" ? "teacher" : "premium"} tool in EduSense.
+      </p>
+      <Link
+        to={role === "teacher" ? "/teacher/plans" : "/student/plans"}
+        className="mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium text-primary-foreground glow transition-transform hover:-translate-y-0.5"
+        style={{ background: "var(--gradient-primary)" }}
+      >
+        <CreditCard className="h-4 w-4" /> View plans
+      </Link>
+    </div>
+  );
+}
+
