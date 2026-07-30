@@ -47,7 +47,8 @@ function TeacherTeams() {
     e.preventDefault();
     if (!name.trim() || !user) return;
     setBusy(true);
-    const { error } = await supabase.from("teams").insert({ teacher_id: user.id, name: name.trim() });
+    const join_code = Array.from({ length: 6 }, () => "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[Math.floor(Math.random() * 32)]).join("");
+    const { error } = await supabase.from("teams").insert({ teacher_id: user.id, name: name.trim(), join_code });
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success("Team created");

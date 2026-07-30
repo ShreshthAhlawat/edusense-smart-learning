@@ -19,6 +19,7 @@ import { Route as AuthenticatedVrLearningRouteImport } from './routes/_authentic
 import { Route as AuthenticatedSelectRoleRouteImport } from './routes/_authenticated.select-role'
 import { Route as AuthenticatedOwnerDashboardRouteImport } from './routes/_authenticated.owner-dashboard'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as AuthenticatedTeacherTeamsRouteImport } from './routes/_authenticated.teacher.teams'
 import { Route as AuthenticatedTeacherSettingsRouteImport } from './routes/_authenticated.teacher.settings'
 import { Route as AuthenticatedTeacherSamplePaperRouteImport } from './routes/_authenticated.teacher.sample-paper'
 import { Route as AuthenticatedTeacherQuizzesRouteImport } from './routes/_authenticated.teacher.quizzes'
@@ -89,6 +90,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedTeacherTeamsRoute =
+  AuthenticatedTeacherTeamsRouteImport.update({
+    id: '/teacher/teams',
+    path: '/teacher/teams',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedTeacherSettingsRoute =
   AuthenticatedTeacherSettingsRouteImport.update({
     id: '/teacher/settings',
@@ -231,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/teacher/quizzes': typeof AuthenticatedTeacherQuizzesRoute
   '/teacher/sample-paper': typeof AuthenticatedTeacherSamplePaperRoute
   '/teacher/settings': typeof AuthenticatedTeacherSettingsRoute
+  '/teacher/teams': typeof AuthenticatedTeacherTeamsRoute
   '/student/quiz/$quizId': typeof AuthenticatedStudentQuizQuizIdRoute
   '/student/tool/$slug': typeof AuthenticatedStudentToolSlugRoute
 }
@@ -261,6 +269,7 @@ export interface FileRoutesByTo {
   '/teacher/quizzes': typeof AuthenticatedTeacherQuizzesRoute
   '/teacher/sample-paper': typeof AuthenticatedTeacherSamplePaperRoute
   '/teacher/settings': typeof AuthenticatedTeacherSettingsRoute
+  '/teacher/teams': typeof AuthenticatedTeacherTeamsRoute
   '/student/quiz/$quizId': typeof AuthenticatedStudentQuizQuizIdRoute
   '/student/tool/$slug': typeof AuthenticatedStudentToolSlugRoute
 }
@@ -293,6 +302,7 @@ export interface FileRoutesById {
   '/_authenticated/teacher/quizzes': typeof AuthenticatedTeacherQuizzesRoute
   '/_authenticated/teacher/sample-paper': typeof AuthenticatedTeacherSamplePaperRoute
   '/_authenticated/teacher/settings': typeof AuthenticatedTeacherSettingsRoute
+  '/_authenticated/teacher/teams': typeof AuthenticatedTeacherTeamsRoute
   '/_authenticated/student/quiz/$quizId': typeof AuthenticatedStudentQuizQuizIdRoute
   '/_authenticated/student/tool/$slug': typeof AuthenticatedStudentToolSlugRoute
 }
@@ -325,6 +335,7 @@ export interface FileRouteTypes {
     | '/teacher/quizzes'
     | '/teacher/sample-paper'
     | '/teacher/settings'
+    | '/teacher/teams'
     | '/student/quiz/$quizId'
     | '/student/tool/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -355,6 +366,7 @@ export interface FileRouteTypes {
     | '/teacher/quizzes'
     | '/teacher/sample-paper'
     | '/teacher/settings'
+    | '/teacher/teams'
     | '/student/quiz/$quizId'
     | '/student/tool/$slug'
   id:
@@ -386,6 +398,7 @@ export interface FileRouteTypes {
     | '/_authenticated/teacher/quizzes'
     | '/_authenticated/teacher/sample-paper'
     | '/_authenticated/teacher/settings'
+    | '/_authenticated/teacher/teams'
     | '/_authenticated/student/quiz/$quizId'
     | '/_authenticated/student/tool/$slug'
   fileRoutesById: FileRoutesById
@@ -469,6 +482,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/teacher/teams': {
+      id: '/_authenticated/teacher/teams'
+      path: '/teacher/teams'
+      fullPath: '/teacher/teams'
+      preLoaderRoute: typeof AuthenticatedTeacherTeamsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/teacher/settings': {
@@ -629,6 +649,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTeacherQuizzesRoute: typeof AuthenticatedTeacherQuizzesRoute
   AuthenticatedTeacherSamplePaperRoute: typeof AuthenticatedTeacherSamplePaperRoute
   AuthenticatedTeacherSettingsRoute: typeof AuthenticatedTeacherSettingsRoute
+  AuthenticatedTeacherTeamsRoute: typeof AuthenticatedTeacherTeamsRoute
   AuthenticatedStudentQuizQuizIdRoute: typeof AuthenticatedStudentQuizQuizIdRoute
   AuthenticatedStudentToolSlugRoute: typeof AuthenticatedStudentToolSlugRoute
 }
@@ -656,6 +677,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedTeacherQuizzesRoute: AuthenticatedTeacherQuizzesRoute,
   AuthenticatedTeacherSamplePaperRoute: AuthenticatedTeacherSamplePaperRoute,
   AuthenticatedTeacherSettingsRoute: AuthenticatedTeacherSettingsRoute,
+  AuthenticatedTeacherTeamsRoute: AuthenticatedTeacherTeamsRoute,
   AuthenticatedStudentQuizQuizIdRoute: AuthenticatedStudentQuizQuizIdRoute,
   AuthenticatedStudentToolSlugRoute: AuthenticatedStudentToolSlugRoute,
 }
