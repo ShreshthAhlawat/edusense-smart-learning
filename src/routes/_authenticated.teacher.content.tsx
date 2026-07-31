@@ -109,16 +109,17 @@ function ContentGenerator() {
             <div className="glass rounded-2xl p-6 print-area">
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4 no-print">
                 <div className="text-sm text-muted-foreground truncate max-w-md">{result.link}</div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2 items-center">
+                  <SpeechPlayer text={result.markdown} label="Listen" />
                   <Button size="sm" variant="secondary" onClick={() => { navigator.clipboard.writeText(result.link); toast.success("Copied"); }}><Copy className="h-4 w-4 mr-1" /> Copy</Button>
                   <Button size="sm" variant="secondary" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Print</Button>
+                  <ShareWithTeam contentType="worksheet" contentId={result.id} />
                   <Button size="sm" onClick={() => { navigator.clipboard.writeText(result.link); toast.success("Share link copied!"); }} style={{ background: "var(--gradient-primary)" }} className="glow"><Share2 className="h-4 w-4 mr-1" /> Share</Button>
                 </div>
               </div>
               <h2 className="text-2xl font-bold mb-4">{result.title}</h2>
-              <article className="prose prose-invert max-w-none prose-headings:text-foreground prose-strong:text-foreground prose-p:text-foreground/90 prose-li:text-foreground/90">
-                <ReactMarkdown>{result.markdown}</ReactMarkdown>
-              </article>
+              <Markdown>{result.markdown}</Markdown>
+
             </div>
           )}
         </div>
