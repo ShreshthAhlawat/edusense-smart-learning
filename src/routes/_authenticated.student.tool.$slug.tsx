@@ -7,12 +7,15 @@ import { DashboardShell, PageHeader, isPaidPlan } from "@/components/DashboardSh
 import { ConfidenceOrb } from "@/components/ConfidenceOrb";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import ReactMarkdown from "react-markdown";
+import { Markdown } from "@/components/Markdown";
+import { SpeechPlayer } from "@/components/SpeechPlayer";
+import { safeExtract } from "@/lib/pdf";
 import { toast } from "sonner";
 import {
   Lock, MessageSquare, FileText, BookMarked, Rocket, Compass, Glasses, Send,
-  Loader2, Sparkles, Copy, Upload,
+  Loader2, Sparkles, Copy, Upload, Printer,
 } from "lucide-react";
+
 
 const TOOLS: Record<string, { title: string; desc: string; icon: any }> = {
   chatbot: { title: "AI Chatbot", desc: "Ask any doubt — get a friendly, curriculum-aware answer.", icon: MessageSquare },
