@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Copy, Loader2, ShieldCheck, Building2, Mail } from "lucide-react";
+import { Copy, Loader2, ShieldCheck, Building2, Mail, Users } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/owner-dashboard")({
   head: () => ({ meta: [
@@ -128,6 +128,8 @@ function OwnerDashboard() {
         </div>
       </div>
 
+      <UserManagement />
+
       <div className="mt-6 glass rounded-2xl p-6">
         <h2 className="font-semibold mb-4 flex items-center gap-2"><Mail className="h-4 w-4 text-primary" /> School license enquiries</h2>
         {requests.data && requests.data.length > 0 ? (
@@ -156,3 +158,99 @@ function OwnerDashboard() {
     </DashboardShell>
   );
 }
+
+const ROLES = ["teacher", "student"] as const;
+const PLANS = ["free", "pro", "school-pro"] as const;
+
+/** Owner-only user management: search users and edit their role / plan. */
+function UserManagement() {
+  const qc = useQueryClient();
+  const [term, setTerm] = useState("");
+  const [savingId, setSavingId] = useState<string | null>(null);
+
+  const users = useQuery({
+    queryKey: ["owner-users"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, username, email, role, plan, created_at")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const update = async (id: string, patch: { role?: "teacher" | "student" | null; plan?: "free" | "pro" | "school-pro" }) => {
+    setSavingId(id);
+    const { error } = await supabase.from("profiles").update(patch as any).eq("id", id);
+    setSavingId(null);
+    if (error) return toast.error(error.message);
+    toast.success("User updated");
+    qc.invalidateQueries({ queryKey: ["owner-users"] });
+  };
+
+  const q = term.trim().toLowerCase();
+  const rows = (users.data ?? []).filter((u: any) =>
+    !q || (u.email ?? "").toLowerCase().includes(q) || (u.username ?? "").toLowerCase().includes(q));
+
+  return (
+    <div className="mt-6 glass rounded-2xl p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <h2 className="font-semibold flex items-center gap-2"><Users className="h-4 w-4 text-primary" /> User management</h2>
+        <Input value={term} onChange={(e) => setTerm(e.target.value)} placeholder="Search by name or email" className="max-w-xs" />
+      </div>
+
+      {users.isLoading ? (
+        <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>
+      ) : rows.length ? (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground border-b border-border">
+                <th className="py-2 pr-3">User</th>
+                <th className="py-2 pr-3">Role</th>
+                <th className="py-2 pr-3">Plan</th>
+                <th className="py-2">Joined</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((u: any) => (
+                <tr key={u.id} className="border-b border-border/60">
+                  <td className="py-2 pr-3">
+                    <div className="font-medium">{u.username ?? "—"}</div>
+                    <div className="text-xs text-muted-foreground">{u.email}</div>
+                  </td>
+                  <td className="py-2 pr-3">
+                    <select
+                      value={u.role ?? ""}
+                      disabled={savingId === u.id}
+                      onChange={(e) => update(u.id, { role: (e.target.value || null) as any })}
+                      className="rounded-md border border-input bg-secondary/40 px-2 py-1 text-xs"
+                    >
+                      <option value="">— none —</option>
+                      {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+                    </select>
+                  </td>
+                  <td className="py-2 pr-3">
+                    <select
+                      value={u.plan}
+                      disabled={savingId === u.id}
+                      onChange={(e) => update(u.id, { plan: e.target.value as any })}
+                      className="rounded-md border border-input bg-secondary/40 px-2 py-1 text-xs"
+                    >
+                      {PLANS.map((p) => <option key={p} value={p}>{p}</option>)}
+                    </select>
+                  </td>
+                  <td className="py-2 text-xs text-muted-foreground">{new Date(u.created_at).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">No users match that search.</p>
+      )}
+    </div>
+  );
+}
+

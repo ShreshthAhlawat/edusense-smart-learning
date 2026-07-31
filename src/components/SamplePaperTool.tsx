@@ -1,28 +1,48 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { generateSamplePaper } from "@/lib/ai.functions";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
+import { Markdown } from "@/components/Markdown";
+import { SpeechPlayer } from "@/components/SpeechPlayer";
+import { ShareWithTeam } from "@/components/ShareWithTeam";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import ReactMarkdown from "react-markdown";
 import { Loader2, Printer, Copy, Sparkles } from "lucide-react";
 
-export function SamplePaperTool() {
+export function SamplePaperTool({ shareable = false }: { shareable?: boolean }) {
   const run = useServerFn(generateSamplePaper);
+  const { user } = useAuth();
   const [topics, setTopics] = useState("");
   const [classLevel, setClassLevel] = useState("Class 8");
   const [language, setLanguage] = useState("English");
   const [count, setCount] = useState(12);
   const [busy, setBusy] = useState(false);
   const [markdown, setMarkdown] = useState("");
+  const [savedId, setSavedId] = useState<string | null>(null);
 
   const go = async () => {
     if (!topics.trim()) return toast.error("Enter 2–3 topics, comma separated");
     setBusy(true);
+    setSavedId(null);
     try {
       const { markdown } = await run({ data: { topics, classLevel, language, totalQuestions: count } });
       setMarkdown(markdown);
+      // Teachers: persist so the paper can be shared with a team.
+      if (shareable && user) {
+        const { data } = await supabase.from("teacher_content").insert({
+          teacher_id: user.id,
+          kind: "sample_paper",
+          title: `Sample Paper: ${topics}`,
+          topic: topics,
+          class_level: classLevel,
+          language,
+          content_markdown: markdown,
+        }).select("id").maybeSingle();
+        if (data) setSavedId(data.id);
+      }
     } catch (e: any) {
       toast.error(e.message ?? "Could not generate sample paper");
     } finally {
@@ -64,16 +84,15 @@ export function SamplePaperTool() {
       <div className="glass rounded-2xl p-6 print-area">
         {markdown ? (
           <>
-            <div className="flex justify-between mb-4 no-print">
-              <div className="text-sm text-muted-foreground">Ready to print or share.</div>
-              <div className="flex gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-4 no-print">
+              <SpeechPlayer text={markdown} label="Listen" />
+              <div className="flex flex-wrap gap-2">
                 <Button size="sm" variant="secondary" onClick={() => { navigator.clipboard.writeText(markdown); toast.success("Copied"); }}><Copy className="h-4 w-4 mr-1" /> Copy</Button>
+                {shareable && <ShareWithTeam contentType="sample_paper" contentId={savedId} />}
                 <Button size="sm" onClick={() => window.print()} style={{ background: "var(--gradient-primary)" }} className="glow"><Printer className="h-4 w-4 mr-1" /> Print</Button>
               </div>
             </div>
-            <article className="prose prose-invert max-w-none prose-headings:text-foreground prose-strong:text-foreground prose-p:text-foreground/90 prose-li:text-foreground/90">
-              <ReactMarkdown>{markdown}</ReactMarkdown>
-            </article>
+            <Markdown>{markdown}</Markdown>
           </>
         ) : (
           <div className="text-center py-16 text-sm text-muted-foreground">Your printable sample paper will appear here.</div>

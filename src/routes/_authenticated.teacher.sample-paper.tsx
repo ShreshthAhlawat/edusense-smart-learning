@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/teacher/sample-paper")({
   component: () => (
     <DashboardShell role="teacher" greeting="Sample Paper Generator">
       <PageHeader title="Generate a sample paper" desc="Enter 2–5 topics — Gemini creates a printable paper with MCQ + written sections and an answer key." />
-      <SamplePaperTool />
+      <SamplePaperTool shareable />
     </DashboardShell>
   ),
 });
