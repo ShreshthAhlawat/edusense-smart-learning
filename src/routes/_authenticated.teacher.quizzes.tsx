@@ -10,7 +10,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { ShareWithTeam } from "@/components/ShareWithTeam";
+import { MathText } from "@/components/Markdown";
 import { Copy, Link as LinkIcon, Loader2, FileQuestion, Printer, Share2, Sparkles } from "lucide-react";
+
 
 export const Route = createFileRoute("/_authenticated/teacher/quizzes")({
   head: () => ({ meta: [
@@ -128,8 +131,9 @@ function QuizGenerator() {
               <span className="truncate max-w-md">{lastQuiz.link}</span>
               <button onClick={() => { navigator.clipboard.writeText(lastQuiz.link); toast.success("Copied"); }} className="text-muted-foreground hover:text-primary"><Copy className="h-4 w-4" /></button>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button size="sm" variant="secondary" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Print</Button>
+              <ShareWithTeam contentType="quiz" contentId={lastQuiz.id} />
               <Button size="sm" onClick={share} style={{ background: "var(--gradient-primary)" }} className="glow"><Share2 className="h-4 w-4 mr-1" /> Share</Button>
             </div>
           </div>
@@ -137,19 +141,26 @@ function QuizGenerator() {
           <ol className="space-y-4 list-decimal pl-5">
             {lastQuiz.questions.map((q: any, i: number) => (
               <li key={i}>
-                <div className="font-medium">{q.question}</div>
-                <ul className="mt-2 space-y-1 text-sm">
-                  {q.options.map((o: string, oi: number) => (
-                    <li key={oi} className="flex items-start gap-2">
-                      <span className="text-muted-foreground w-5">{String.fromCharCode(65 + oi)}.</span>
-                      <span>{o}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-1 text-xs text-muted-foreground print-only">Answer: {String.fromCharCode(65 + q.correct)} · Subtopic: {q.subtopic}</div>
+                <div className="font-medium"><MathText>{q.question}</MathText></div>
+                {q.options?.length ? (
+                  <ul className="mt-2 space-y-1 text-sm">
+                    {q.options.map((o: string, oi: number) => (
+                      <li key={oi} className="flex items-start gap-2">
+                        <span className="text-muted-foreground w-5">{String.fromCharCode(65 + oi)}.</span>
+                        <span><MathText>{o}</MathText></span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="mt-2 h-16 rounded-lg border border-dashed border-border" />
+                )}
+                <div className="mt-1 text-xs text-muted-foreground print-only">
+                  {q.options?.length ? `Answer: ${String.fromCharCode(65 + q.correct)} · ` : ""}Subtopic: {q.subtopic}
+                </div>
               </li>
             ))}
           </ol>
+
         </div>
       )}
     </DashboardShell>
