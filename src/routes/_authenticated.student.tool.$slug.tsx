@@ -172,23 +172,10 @@ function PdfSummarizer() {
 
   const onFile = async (f: File) => {
     setFile(f.name);
-    if (f.type === "text/plain") { setText(await f.text()); return; }
-    try {
-      const pdfjs: any = await import(/* @vite-ignore */ "https://esm.sh/pdfjs-dist@4.7.76/build/pdf.mjs" as any);
-      pdfjs.GlobalWorkerOptions.workerSrc = "https://esm.sh/pdfjs-dist@4.7.76/build/pdf.worker.mjs";
-      const buf = await f.arrayBuffer();
-      const pdf = await pdfjs.getDocument({ data: buf }).promise;
-      let out = "";
-      for (let p = 1; p <= Math.min(pdf.numPages, 30); p++) {
-        const page = await pdf.getPage(p);
-        const c = await page.getTextContent();
-        out += c.items.map((it: any) => it.str).join(" ") + "\n\n";
-      }
-      setText(out.slice(0, 120_000));
-    } catch (e: any) {
-      toast.error("Could not read PDF — paste text instead.");
-    }
+    const extracted = await safeExtract(f, (d, t) => setFile(`${f.name} — page ${d}/${t}`));
+    if (extracted) { setText(extracted); setFile(`${f.name} (full document read)`); }
   };
+
 
   const go = async () => {
     if (!text.trim() || text.trim().length < 20) return toast.error("Please upload a PDF or paste enough text");
@@ -230,10 +217,16 @@ function PdfSummarizer() {
           {busy ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Summarizing…</> : "Summarize"}
         </Button>
       </div>
-      <div className="glass rounded-2xl p-6">
-        <div className="flex items-center justify-between mb-3">
+      <div className="glass rounded-2xl p-6 print-area">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-3 no-print">
           <h3 className="font-semibold">Summary</h3>
-          {summary && <Button size="sm" variant="secondary" onClick={() => { navigator.clipboard.writeText(summary); toast.success("Copied"); }}><Copy className="h-4 w-4 mr-1" /> Copy</Button>}
+          {summary && (
+            <div className="flex items-center gap-2">
+              <SpeechPlayer text={summary} label="Listen" />
+              <Button size="sm" variant="secondary" onClick={() => { navigator.clipboard.writeText(summary); toast.success("Copied"); }}><Copy className="h-4 w-4 mr-1" /> Copy</Button>
+              <Button size="sm" variant="secondary" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Print</Button>
+            </div>
+          )}
         </div>
         {summary ? (
           <Markdown>{summary}</Markdown>
@@ -241,6 +234,7 @@ function PdfSummarizer() {
           <p className="text-sm text-muted-foreground">Upload a document and hit "Summarize" to see key concepts here.</p>
         )}
       </div>
+
     </div>
   );
 }
@@ -270,9 +264,10 @@ function StoryGen() {
         </Button>
       </div>
       {story && (
-        <div className="glass rounded-2xl p-6">
+        <div className="glass rounded-2xl p-6 print-area">
+          <div className="mb-3 flex justify-end no-print"><SpeechPlayer text={story} label="Listen to story" /></div>
           <Markdown>{story}</Markdown>
-          <div className="mt-4 flex justify-between">
+          <div className="mt-4 flex justify-between no-print">
             <Button size="sm" variant="secondary" onClick={() => { navigator.clipboard.writeText(story); toast.success("Copied"); }}><Copy className="h-4 w-4 mr-1" /> Copy</Button>
             <Button size="sm" onClick={() => generate(variant + 1)} disabled={busy} style={{ background: "var(--gradient-primary)" }} className="glow">
               {busy ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Sparkles className="h-4 w-4 mr-1" />}
@@ -281,6 +276,7 @@ function StoryGen() {
           </div>
         </div>
       )}
+
     </div>
   );
 }
@@ -295,20 +291,10 @@ function Explainer() {
 
   const onFile = async (f: File) => {
     setFile(f.name);
-    if (f.type === "text/plain") { setText(await f.text()); return; }
-    try {
-      const pdfjs: any = await import(/* @vite-ignore */ "https://esm.sh/pdfjs-dist@4.7.76/build/pdf.mjs" as any);
-      pdfjs.GlobalWorkerOptions.workerSrc = "https://esm.sh/pdfjs-dist@4.7.76/build/pdf.worker.mjs";
-      const buf = await f.arrayBuffer();
-      const pdf = await pdfjs.getDocument({ data: buf }).promise;
-      let s = "";
-      for (let p = 1; p <= Math.min(pdf.numPages, 30); p++) {
-        const c = await (await pdf.getPage(p)).getTextContent();
-        s += c.items.map((it: any) => it.str).join(" ") + "\n\n";
-      }
-      setText(s.slice(0, 120_000));
-    } catch { toast.error("Could not read PDF"); }
+    const extracted = await safeExtract(f, (d, t) => setFile(`${f.name} — page ${d}/${t}`));
+    if (extracted) { setText(extracted); setFile(`${f.name} (full document read)`); }
   };
+
 
   const go = async () => {
     if (!text.trim()) return toast.error("Add some text or upload a file");
@@ -343,11 +329,20 @@ function Explainer() {
           {busy ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Explaining…</> : "Explain"}
         </Button>
       </div>
-      <div className="glass rounded-2xl p-6">
-        <h3 className="font-semibold mb-3">Explanation</h3>
+      <div className="glass rounded-2xl p-6 print-area">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-3 no-print">
+          <h3 className="font-semibold">Explanation</h3>
+          {out && (
+            <div className="flex items-center gap-2">
+              <SpeechPlayer text={out} label="Listen" />
+              <Button size="sm" variant="secondary" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Print</Button>
+            </div>
+          )}
+        </div>
         {out ? <Markdown>{out}</Markdown>
           : <p className="text-sm text-muted-foreground">Your conversational explanation will appear here.</p>}
       </div>
+
     </div>
   );
 }
