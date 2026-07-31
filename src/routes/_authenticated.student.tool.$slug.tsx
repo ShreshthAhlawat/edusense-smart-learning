@@ -152,7 +152,7 @@ function MessageBubble({ m }: { m: Msg }) {
     <div className={"flex " + (m.role === "user" ? "justify-end" : "justify-start")}>
       <div className={"max-w-[85%] rounded-2xl px-4 py-2.5 text-sm " + (m.role === "user" ? "bg-primary/30 border border-primary/40" : "bg-secondary/60 border border-border")}>
         {m.role === "assistant" ? (
-          <article className="prose prose-sm max-w-none"><ReactMarkdown>{m.content}</ReactMarkdown></article>
+          <Markdown>{m.content}</Markdown>
         ) : (
           <div className="whitespace-pre-wrap">{m.content}</div>
         )}
@@ -236,7 +236,7 @@ function PdfSummarizer() {
           {summary && <Button size="sm" variant="secondary" onClick={() => { navigator.clipboard.writeText(summary); toast.success("Copied"); }}><Copy className="h-4 w-4 mr-1" /> Copy</Button>}
         </div>
         {summary ? (
-          <article className="prose prose-sm max-w-none"><ReactMarkdown>{summary}</ReactMarkdown></article>
+          <Markdown>{summary}</Markdown>
         ) : (
           <p className="text-sm text-muted-foreground">Upload a document and hit "Summarize" to see key concepts here.</p>
         )}
@@ -271,7 +271,7 @@ function StoryGen() {
       </div>
       {story && (
         <div className="glass rounded-2xl p-6">
-          <article className="prose max-w-none"><ReactMarkdown>{story}</ReactMarkdown></article>
+          <Markdown>{story}</Markdown>
           <div className="mt-4 flex justify-between">
             <Button size="sm" variant="secondary" onClick={() => { navigator.clipboard.writeText(story); toast.success("Copied"); }}><Copy className="h-4 w-4 mr-1" /> Copy</Button>
             <Button size="sm" onClick={() => generate(variant + 1)} disabled={busy} style={{ background: "var(--gradient-primary)" }} className="glow">
@@ -345,7 +345,7 @@ function Explainer() {
       </div>
       <div className="glass rounded-2xl p-6">
         <h3 className="font-semibold mb-3">Explanation</h3>
-        {out ? <article className="prose prose-sm max-w-none"><ReactMarkdown>{out}</ReactMarkdown></article>
+        {out ? <Markdown>{out}</Markdown>
           : <p className="text-sm text-muted-foreground">Your conversational explanation will appear here.</p>}
       </div>
     </div>
