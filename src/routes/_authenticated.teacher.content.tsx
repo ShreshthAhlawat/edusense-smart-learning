@@ -10,8 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import ReactMarkdown from "react-markdown";
+import { Markdown } from "@/components/Markdown";
+import { SpeechPlayer } from "@/components/SpeechPlayer";
+import { ShareWithTeam } from "@/components/ShareWithTeam";
 import { FileText, BookMarked, Sparkles, Loader2, Printer, Share2, Copy } from "lucide-react";
+
 
 export const Route = createFileRoute("/_authenticated/teacher/content")({
   head: () => ({ meta: [
