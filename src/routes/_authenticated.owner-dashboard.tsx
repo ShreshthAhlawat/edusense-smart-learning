@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Copy, Loader2, ShieldCheck, Building2, Mail } from "lucide-react";
+import { Copy, Loader2, ShieldCheck, Building2, Mail, Users } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/owner-dashboard")({
   head: () => ({ meta: [
@@ -180,9 +180,9 @@ function UserManagement() {
     },
   });
 
-  const update = async (id: string, patch: Record<string, any>) => {
+  const update = async (id: string, patch: { role?: "teacher" | "student" | null; plan?: "free" | "pro" | "school-pro" }) => {
     setSavingId(id);
-    const { error } = await supabase.from("profiles").update(patch).eq("id", id);
+    const { error } = await supabase.from("profiles").update(patch as any).eq("id", id);
     setSavingId(null);
     if (error) return toast.error(error.message);
     toast.success("User updated");
@@ -224,7 +224,7 @@ function UserManagement() {
                     <select
                       value={u.role ?? ""}
                       disabled={savingId === u.id}
-                      onChange={(e) => update(u.id, { role: e.target.value || null })}
+                      onChange={(e) => update(u.id, { role: (e.target.value || null) as any })}
                       className="rounded-md border border-input bg-secondary/40 px-2 py-1 text-xs"
                     >
                       <option value="">— none —</option>
@@ -235,7 +235,7 @@ function UserManagement() {
                     <select
                       value={u.plan}
                       disabled={savingId === u.id}
-                      onChange={(e) => update(u.id, { plan: e.target.value })}
+                      onChange={(e) => update(u.id, { plan: e.target.value as any })}
                       className="rounded-md border border-input bg-secondary/40 px-2 py-1 text-xs"
                     >
                       {PLANS.map((p) => <option key={p} value={p}>{p}</option>)}
