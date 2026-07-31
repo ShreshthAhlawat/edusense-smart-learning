@@ -1,181 +1,163 @@
 import { useEffect, useRef, useState } from "react";
-import { Mic, MicOff, Loader2, AlertTriangle, PhoneOff } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { chatWithTutor } from "@/lib/ai.functions";
+import { Mic, MicOff, Loader2, AlertTriangle, PhoneOff, Volume2, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { pickVoice } from "@/components/SpeechPlayer";
 
-type Status = "idle" | "connecting" | "listening" | "speaking" | "error";
+type Status = "idle" | "listening" | "thinking" | "speaking" | "error";
+type Turn = { role: "user" | "assistant"; content: string };
 
-// ---- audio helpers ----
-function encodePcm16(input: Float32Array): Int16Array {
-  const out = new Int16Array(input.length);
-  for (let i = 0; i < input.length; i++) {
-    const s = Math.max(-1, Math.min(1, input[i]));
-    out[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
-  }
-  return out;
-}
+const COACH: Record<"language" | "interview", string> = {
+  language:
+    "You are EduSense Coach, an encouraging spoken-English conversation partner for Indian students. Keep every reply to 1-3 short spoken sentences. Gently correct grammar or pronunciation, then ask one engaging follow-up question. Never use markdown, lists, or symbols — this is read aloud.",
+  interview:
+    "You are EduSense Coach, a warm but rigorous mock interviewer for Indian students preparing for competitive exams and college admissions. Ask ONE question at a time. After each answer give brief honest feedback in one or two sentences, then ask the next question. Never use markdown or symbols — this is read aloud.",
+};
 
-function downsampleTo16k(buffer: Float32Array, sampleRate: number): Float32Array {
-  if (sampleRate === 16000) return buffer;
-  const ratio = sampleRate / 16000;
-  const newLen = Math.round(buffer.length / ratio);
-  const result = new Float32Array(newLen);
-  let off = 0, i = 0;
-  while (i < newLen) {
-    const nextOff = Math.round((i + 1) * ratio);
-    let acc = 0, cnt = 0;
-    for (let j = off; j < nextOff && j < buffer.length; j++) { acc += buffer[j]; cnt++; }
-    result[i] = cnt ? acc / cnt : 0;
-    off = nextOff; i++;
-  }
-  return result;
-}
+const FEEDBACK_PROMPT =
+  "The session is ending. Give the student honest, specific closing feedback in 3-4 spoken sentences: what they did well, the single biggest thing to improve, and one concrete tip to practise.";
 
-function b64FromBytes(bytes: Uint8Array): string {
-  let s = "";
-  for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
-  return btoa(s);
-}
-function bytesFromB64(b: string): Uint8Array {
-  const bin = atob(b);
-  const out = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
-  return out;
-}
-
+/** Turn-based voice coach: SpeechRecognition in, Gemini in the middle, speechSynthesis out. */
 export function ConfidenceOrb() {
+  const runChat = useServerFn(chatWithTutor);
   const [mode, setMode] = useState<"language" | "interview" | null>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
-  const wsRef = useRef<WebSocket | null>(null);
-  const ctxRef = useRef<AudioContext | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const workletRef = useRef<ScriptProcessorNode | null>(null);
-  const playCtxRef = useRef<AudioContext | null>(null);
-  const playheadRef = useRef<number>(0);
-  const sourcesRef = useRef<AudioBufferSourceNode[]>([]);
+  const [turns, setTurns] = useState<Turn[]>([]);
+  const [interim, setInterim] = useState("");
+  const [voiceNote, setVoiceNote] = useState<string | null>(null);
+  const [sttSupported, setSttSupported] = useState(true);
 
-  const relayUrl = (import.meta as any).env?.VITE_GEMINI_RELAY_URL as string | undefined;
+  const recogRef = useRef<any>(null);
+  const turnsRef = useRef<Turn[]>([]);
+  const modeRef = useRef<"language" | "interview" | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const cleanup = () => {
-    try { wsRef.current?.close(); } catch {}
-    wsRef.current = null;
-    try { workletRef.current?.disconnect(); } catch {}
-    workletRef.current = null;
-    try { streamRef.current?.getTracks().forEach((t) => t.stop()); } catch {}
-    streamRef.current = null;
-    try { ctxRef.current?.close(); } catch {}
-    ctxRef.current = null;
-    sourcesRef.current.forEach((s) => { try { s.stop(); } catch {} });
-    sourcesRef.current = [];
-    try { playCtxRef.current?.close(); } catch {}
-    playCtxRef.current = null;
-    playheadRef.current = 0;
-  };
+  useEffect(() => { turnsRef.current = turns; }, [turns]);
+  useEffect(() => { scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" }); }, [turns, interim]);
 
-  useEffect(() => () => cleanup(), []);
+  useEffect(() => {
+    const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
+    setSttSupported(!!SR);
+  }, []);
 
-  const stopPlayback = () => {
-    sourcesRef.current.forEach((s) => { try { s.stop(); } catch {} });
-    sourcesRef.current = [];
-    playheadRef.current = 0;
-  };
+  useEffect(() => () => {
+    try { recogRef.current?.abort(); } catch { /* noop */ }
+    try { window.speechSynthesis?.cancel(); } catch { /* noop */ }
+  }, []);
 
-  const playChunk = (bytes: Uint8Array) => {
-    if (!playCtxRef.current) playCtxRef.current = new AudioContext({ sampleRate: 24000 });
-    const ctx = playCtxRef.current;
-    if (ctx.state === "suspended") ctx.resume().catch(() => {});
-    const samples = new Int16Array(bytes.buffer, bytes.byteOffset, Math.floor(bytes.byteLength / 2));
-    const floats = new Float32Array(samples.length);
-    for (let i = 0; i < samples.length; i++) floats[i] = samples[i] / 32768;
-    const buf = ctx.createBuffer(1, floats.length, 24000);
-    buf.copyToChannel(floats, 0);
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-    src.connect(ctx.destination);
-    const start = Math.max(playheadRef.current, ctx.currentTime + 0.02);
-    src.start(start);
-    playheadRef.current = start + buf.duration;
-    sourcesRef.current.push(src);
-    src.onended = () => { sourcesRef.current = sourcesRef.current.filter((s) => s !== src); };
+  const speak = (text: string, onDone?: () => void) => {
+    const synth = window.speechSynthesis;
+    if (!synth) { onDone?.(); return; }
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    const v = pickVoice(synth.getVoices());
+    if (v) {
+      u.voice = v; u.lang = v.lang;
+      if (!v.lang?.toLowerCase().startsWith("en-in")) setVoiceNote(`No Indian English (en-IN) voice found — using “${v.name}” instead.`);
+      else setVoiceNote(null);
+    } else {
+      u.lang = "en-IN";
+      setVoiceNote("No system voices detected — audio may be unavailable in this browser.");
+    }
     setStatus("speaking");
+    u.onend = () => { setStatus("idle"); onDone?.(); };
+    u.onerror = () => { setStatus("idle"); onDone?.(); };
+    synth.speak(u);
   };
 
-  const start = async (m: "language" | "interview") => {
-    setError(null);
-    setMode(m);
-    if (!relayUrl) {
-      setError("Voice relay not configured. Set VITE_GEMINI_RELAY_URL to your deployed relay's wss:// URL.");
-      setStatus("error");
-      return;
-    }
-    setStatus("connecting");
-
-    // Ask for mic first — surfaces the browser permission prompt.
-    let stream: MediaStream;
+  const askCoach = async (next: Turn[], extraSystem?: string) => {
+    setStatus("thinking");
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, channelCount: 1 } });
-    } catch {
-      setError("We couldn't access your microphone. Please allow mic permission and try again.");
+      const { reply } = await runChat({
+        data: {
+          messages: next.length ? next : [{ role: "user" as const, content: "Start the session with a warm opening line and your first question." }],
+          system: COACH[modeRef.current ?? "language"] + (extraSystem ? `\n\n${extraSystem}` : ""),
+          persona: "student" as const,
+        },
+      });
+      const updated: Turn[] = [...next, { role: "assistant", content: reply }];
+      setTurns(updated);
+      speak(reply);
+    } catch (e: any) {
+      setError(e?.message ?? "The coach could not respond. Please try again.");
       setStatus("error");
-      return;
     }
-    streamRef.current = stream;
-
-    // Open relay socket.
-    const ws = new WebSocket(relayUrl);
-    ws.binaryType = "arraybuffer";
-    wsRef.current = ws;
-
-    ws.onopen = () => {
-      ws.send(JSON.stringify({ type: "start", mode: m }));
-      setStatus("listening");
-      // Set up mic capture → 16k PCM chunks → send as base64.
-      const ctx = new AudioContext();
-      ctxRef.current = ctx;
-      const source = ctx.createMediaStreamSource(stream);
-      const proc = ctx.createScriptProcessor(4096, 1, 1);
-      workletRef.current = proc;
-      proc.onaudioprocess = (e) => {
-        if (ws.readyState !== WebSocket.OPEN) return;
-        const input = e.inputBuffer.getChannelData(0);
-        // Simple barge-in: any strong mic input while assistant is speaking → cut playback.
-        let peak = 0;
-        for (let i = 0; i < input.length; i++) { const a = Math.abs(input[i]); if (a > peak) peak = a; }
-        if (peak > 0.06 && sourcesRef.current.length > 0) {
-          stopPlayback();
-          ws.send(JSON.stringify({ type: "interrupt" }));
-        }
-        const down = downsampleTo16k(input, ctx.sampleRate);
-        const pcm = encodePcm16(down);
-        const bytes = new Uint8Array(pcm.buffer);
-        ws.send(JSON.stringify({ type: "audio", data: b64FromBytes(bytes) }));
-      };
-      source.connect(proc);
-      proc.connect(ctx.destination);
-    };
-
-    ws.onmessage = (ev) => {
-      try {
-        const msg = JSON.parse(typeof ev.data === "string" ? ev.data : new TextDecoder().decode(ev.data));
-        if (msg.type === "audio" && msg.data) playChunk(bytesFromB64(msg.data));
-        else if (msg.type === "turn_complete") setStatus("listening");
-        else if (msg.type === "interrupted") { stopPlayback(); setStatus("listening"); }
-        else if (msg.type === "error") { setError(msg.error || "Relay error"); setStatus("error"); }
-      } catch {}
-    };
-    ws.onerror = () => { setError("Voice relay connection failed."); setStatus("error"); };
-    ws.onclose = () => { if (status !== "error") setStatus("idle"); };
   };
 
-  const hangup = () => { cleanup(); setStatus("idle"); setMode(null); };
+  const listen = () => {
+    const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
+    if (!SR) { setError("Speech recognition isn’t supported in this browser. Try Chrome on desktop or Android."); setStatus("error"); return; }
+    try { window.speechSynthesis?.cancel(); } catch { /* noop */ }
+    const rec = new SR();
+    rec.lang = "en-IN";
+    rec.interimResults = true;
+    rec.continuous = false;
+    let finalText = "";
+    rec.onresult = (e: any) => {
+      let live = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) finalText += t; else live += t;
+      }
+      setInterim(live);
+    };
+    rec.onerror = (e: any) => {
+      setInterim("");
+      setStatus("idle");
+      if (e?.error === "not-allowed" || e?.error === "service-not-allowed") {
+        setError("Microphone access was blocked. Allow mic permission and press the orb to retry.");
+        setStatus("error");
+      }
+    };
+    rec.onend = () => {
+      setInterim("");
+      const said = finalText.trim();
+      if (!said) { setStatus("idle"); return; }
+      const next: Turn[] = [...turnsRef.current, { role: "user", content: said }];
+      setTurns(next);
+      askCoach(next);
+    };
+    recogRef.current = rec;
+    setError(null);
+    setStatus("listening");
+    try { rec.start(); } catch { setStatus("idle"); }
+  };
 
-  if (!mode || status === "idle") {
+  const stopListening = () => { try { recogRef.current?.stop(); } catch { /* noop */ } };
+
+  const start = (m: "language" | "interview") => {
+    modeRef.current = m;
+    setMode(m);
+    setTurns([]);
+    setError(null);
+    askCoach([]);
+  };
+
+  const endSession = async () => {
+    stopListening();
+    try { window.speechSynthesis?.cancel(); } catch { /* noop */ }
+    if (turnsRef.current.length) {
+      const next: Turn[] = [...turnsRef.current, { role: "user", content: FEEDBACK_PROMPT }];
+      await askCoach(next);
+    } else {
+      setMode(null); setStatus("idle");
+    }
+  };
+
+  const leave = () => {
+    stopListening();
+    try { window.speechSynthesis?.cancel(); } catch { /* noop */ }
+    setMode(null); setStatus("idle"); setTurns([]); setError(null);
+  };
+
+  if (!mode) {
     return (
       <div className="max-w-2xl mx-auto grid gap-4 md:grid-cols-2">
         {[
-          { key: "language", title: "Language practice", desc: "Casual English conversation with gentle corrections." },
-          { key: "interview", title: "Mock interview / competition", desc: "Practice interviews and competitive exams with feedback." },
+          { key: "language", title: "Language practice", desc: "Casual spoken English with gentle corrections." },
+          { key: "interview", title: "Mock interview / competition", desc: "Interview and competitive-exam practice with honest feedback." },
         ].map((c) => (
           <button key={c.key} onClick={() => start(c.key as any)} className="glass rounded-2xl p-6 text-left hover:-translate-y-0.5 hover:glow transition-all">
             <h3 className="font-semibold">{c.title}</h3>
@@ -183,55 +165,74 @@ export function ConfidenceOrb() {
             <div className="mt-4 inline-flex items-center gap-2 text-sm text-primary"><Mic className="h-4 w-4" /> Start voice session</div>
           </button>
         ))}
-        {!relayUrl && (
+        {!sttSupported && (
           <div className="md:col-span-2 rounded-2xl border border-yellow-500/40 bg-yellow-500/10 p-4 flex gap-3 text-sm">
             <AlertTriangle className="h-5 w-5 text-yellow-400 shrink-0" />
-            <div>
-              <div className="font-medium">Voice relay not configured yet.</div>
-              <p className="mt-1 text-muted-foreground">Deploy the small relay in <code className="text-xs">/relay</code> (see its README) and set <code className="text-xs">VITE_GEMINI_RELAY_URL</code> to its <code className="text-xs">wss://</code> URL.</p>
-            </div>
+            <div>This browser doesn’t support speech recognition. Use Chrome (desktop or Android) for the voice experience.</div>
           </div>
         )}
       </div>
     );
   }
 
-  const label = status === "connecting" ? "Connecting…"
-    : status === "listening" ? "Listening — speak anytime"
-    : status === "speaking" ? "Coach is speaking…"
-    : status === "error" ? "Something went wrong"
-    : "Ready";
+  const label =
+    status === "listening" ? "Listening — speak now" :
+    status === "thinking" ? "Thinking…" :
+    status === "speaking" ? "Coach is speaking…" :
+    status === "error" ? "Something went wrong" :
+    "Tap the orb and answer";
+
+  const busy = status === "thinking" || status === "speaking";
 
   return (
-    <div className="max-w-xl mx-auto flex flex-col items-center py-10">
-      <div className="relative h-72 w-72 flex items-center justify-center">
-        {/* Outer glow ring */}
-        <div className={"absolute inset-0 rounded-full opacity-40 blur-2xl transition-transform duration-500 " + (status === "speaking" ? "scale-110 animate-pulse" : status === "listening" ? "scale-100" : "scale-90")}
-          style={{ background: "var(--gradient-primary)" }} />
-        {/* Middle ring */}
-        <div className={"absolute h-56 w-56 rounded-full border border-primary/40 " + (status === "listening" ? "animate-ping" : "")} />
-        {/* Core orb */}
-        <div className={"relative h-40 w-40 rounded-full flex items-center justify-center glow transition-transform " + (status === "speaking" ? "scale-105" : "scale-100")}
+    <div className="max-w-2xl mx-auto flex flex-col items-center py-6">
+      <button
+        onClick={() => (status === "listening" ? stopListening() : busy ? undefined : listen())}
+        disabled={busy}
+        aria-label={status === "listening" ? "Stop listening" : "Start speaking"}
+        className="relative h-64 w-64 flex items-center justify-center outline-none"
+      >
+        <div
+          className={"absolute inset-0 rounded-full opacity-40 blur-2xl transition-transform duration-500 " +
+            (status === "speaking" ? "scale-110 animate-pulse" : status === "listening" ? "scale-105 animate-pulse" : status === "thinking" ? "scale-95" : "scale-90")}
+          style={{ background: "var(--gradient-primary)" }}
+        />
+        <div className={"absolute h-52 w-52 rounded-full border border-primary/40 " + (status === "listening" ? "animate-ping" : "")} />
+        <div className={"relative h-36 w-36 rounded-full flex items-center justify-center glow transition-transform " + (status === "speaking" ? "scale-105" : "scale-100")}
           style={{ background: "var(--gradient-primary)" }}>
-          {status === "connecting" ? <Loader2 className="h-10 w-10 animate-spin text-primary-foreground" />
+          {status === "thinking" ? <Loader2 className="h-10 w-10 animate-spin text-primary-foreground" />
+            : status === "speaking" ? <Volume2 className="h-10 w-10 text-primary-foreground" />
             : status === "error" ? <AlertTriangle className="h-10 w-10 text-primary-foreground" />
             : status === "listening" ? <Mic className="h-10 w-10 text-primary-foreground" />
             : <MicOff className="h-10 w-10 text-primary-foreground" />}
         </div>
-      </div>
+      </button>
 
-      <div className="mt-6 text-lg font-medium">{label}</div>
-      <div className="mt-1 text-xs text-muted-foreground uppercase tracking-wider">Mode: {mode}</div>
-
-      {error && (
-        <div className="mt-4 max-w-sm text-center text-sm text-red-400">{error}</div>
+      <div className="mt-5 text-lg font-medium">{label}</div>
+      <div className="mt-1 text-xs text-muted-foreground uppercase tracking-wider">Mode: {mode === "language" ? "Language practice" : "Mock interview"}</div>
+      {interim && <div className="mt-2 text-sm text-muted-foreground italic">“{interim}”</div>}
+      {error && <div className="mt-3 max-w-sm text-center text-sm text-red-400">{error}</div>}
+      {voiceNote && (
+        <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground"><Info className="h-3.5 w-3.5" /> {voiceNote}</div>
       )}
 
-      <div className="mt-8 flex gap-3">
-        {status === "error" ? (
-          <Button onClick={() => start(mode)} style={{ background: "var(--gradient-primary)" }} className="glow"><Mic className="h-4 w-4 mr-2" /> Retry</Button>
-        ) : null}
-        <Button variant="secondary" onClick={hangup}><PhoneOff className="h-4 w-4 mr-2" /> End session</Button>
+      <div className="mt-6 flex gap-3">
+        {status === "error" && <Button onClick={listen} style={{ background: "var(--gradient-primary)" }} className="glow"><Mic className="h-4 w-4 mr-2" /> Retry</Button>}
+        <Button variant="secondary" onClick={endSession} disabled={busy}>Finish &amp; get feedback</Button>
+        <Button variant="ghost" onClick={leave}><PhoneOff className="h-4 w-4 mr-2" /> Exit</Button>
+      </div>
+
+      <div ref={scrollRef} className="mt-8 w-full glass rounded-2xl p-5 max-h-72 overflow-y-auto space-y-3">
+        <div className="text-xs uppercase tracking-wider text-muted-foreground">Transcript</div>
+        {turns.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Your conversation will appear here as you speak.</p>
+        ) : turns.filter((t) => t.content !== FEEDBACK_PROMPT).map((t, i) => (
+          <div key={i} className={"flex " + (t.role === "user" ? "justify-end" : "justify-start")}>
+            <div className={"max-w-[85%] rounded-2xl px-4 py-2 text-sm " + (t.role === "user" ? "bg-primary/25 border border-primary/40" : "bg-secondary/60 border border-border")}>
+              {t.content}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
