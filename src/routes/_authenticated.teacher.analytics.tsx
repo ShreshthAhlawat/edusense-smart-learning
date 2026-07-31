@@ -34,7 +34,7 @@ function Analytics() {
         .eq("teacher_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as any[];
     },
     enabled: !!user,
   });
@@ -123,7 +123,7 @@ function Analytics() {
     .slice(0, 5);
 
   const nameOf = (studentId: string) => {
-    const m = (team?.team_members ?? []).find((x: any) => x.student_id === studentId);
+    const m: any = (team?.team_members ?? []).find((x: any) => x.student_id === studentId);
     return m?.profiles?.username ?? m?.profiles?.email ?? "Student";
   };
 
