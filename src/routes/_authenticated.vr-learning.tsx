@@ -23,23 +23,18 @@ export const Route = createFileRoute("/_authenticated/vr-learning")({
 
 type Model = { uid: string; title: string; creator: string; license: string; thumbnail: string | null; viewerUrl: string };
 
-// Curated "quick start" models — verified working Sketchfab CC embeds.
-const QUICK_START: Model[] = [
-  { uid: "168c3ec3d10d40b3bc9908c4b34d9f2f", title: "Human Heart", creator: "3D Anatomy", license: "CC-BY",
-    thumbnail: "https://media.sketchfab.com/models/168c3ec3d10d40b3bc9908c4b34d9f2f/thumbnails/3f8f8a3c0e2f4bd4938b9e2c6b0a9d43/1024x576.jpeg",
-    viewerUrl: "https://sketchfab.com/models/168c3ec3d10d40b3bc9908c4b34d9f2f/embed" },
-  { uid: "2100b789ac9247dab375ef0b1030f6f0", title: "Solar System", creator: "NASA / educational", license: "CC-BY",
-    thumbnail: "https://media.sketchfab.com/models/2100b789ac9247dab375ef0b1030f6f0/thumbnails/preview/1024x576.jpeg",
-    viewerUrl: "https://sketchfab.com/models/2100b789ac9247dab375ef0b1030f6f0/embed" },
-  { uid: "c6c8f3a4c9114cba9c4de1e0d7f5b9d3", title: "DNA Double Helix", creator: "BioModels", license: "CC-BY",
-    thumbnail: "https://media.sketchfab.com/models/c6c8f3a4c9114cba9c4de1e0d7f5b9d3/thumbnails/preview/1024x576.jpeg",
-    viewerUrl: "https://sketchfab.com/models/c6c8f3a4c9114cba9c4de1e0d7f5b9d3/embed" },
-  { uid: "3b8e6a9b0d4f4a0d9d2f0e8c5b1a1d2f", title: "T-Rex Skeleton", creator: "Natural History", license: "CC-BY",
-    thumbnail: "https://media.sketchfab.com/models/3b8e6a9b0d4f4a0d9d2f0e8c5b1a1d2f/thumbnails/preview/1024x576.jpeg",
-    viewerUrl: "https://sketchfab.com/models/3b8e6a9b0d4f4a0d9d2f0e8c5b1a1d2f/embed" },
-  { uid: "d9c7a1b0e3f24c5691e4c8d1f2a3b0c9", title: "Plant Cell", creator: "BioAtlas", license: "CC-BY",
-    thumbnail: "https://media.sketchfab.com/models/d9c7a1b0e3f24c5691e4c8d1f2a3b0c9/thumbnails/preview/1024x576.jpeg",
-    viewerUrl: "https://sketchfab.com/models/d9c7a1b0e3f24c5691e4c8d1f2a3b0c9/embed" },
+// Pre-fed starter topics for basic science & geography. Clicking one runs a
+// live Sketchfab search for verified CC-licensed models on that topic.
+const CURATED_TOPICS: { label: string; query: string; blurb: string }[] = [
+  { label: "Atom structure", query: "atom model nucleus electrons", blurb: "Nucleus, protons, neutrons & electron shells" },
+  { label: "Animal cell", query: "animal cell labelled organelles", blurb: "Labelled organelles of an animal cell" },
+  { label: "Plant cell", query: "plant cell labelled chloroplast", blurb: "Cell wall, chloroplasts & vacuole" },
+  { label: "Human heart", query: "human heart anatomy labelled", blurb: "Chambers, valves & blood flow" },
+  { label: "DNA double helix", query: "dna double helix model", blurb: "Base pairs and the twisted ladder" },
+  { label: "Human skeleton", query: "human skeleton anatomy", blurb: "Bones of the human body" },
+  { label: "Solar system", query: "solar system planets sun", blurb: "The Sun and all eight planets" },
+  { label: "Map of India", query: "india map states labelled 3d", blurb: "India with states & labelling" },
+  { label: "World map", query: "world map continents oceans globe", blurb: "Continents and oceans of the world" },
 ];
 
 function VRLearning() {
@@ -115,8 +110,22 @@ function VRLearning() {
       <PageHeader title="Search 3D models" desc="Type a topic to explore interactive Sketchfab models with proper Creative Commons licensing." />
 
       <section className="mb-8">
-        <h2 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider flex items-center gap-2"><Star className="h-3.5 w-3.5 text-primary" /> Quick-start topics</h2>
-        <ModelGrid models={QUICK_START} onOpen={setSelected} onSave={isTeacher ? saveModel : undefined} saveBusy={busy} />
+        <h2 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider flex items-center gap-2"><Star className="h-3.5 w-3.5 text-primary" /> Ready-made science & geography topics</h2>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {CURATED_TOPICS.map((t) => (
+            <button
+              key={t.label}
+              onClick={() => { setQuery(t.label); setSubmitted(t.query); }}
+              className={
+                "glass rounded-2xl p-4 text-left transition-all hover:-translate-y-0.5 hover:glow border " +
+                (submitted === t.query ? "border-primary bg-primary/10" : "border-transparent")
+              }
+            >
+              <div className="flex items-center gap-2 text-sm font-semibold"><Glasses className="h-4 w-4 text-primary" /> {t.label}</div>
+              <div className="mt-1 text-xs text-muted-foreground">{t.blurb}</div>
+            </button>
+          ))}
+        </div>
       </section>
 
       <div className="glass rounded-2xl p-4 flex gap-2 mb-6">
