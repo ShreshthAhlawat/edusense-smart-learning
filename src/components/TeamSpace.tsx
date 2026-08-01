@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -113,7 +112,7 @@ export function TeamSpace({ teamId, teamName }: { teamId: string; teamName: stri
             {shares.data.map((s) => {
               const Icon = ICONS[s.content_type] ?? FileText;
               return (
-                <Link key={s.id} to={s.href} className="glass rounded-2xl p-4 flex items-start gap-3 transition-all hover:-translate-y-0.5 hover:glow">
+                <a key={s.id} href={s.href} className="glass rounded-2xl p-4 flex items-start gap-3 transition-all hover:-translate-y-0.5 hover:glow">
                   <div className="h-9 w-9 shrink-0 rounded-lg flex items-center justify-center bg-primary/15 border border-primary/30">
                     <Icon className="h-4 w-4 text-primary" />
                   </div>
@@ -126,7 +125,7 @@ export function TeamSpace({ teamId, teamName }: { teamId: string; teamName: stri
                       Shared {new Date(s.shared_at).toLocaleDateString()}
                     </div>
                   </div>
-                </Link>
+                </a>
               );
             })}
           </div>
