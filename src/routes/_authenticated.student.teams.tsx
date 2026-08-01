@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -72,10 +72,16 @@ function StudentTeams() {
       ) : teams.data && teams.data.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2">
           {teams.data.map((m: any) => (
-            <div key={m.teams?.id} className="glass rounded-2xl p-5 transition-all hover:-translate-y-0.5 hover:glow">
+            <Link
+              key={m.teams?.id}
+              to="/student/team/$teamId"
+              params={{ teamId: m.teams?.id }}
+              className="glass rounded-2xl p-5 transition-all hover:-translate-y-0.5 hover:glow block"
+            >
               <div className="flex items-center gap-2 font-semibold"><Users2 className="h-4 w-4 text-primary" /> {m.teams?.name}</div>
               <div className="mt-1 text-xs text-muted-foreground">Joined {new Date(m.joined_at).toLocaleDateString()}</div>
-            </div>
+              <div className="mt-3 text-xs text-primary">Open team space — shared work & doubts →</div>
+            </Link>
           ))}
         </div>
       ) : (

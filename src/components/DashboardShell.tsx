@@ -3,6 +3,7 @@ import { type ReactNode } from "react";
 import { Logo } from "@/components/Logo";
 import { useAuth, isOwner, type Profile } from "@/lib/auth";
 import { useTheme } from "@/lib/theme";
+import { NotificationBell } from "@/components/NotificationBell";
 import {
   LayoutDashboard, FileQuestion, Sparkles, BarChart3, CreditCard,
   UserCircle, Settings, LogOut, TrendingUp, BookOpen, ListChecks,
@@ -141,6 +142,7 @@ export function DashboardShell({
             <button className="hidden md:flex items-center gap-1.5 rounded-lg glass px-3 py-1.5 text-sm">
               <Globe className="h-4 w-4" /> English
             </button>
+            <NotificationBell role={role} />
             <button onClick={toggle} className="rounded-lg glass p-2" aria-label="Toggle theme">
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>

@@ -41,7 +41,9 @@ import { Route as AuthenticatedStudentPlansRouteImport } from './routes/_authent
 import { Route as AuthenticatedStudentMyPlanRouteImport } from './routes/_authenticated.student.my-plan'
 import { Route as AuthenticatedStudentHomeworkRouteImport } from './routes/_authenticated.student.homework'
 import { Route as AuthenticatedStudentDashboardRouteImport } from './routes/_authenticated.student.dashboard'
+import { Route as AuthenticatedTeacherTeamTeamIdRouteImport } from './routes/_authenticated.teacher.team.$teamId'
 import { Route as AuthenticatedStudentToolSlugRouteImport } from './routes/_authenticated.student.tool.$slug'
+import { Route as AuthenticatedStudentTeamTeamIdRouteImport } from './routes/_authenticated.student.team.$teamId'
 import { Route as AuthenticatedStudentQuizQuizIdRouteImport } from './routes/_authenticated.student.quiz.$quizId'
 
 const PaymentSuccessRoute = PaymentSuccessRouteImport.update({
@@ -226,10 +228,22 @@ const AuthenticatedStudentDashboardRoute =
     path: '/student/dashboard',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedTeacherTeamTeamIdRoute =
+  AuthenticatedTeacherTeamTeamIdRouteImport.update({
+    id: '/teacher/team/$teamId',
+    path: '/teacher/team/$teamId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedStudentToolSlugRoute =
   AuthenticatedStudentToolSlugRouteImport.update({
     id: '/student/tool/$slug',
     path: '/student/tool/$slug',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentTeamTeamIdRoute =
+  AuthenticatedStudentTeamTeamIdRouteImport.update({
+    id: '/student/team/$teamId',
+    path: '/student/team/$teamId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedStudentQuizQuizIdRoute =
@@ -272,7 +286,9 @@ export interface FileRoutesByFullPath {
   '/teacher/teams': typeof AuthenticatedTeacherTeamsRoute
   '/teacher/topic-explorer': typeof AuthenticatedTeacherTopicExplorerRoute
   '/student/quiz/$quizId': typeof AuthenticatedStudentQuizQuizIdRoute
+  '/student/team/$teamId': typeof AuthenticatedStudentTeamTeamIdRoute
   '/student/tool/$slug': typeof AuthenticatedStudentToolSlugRoute
+  '/teacher/team/$teamId': typeof AuthenticatedTeacherTeamTeamIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -307,7 +323,9 @@ export interface FileRoutesByTo {
   '/teacher/teams': typeof AuthenticatedTeacherTeamsRoute
   '/teacher/topic-explorer': typeof AuthenticatedTeacherTopicExplorerRoute
   '/student/quiz/$quizId': typeof AuthenticatedStudentQuizQuizIdRoute
+  '/student/team/$teamId': typeof AuthenticatedStudentTeamTeamIdRoute
   '/student/tool/$slug': typeof AuthenticatedStudentToolSlugRoute
+  '/teacher/team/$teamId': typeof AuthenticatedTeacherTeamTeamIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -344,7 +362,9 @@ export interface FileRoutesById {
   '/_authenticated/teacher/teams': typeof AuthenticatedTeacherTeamsRoute
   '/_authenticated/teacher/topic-explorer': typeof AuthenticatedTeacherTopicExplorerRoute
   '/_authenticated/student/quiz/$quizId': typeof AuthenticatedStudentQuizQuizIdRoute
+  '/_authenticated/student/team/$teamId': typeof AuthenticatedStudentTeamTeamIdRoute
   '/_authenticated/student/tool/$slug': typeof AuthenticatedStudentToolSlugRoute
+  '/_authenticated/teacher/team/$teamId': typeof AuthenticatedTeacherTeamTeamIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -381,7 +401,9 @@ export interface FileRouteTypes {
     | '/teacher/teams'
     | '/teacher/topic-explorer'
     | '/student/quiz/$quizId'
+    | '/student/team/$teamId'
     | '/student/tool/$slug'
+    | '/teacher/team/$teamId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -416,7 +438,9 @@ export interface FileRouteTypes {
     | '/teacher/teams'
     | '/teacher/topic-explorer'
     | '/student/quiz/$quizId'
+    | '/student/team/$teamId'
     | '/student/tool/$slug'
+    | '/teacher/team/$teamId'
   id:
     | '__root__'
     | '/'
@@ -452,7 +476,9 @@ export interface FileRouteTypes {
     | '/_authenticated/teacher/teams'
     | '/_authenticated/teacher/topic-explorer'
     | '/_authenticated/student/quiz/$quizId'
+    | '/_authenticated/student/team/$teamId'
     | '/_authenticated/student/tool/$slug'
+    | '/_authenticated/teacher/team/$teamId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -690,11 +716,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/teacher/team/$teamId': {
+      id: '/_authenticated/teacher/team/$teamId'
+      path: '/teacher/team/$teamId'
+      fullPath: '/teacher/team/$teamId'
+      preLoaderRoute: typeof AuthenticatedTeacherTeamTeamIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/student/tool/$slug': {
       id: '/_authenticated/student/tool/$slug'
       path: '/student/tool/$slug'
       fullPath: '/student/tool/$slug'
       preLoaderRoute: typeof AuthenticatedStudentToolSlugRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/student/team/$teamId': {
+      id: '/_authenticated/student/team/$teamId'
+      path: '/student/team/$teamId'
+      fullPath: '/student/team/$teamId'
+      preLoaderRoute: typeof AuthenticatedStudentTeamTeamIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/student/quiz/$quizId': {
@@ -735,7 +775,9 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTeacherTeamsRoute: typeof AuthenticatedTeacherTeamsRoute
   AuthenticatedTeacherTopicExplorerRoute: typeof AuthenticatedTeacherTopicExplorerRoute
   AuthenticatedStudentQuizQuizIdRoute: typeof AuthenticatedStudentQuizQuizIdRoute
+  AuthenticatedStudentTeamTeamIdRoute: typeof AuthenticatedStudentTeamTeamIdRoute
   AuthenticatedStudentToolSlugRoute: typeof AuthenticatedStudentToolSlugRoute
+  AuthenticatedTeacherTeamTeamIdRoute: typeof AuthenticatedTeacherTeamTeamIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -769,7 +811,9 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedTeacherTopicExplorerRoute:
     AuthenticatedTeacherTopicExplorerRoute,
   AuthenticatedStudentQuizQuizIdRoute: AuthenticatedStudentQuizQuizIdRoute,
+  AuthenticatedStudentTeamTeamIdRoute: AuthenticatedStudentTeamTeamIdRoute,
   AuthenticatedStudentToolSlugRoute: AuthenticatedStudentToolSlugRoute,
+  AuthenticatedTeacherTeamTeamIdRoute: AuthenticatedTeacherTeamTeamIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
