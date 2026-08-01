@@ -68,12 +68,16 @@ export function isPaidPlan(plan: Profile["plan"] | undefined | null) {
 export function DashboardShell({
   role, greeting, children,
 }: { role: "teacher" | "student"; greeting?: string; children: ReactNode }) {
-  const groups = role === "teacher" ? teacherGroups : studentGroups;
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const { profile, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const { theme, toggle } = useTheme();
   const navigate = useNavigate();
   const isPro = isPaidPlan(profile?.plan);
+  const baseGroups = role === "teacher" ? teacherGroups : studentGroups;
+  const groups: NavGroup[] = isOwner(user)
+    ? [...baseGroups, { label: "Internal", items: [{ to: "/owner-dashboard", label: "Owner Dashboard", icon: ShieldCheck }] }]
+    : baseGroups;
+
 
   return (
     <div className="flex min-h-screen w-full">
