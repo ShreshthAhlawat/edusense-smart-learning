@@ -430,6 +430,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      content_shared_with_user: {
+        Args: { _content_id: string; _user_id: string }
+        Returns: boolean
+      }
+      get_public_quiz: { Args: { _quiz_id: string }; Returns: Json }
       is_team_member: {
         Args: { _team_id: string; _user_id: string }
         Returns: boolean
@@ -440,6 +445,19 @@ export type Database = {
       }
       join_team_by_code: { Args: { _code: string }; Returns: Json }
       redeem_school_code: { Args: { _code: string }; Returns: Json }
+      shares_team_with: {
+        Args: { _teacher_id: string; _user_id: string }
+        Returns: boolean
+      }
+      submit_public_quiz_attempt: {
+        Args: {
+          _guest_name: string
+          _mcq_answers: Json
+          _quiz_id: string
+          _written_answers?: Json
+        }
+        Returns: Json
+      }
     }
     Enums: {
       user_plan: "free" | "pro" | "school-pro"

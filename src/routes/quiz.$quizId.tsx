@@ -36,7 +36,12 @@ function PublicQuiz() {
 
   const quiz = useQuery({
     queryKey: ["public-quiz", quizId],
-    queryFn: async () => (await supabase.from("quizzes").select("*").eq("id", quizId).maybeSingle()).data,
+    queryFn: async () => {
+      // Answers are never sent to the browser: the server returns a sanitized quiz.
+      const { data, error } = await supabase.rpc("get_public_quiz" as any, { _quiz_id: quizId });
+      if (error) throw error;
+      return (data as any) ?? null;
+    },
   });
   const questions = (quiz.data?.questions as Q[]) ?? [];
   const q = questions[idx];
@@ -44,35 +49,27 @@ function PublicQuiz() {
   const submit = async () => {
     if (!quiz.data) return;
     setSubmitting(true);
-    const breakdown: Record<string, { correct: number; total: number }> = {};
-    let correct = 0;
-    let totalScored = 0;
     const written: { q: string; answer: string; subtopic: string }[] = [];
     questions.forEach((qq, i) => {
-      if (qq.type === "written") {
-        written.push({ q: qq.question, answer: writtenAnswers[i] ?? "", subtopic: qq.subtopic });
-        return;
-      }
-      const b = (breakdown[qq.subtopic] ??= { correct: 0, total: 0 });
-      b.total += 1; totalScored += 1;
-      if (mcqAnswers[i] === qq.correct) { b.correct += 1; correct += 1; }
+      if (qq.type === "written") written.push({ q: qq.question, answer: writtenAnswers[i] ?? "", subtopic: qq.subtopic });
     });
-    const score = totalScored > 0 ? Math.round((correct / totalScored) * 100) : 0;
-    const weakest = Object.entries(breakdown).sort((a, b) => (a[1].correct / a[1].total) - (b[1].correct / b[1].total))[0]?.[0] ?? null;
 
-    const payload: any = {
-      quiz_id: quiz.data.id, subject: quiz.data.subject,
-      score, correct_count: correct, total_count: totalScored,
-      subtopic_breakdown: breakdown, written_answers: written,
-    };
-    if (user) payload.student_id = user.id;
-    else payload.guest_name = guestName.trim() || "Guest";
-
-    const { error } = await supabase.from("quiz_attempts").insert(payload);
+    // Scoring happens server-side against the hidden answer key.
+    const { data, error } = await supabase.rpc("submit_public_quiz_attempt" as any, {
+      _quiz_id: quiz.data.id,
+      _guest_name: user ? null : (guestName.trim() || "Guest"),
+      _mcq_answers: mcqAnswers as any,
+      _written_answers: written as any,
+    });
     setSubmitting(false);
     if (error) return toast.error(error.message);
-    setResult({ score, breakdown, weakest });
+    const res = data as any;
+    if (!res?.ok) return toast.error(res?.error ?? "Could not submit");
+    const breakdown = (res.breakdown ?? {}) as Record<string, { correct: number; total: number }>;
+    const weakest = Object.entries(breakdown).sort((a, b) => (a[1].correct / a[1].total) - (b[1].correct / b[1].total))[0]?.[0] ?? null;
+    setResult({ score: Number(res.score) || 0, breakdown, weakest });
   };
+
 
   if (quiz.isLoading) return <Shell><div className="flex justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div></Shell>;
   if (!quiz.data) return <Shell><div className="text-center py-20"><h1 className="text-2xl font-bold">Quiz not found</h1><Link to="/" className="text-primary hover:underline mt-4 inline-block">Go home</Link></div></Shell>;
