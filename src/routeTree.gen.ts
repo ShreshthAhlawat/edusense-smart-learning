@@ -42,6 +42,7 @@ import { Route as AuthenticatedStudentMyPlanRouteImport } from './routes/_authen
 import { Route as AuthenticatedStudentHomeworkRouteImport } from './routes/_authenticated.student.homework'
 import { Route as AuthenticatedStudentDashboardRouteImport } from './routes/_authenticated.student.dashboard'
 import { Route as AuthenticatedStudentToolSlugRouteImport } from './routes/_authenticated.student.tool.$slug'
+import { Route as AuthenticatedStudentTeamTeamIdRouteImport } from './routes/_authenticated.student.team.$teamId'
 import { Route as AuthenticatedStudentQuizQuizIdRouteImport } from './routes/_authenticated.student.quiz.$quizId'
 
 const PaymentSuccessRoute = PaymentSuccessRouteImport.update({
@@ -232,6 +233,12 @@ const AuthenticatedStudentToolSlugRoute =
     path: '/student/tool/$slug',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedStudentTeamTeamIdRoute =
+  AuthenticatedStudentTeamTeamIdRouteImport.update({
+    id: '/student/team/$teamId',
+    path: '/student/team/$teamId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedStudentQuizQuizIdRoute =
   AuthenticatedStudentQuizQuizIdRouteImport.update({
     id: '/student/quiz/$quizId',
@@ -272,6 +279,7 @@ export interface FileRoutesByFullPath {
   '/teacher/teams': typeof AuthenticatedTeacherTeamsRoute
   '/teacher/topic-explorer': typeof AuthenticatedTeacherTopicExplorerRoute
   '/student/quiz/$quizId': typeof AuthenticatedStudentQuizQuizIdRoute
+  '/student/team/$teamId': typeof AuthenticatedStudentTeamTeamIdRoute
   '/student/tool/$slug': typeof AuthenticatedStudentToolSlugRoute
 }
 export interface FileRoutesByTo {
@@ -307,6 +315,7 @@ export interface FileRoutesByTo {
   '/teacher/teams': typeof AuthenticatedTeacherTeamsRoute
   '/teacher/topic-explorer': typeof AuthenticatedTeacherTopicExplorerRoute
   '/student/quiz/$quizId': typeof AuthenticatedStudentQuizQuizIdRoute
+  '/student/team/$teamId': typeof AuthenticatedStudentTeamTeamIdRoute
   '/student/tool/$slug': typeof AuthenticatedStudentToolSlugRoute
 }
 export interface FileRoutesById {
@@ -344,6 +353,7 @@ export interface FileRoutesById {
   '/_authenticated/teacher/teams': typeof AuthenticatedTeacherTeamsRoute
   '/_authenticated/teacher/topic-explorer': typeof AuthenticatedTeacherTopicExplorerRoute
   '/_authenticated/student/quiz/$quizId': typeof AuthenticatedStudentQuizQuizIdRoute
+  '/_authenticated/student/team/$teamId': typeof AuthenticatedStudentTeamTeamIdRoute
   '/_authenticated/student/tool/$slug': typeof AuthenticatedStudentToolSlugRoute
 }
 export interface FileRouteTypes {
@@ -381,6 +391,7 @@ export interface FileRouteTypes {
     | '/teacher/teams'
     | '/teacher/topic-explorer'
     | '/student/quiz/$quizId'
+    | '/student/team/$teamId'
     | '/student/tool/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -416,6 +427,7 @@ export interface FileRouteTypes {
     | '/teacher/teams'
     | '/teacher/topic-explorer'
     | '/student/quiz/$quizId'
+    | '/student/team/$teamId'
     | '/student/tool/$slug'
   id:
     | '__root__'
@@ -452,6 +464,7 @@ export interface FileRouteTypes {
     | '/_authenticated/teacher/teams'
     | '/_authenticated/teacher/topic-explorer'
     | '/_authenticated/student/quiz/$quizId'
+    | '/_authenticated/student/team/$teamId'
     | '/_authenticated/student/tool/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -697,6 +710,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentToolSlugRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/student/team/$teamId': {
+      id: '/_authenticated/student/team/$teamId'
+      path: '/student/team/$teamId'
+      fullPath: '/student/team/$teamId'
+      preLoaderRoute: typeof AuthenticatedStudentTeamTeamIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/student/quiz/$quizId': {
       id: '/_authenticated/student/quiz/$quizId'
       path: '/student/quiz/$quizId'
@@ -735,6 +755,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTeacherTeamsRoute: typeof AuthenticatedTeacherTeamsRoute
   AuthenticatedTeacherTopicExplorerRoute: typeof AuthenticatedTeacherTopicExplorerRoute
   AuthenticatedStudentQuizQuizIdRoute: typeof AuthenticatedStudentQuizQuizIdRoute
+  AuthenticatedStudentTeamTeamIdRoute: typeof AuthenticatedStudentTeamTeamIdRoute
   AuthenticatedStudentToolSlugRoute: typeof AuthenticatedStudentToolSlugRoute
 }
 
@@ -769,6 +790,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedTeacherTopicExplorerRoute:
     AuthenticatedTeacherTopicExplorerRoute,
   AuthenticatedStudentQuizQuizIdRoute: AuthenticatedStudentQuizQuizIdRoute,
+  AuthenticatedStudentTeamTeamIdRoute: AuthenticatedStudentTeamTeamIdRoute,
   AuthenticatedStudentToolSlugRoute: AuthenticatedStudentToolSlugRoute,
 }
 
