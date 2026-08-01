@@ -1,13 +1,13 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { type ReactNode } from "react";
 import { Logo } from "@/components/Logo";
-import { useAuth, type Profile } from "@/lib/auth";
+import { useAuth, isOwner, type Profile } from "@/lib/auth";
 import { useTheme } from "@/lib/theme";
 import {
   LayoutDashboard, FileQuestion, Sparkles, BarChart3, CreditCard,
   UserCircle, Settings, LogOut, TrendingUp, BookOpen, ListChecks,
   MessageSquare, FileText, BookMarked, Rocket, Compass, Glasses,
-  Lock, Sun, Moon, Globe, Zap, ScrollText, Wand2, Users2, Telescope,
+  Lock, Sun, Moon, Globe, Zap, ScrollText, Wand2, Users2, Telescope, ShieldCheck,
 } from "lucide-react";
 
 type NavItem = { to: string; label: string; icon: any; locked?: boolean };
