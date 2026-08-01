@@ -32,16 +32,36 @@ function TeacherTeams() {
   const teams = useQuery({
     queryKey: ["teacher-teams", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: rows, error } = await supabase
         .from("teams")
-        .select("*, team_members(student_id, joined_at, profiles:student_id(username, email))")
+        .select("*")
         .eq("teacher_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      const teamList = rows ?? [];
+      if (!teamList.length) return [];
+
+      const { data: members } = await supabase
+        .from("team_members")
+        .select("team_id, student_id, joined_at")
+        .in("team_id", teamList.map((t) => t.id));
+
+      const ids = [...new Set((members ?? []).map((m) => m.student_id))];
+      const { data: people } = ids.length
+        ? await supabase.from("profiles").select("id, username, email").in("id", ids)
+        : { data: [] as any[] };
+      const byId = new Map((people ?? []).map((p: any) => [p.id, p]));
+
+      return teamList.map((t) => ({
+        ...t,
+        team_members: (members ?? [])
+          .filter((m) => m.team_id === t.id)
+          .map((m) => ({ ...m, profiles: byId.get(m.student_id) ?? null })),
+      }));
     },
     enabled: !!user,
   });
+
 
   const create = async (e: React.FormEvent) => {
     e.preventDefault();

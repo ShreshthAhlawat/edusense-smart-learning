@@ -1,13 +1,13 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { type ReactNode } from "react";
 import { Logo } from "@/components/Logo";
-import { useAuth, type Profile } from "@/lib/auth";
+import { useAuth, isOwner, type Profile } from "@/lib/auth";
 import { useTheme } from "@/lib/theme";
 import {
   LayoutDashboard, FileQuestion, Sparkles, BarChart3, CreditCard,
   UserCircle, Settings, LogOut, TrendingUp, BookOpen, ListChecks,
   MessageSquare, FileText, BookMarked, Rocket, Compass, Glasses,
-  Lock, Sun, Moon, Globe, Zap, ScrollText, Wand2, Users2, Telescope,
+  Lock, Sun, Moon, Globe, Zap, ScrollText, Wand2, Users2, Telescope, ShieldCheck,
 } from "lucide-react";
 
 type NavItem = { to: string; label: string; icon: any; locked?: boolean };
@@ -68,12 +68,16 @@ export function isPaidPlan(plan: Profile["plan"] | undefined | null) {
 export function DashboardShell({
   role, greeting, children,
 }: { role: "teacher" | "student"; greeting?: string; children: ReactNode }) {
-  const groups = role === "teacher" ? teacherGroups : studentGroups;
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const { profile, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const { theme, toggle } = useTheme();
   const navigate = useNavigate();
   const isPro = isPaidPlan(profile?.plan);
+  const baseGroups = role === "teacher" ? teacherGroups : studentGroups;
+  const groups: NavGroup[] = isOwner(user)
+    ? [...baseGroups, { label: "Internal", items: [{ to: "/owner-dashboard", label: "Owner Dashboard", icon: ShieldCheck }] }]
+    : baseGroups;
+
 
   return (
     <div className="flex min-h-screen w-full">
