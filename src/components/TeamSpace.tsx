@@ -50,8 +50,8 @@ export function useTeamShares(teamId: string | undefined) {
           : Promise.resolve({ data: [] as any[] } as any),
       ]);
 
-      const quizById = new Map((quizzes ?? []).map((q: any) => [q.id, q]));
-      const contentById = new Map((contents ?? []).map((c: any) => [c.id, c]));
+      const quizById = new Map<string, any>((quizzes ?? []).map((q: any) => [q.id, q]));
+      const contentById = new Map<string, any>((contents ?? []).map((c: any) => [c.id, c]));
 
       return rows.map((r) => {
         if (r.content_type === "quiz") {
