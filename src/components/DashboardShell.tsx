@@ -156,10 +156,15 @@ export function DashboardShell({
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Topbar */}
-        <header className="sticky top-0 z-20 backdrop-blur-xl bg-background/40 border-b border-border h-16 flex items-center justify-between px-4 md:px-8">
-          <div>
-            <div className="text-sm text-muted-foreground">Hi{profile?.username ? `, ${profile.username}` : ""} 👋</div>
-            <div className="text-lg font-semibold">{greeting ?? "Welcome back"}</div>
+        <header className="sticky top-0 z-20 backdrop-blur-xl bg-background/40 border-b border-border h-16 flex items-center justify-between gap-2 px-4 md:px-8">
+          <div className="flex min-w-0 items-center gap-2">
+            <button className="md:hidden shrink-0 rounded-lg glass p-2" aria-label="Open menu" onClick={() => setMobileOpen(true)}>
+              <Menu className="h-4 w-4" />
+            </button>
+            <div className="min-w-0">
+              <div className="truncate text-sm text-muted-foreground">Hi{profile?.username ? `, ${profile.username}` : ""} 👋</div>
+              <div className="truncate text-lg font-semibold">{greeting ?? "Welcome back"}</div>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <button className="hidden md:flex items-center gap-1.5 rounded-lg glass px-3 py-1.5 text-sm">
