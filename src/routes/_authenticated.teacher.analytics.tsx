@@ -30,14 +30,34 @@ function Analytics() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("teams")
-        .select("id, name, join_code, team_members(student_id, profiles:student_id(username, email))")
+        .select("id, name, join_code")
         .eq("teacher_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as any[];
+      const teamRows = data ?? [];
+      if (!teamRows.length) return [];
+
+      const { data: members } = await supabase
+        .from("team_members")
+        .select("team_id, student_id")
+        .in("team_id", teamRows.map((t) => t.id));
+
+      const studentIds = [...new Set((members ?? []).map((m) => m.student_id))];
+      const { data: profs } = studentIds.length
+        ? await supabase.from("profiles").select("id, username, email").in("id", studentIds)
+        : { data: [] as any[] };
+      const profById = new Map<string, any>((profs ?? []).map((p: any) => [p.id, p]));
+
+      return teamRows.map((t) => ({
+        ...t,
+        team_members: (members ?? [])
+          .filter((m) => m.team_id === t.id)
+          .map((m) => ({ student_id: m.student_id, profiles: profById.get(m.student_id) ?? null })),
+      })) as any[];
     },
     enabled: !!user,
   });
+
 
   const team = teams.data?.find((t: any) => t.id === teamId) ?? null;
   const memberIds: string[] = (team?.team_members ?? []).map((m: any) => m.student_id);
