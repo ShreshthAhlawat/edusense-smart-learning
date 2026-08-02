@@ -1,5 +1,5 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { type ReactNode } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { useAuth, isOwner, type Profile } from "@/lib/auth";
 import { useTheme } from "@/lib/theme";
@@ -9,6 +9,7 @@ import {
   UserCircle, Settings, LogOut, TrendingUp, BookOpen, ListChecks,
   MessageSquare, FileText, BookMarked, Rocket, Compass, Glasses,
   Lock, Sun, Moon, Globe, Zap, ScrollText, Wand2, Users2, Telescope, ShieldCheck,
+  Menu, X,
 } from "lucide-react";
 
 type NavItem = { to: string; label: string; icon: any; locked?: boolean };
@@ -78,65 +79,92 @@ export function DashboardShell({
   const groups: NavGroup[] = isOwner(user)
     ? [...baseGroups, { label: "Internal", items: [{ to: "/owner-dashboard", label: "Owner Dashboard", icon: ShieldCheck }] }]
     : baseGroups;
+  const [mobileOpen, setMobileOpen] = useState(false);
+  useEffect(() => { setMobileOpen(false); }, [pathname]);
 
+  const sidebarInner = (
+    <>
+      <div className="px-4 py-4 border-b border-sidebar-border flex items-center gap-2">
+        <Link to="/" className="block flex-1 min-w-0">
+          <Logo className="w-full h-auto" />
+        </Link>
+        <button className="md:hidden rounded-lg glass p-2" aria-label="Close menu" onClick={() => setMobileOpen(false)}>
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+      <nav className="flex-1 overflow-y-auto p-3 space-y-4">
+        {groups.map((g, gi) => (
+          <div key={gi}>
+            {g.label && (
+              <div className="px-3 py-1.5 text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
+                {g.label}
+              </div>
+            )}
+            <div className="space-y-0.5">
+              {g.items.map((item) => {
+                const active = pathname === item.to;
+                const showLock = item.locked && !isPro;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setMobileOpen(false)}
+                    className={
+                      "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors " +
+                      (active
+                        ? "bg-primary/20 text-foreground font-medium"
+                        : "text-muted-foreground hover:bg-secondary hover:text-foreground")
+                    }
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span className="flex-1 truncate">{item.label}</span>
+                    {showLock && <Lock className="h-3.5 w-3.5 text-muted-foreground" />}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+        <button
+          onClick={() => { signOut().then(() => navigate({ to: "/" })); }}
+          className="mt-4 flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-destructive/20 hover:text-destructive transition-colors"
+        >
+          <LogOut className="h-4 w-4" /> Log out
+        </button>
+      </nav>
+    </>
+  );
 
   return (
     <div className="flex min-h-screen w-full">
-      {/* Sidebar */}
+      {/* Sidebar (desktop) */}
       <aside className="hidden md:flex w-64 shrink-0 flex-col glass-strong border-r border-sidebar-border">
-        <div className="px-4 py-4 border-b border-sidebar-border">
-          <Link to="/" className="block">
-            <Logo className="w-full h-auto" />
-          </Link>
-        </div>
-        <nav className="flex-1 overflow-y-auto p-3 space-y-4">
-          {groups.map((g, gi) => (
-            <div key={gi}>
-              {g.label && (
-                <div className="px-3 py-1.5 text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
-                  {g.label}
-                </div>
-              )}
-              <div className="space-y-0.5">
-                {g.items.map((item) => {
-                  const active = pathname === item.to;
-                  const showLock = item.locked && !isPro;
-                  return (
-                    <Link
-                      key={item.to}
-                      to={item.to}
-                      className={
-                        "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors " +
-                        (active
-                          ? "bg-primary/20 text-foreground font-medium"
-                          : "text-muted-foreground hover:bg-secondary hover:text-foreground")
-                      }
-                    >
-                      <item.icon className="h-4 w-4" />
-                      <span className="flex-1 truncate">{item.label}</span>
-                      {showLock && <Lock className="h-3.5 w-3.5 text-muted-foreground" />}
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-          <button
-            onClick={() => { signOut().then(() => navigate({ to: "/" })); }}
-            className="mt-4 flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-destructive/20 hover:text-destructive transition-colors"
-          >
-            <LogOut className="h-4 w-4" /> Log out
-          </button>
-        </nav>
+        {sidebarInner}
       </aside>
+
+      {/* Sidebar (mobile drawer) */}
+      {mobileOpen && (
+        <div className="md:hidden fixed inset-0 z-40">
+          <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <aside className="absolute inset-y-0 left-0 w-64 max-w-[80%] flex flex-col glass-strong border-r border-sidebar-border">
+            {sidebarInner}
+          </aside>
+        </div>
+      )}
+
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Topbar */}
-        <header className="sticky top-0 z-20 backdrop-blur-xl bg-background/40 border-b border-border h-16 flex items-center justify-between px-4 md:px-8">
-          <div>
-            <div className="text-sm text-muted-foreground">Hi{profile?.username ? `, ${profile.username}` : ""} 👋</div>
-            <div className="text-lg font-semibold">{greeting ?? "Welcome back"}</div>
+        <header className="sticky top-0 z-20 backdrop-blur-xl bg-background/40 border-b border-border h-16 flex items-center justify-between gap-2 px-4 md:px-8">
+          <div className="flex min-w-0 items-center gap-2">
+            <button className="md:hidden shrink-0 rounded-lg glass p-2" aria-label="Open menu" onClick={() => setMobileOpen(true)}>
+              <Menu className="h-4 w-4" />
+            </button>
+            <div className="min-w-0">
+              <div className="truncate text-sm text-muted-foreground">Hi{profile?.username ? `, ${profile.username}` : ""} 👋</div>
+              <div className="truncate text-lg font-semibold">{greeting ?? "Welcome back"}</div>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <button className="hidden md:flex items-center gap-1.5 rounded-lg glass px-3 py-1.5 text-sm">
