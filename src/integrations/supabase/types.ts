@@ -14,6 +14,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      class_timetables: {
+        Row: {
+          created_at: string
+          day_of_week: string
+          end_time: string
+          id: string
+          period: string
+          start_time: string
+          subject: string
+          teacher_id: string
+          teacher_name: string | null
+          team_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week: string
+          end_time: string
+          id?: string
+          period: string
+          start_time: string
+          subject: string
+          teacher_id: string
+          teacher_name?: string | null
+          team_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: string
+          end_time?: string
+          id?: string
+          period?: string
+          start_time?: string
+          subject?: string
+          teacher_id?: string
+          teacher_name?: string | null
+          team_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_timetables_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_shares: {
         Row: {
           content_id: string
@@ -42,6 +92,65 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "content_shares_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      engagement_sessions: {
+        Row: {
+          created_at: string
+          duration_seconds: number
+          ended_at: string
+          engagement_score: number
+          expression_distribution: Json
+          id: string
+          max_students: number
+          session_date: string
+          started_at: string
+          students_present: number
+          subject: string
+          teacher_id: string
+          team_id: string
+          timeline: Json
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number
+          ended_at: string
+          engagement_score?: number
+          expression_distribution?: Json
+          id?: string
+          max_students?: number
+          session_date?: string
+          started_at: string
+          students_present?: number
+          subject?: string
+          teacher_id: string
+          team_id: string
+          timeline?: Json
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number
+          ended_at?: string
+          engagement_score?: number
+          expression_distribution?: Json
+          id?: string
+          max_students?: number
+          session_date?: string
+          started_at?: string
+          students_present?: number
+          subject?: string
+          teacher_id?: string
+          team_id?: string
+          timeline?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engagement_sessions_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "teams"
