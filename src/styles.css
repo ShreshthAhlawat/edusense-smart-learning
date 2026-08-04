@@ -210,6 +210,51 @@
 .animate-pulse-glow { animation: pulse-glow 4s ease-in-out infinite; }
 .animate-fade-in-up { animation: fade-in-up 0.6s ease-out both; }
 
+/* ---- Site-wide motion ---- */
+html { scroll-behavior: smooth; }
+
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(28px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Scroll-linked reveal for cards & sections — pure CSS, no JS */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    main section,
+    main article,
+    main .glass,
+    main .glass-strong,
+    [data-reveal] {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 22%;
+    }
+  }
+  /* Fallback for engines without scroll-driven animations */
+  @supports not (animation-timeline: view()) {
+    main .glass,
+    main .glass-strong,
+    [data-reveal] { animation: fade-in-up 0.5s ease-out both; }
+  }
+
+  /* Smooth hover lift across the app */
+  main .glass,
+  main .glass-strong {
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+  main .glass:hover,
+  main .glass-strong:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-elegant);
+  }
+  a, button { transition: color .2s ease, background-color .2s ease, opacity .2s ease, transform .2s ease; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
 @keyframes checkmark-draw {
   0% { stroke-dashoffset: 100; opacity: 0; }
   30% { opacity: 1; }

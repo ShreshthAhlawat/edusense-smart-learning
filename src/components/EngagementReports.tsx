@@ -199,7 +199,7 @@ export function EngagementReports({ teacherId, teams }: { teacherId: string; tea
                   <XAxis dataKey="subject" stroke="oklch(0.75 0.04 275)" fontSize={12} />
                   <YAxis stroke="oklch(0.75 0.04 275)" fontSize={12} />
                   <Tooltip contentStyle={{ background: "oklch(0.2 0.05 278)", border: "1px solid oklch(1 0 0 / 0.1)", borderRadius: 8 }} />
-                  <Bar dataKey="avg" fill="oklch(0.65 0.22 280)" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="avg" fill="oklch(0.65 0.22 280)" radius={[6, 6, 0, 0]} isAnimationActive animationDuration={1000} animationEasing="ease-out" />
                 </BarChart>
               </ResponsiveContainer>
             </Panel>
@@ -207,7 +207,7 @@ export function EngagementReports({ teacherId, teams }: { teacherId: string; tea
 
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="glass rounded-2xl p-6">
-              <h3 className="mb-4 font-semibold">Expression mix</h3>
+              <h3 className="mb-4 font-semibold">Mood mix</h3>
               <ul className="space-y-2">
                 {distTotals.map((d) => (
                   <li key={d.name}>
