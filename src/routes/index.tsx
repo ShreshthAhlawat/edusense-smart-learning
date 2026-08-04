@@ -3,10 +3,11 @@ import { useEffect, useState } from "react";
 import { GlowBackground } from "@/components/GlowBackground";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
+import { useTheme } from "@/lib/theme";
 import { Button } from "@/components/ui/button";
 import {
   Sparkles, Brain, ShieldCheck, BarChart3, Users, BookOpen,
-  MessageCircle, X, ArrowRight,
+  MessageCircle, X, ArrowRight, Sun, Moon,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
