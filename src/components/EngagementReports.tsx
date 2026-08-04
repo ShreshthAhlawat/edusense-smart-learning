@@ -159,16 +159,38 @@ export function EngagementReports({ teacherId, teams }: { teacherId: string; tea
           <div className="grid gap-6 lg:grid-cols-2">
             <Panel title="Engagement trend">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={trend}>
+                <AreaChart data={trend} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="engFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="oklch(0.65 0.22 280)" stopOpacity={0.55} />
+                      <stop offset="100%" stopColor="oklch(0.65 0.22 280)" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="stuFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="oklch(0.6 0.2 250)" stopOpacity={0.35} />
+                      <stop offset="100%" stopColor="oklch(0.6 0.2 250)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="oklch(1 0 0 / 0.08)" />
-                  <XAxis dataKey="day" stroke="oklch(0.75 0.04 275)" fontSize={12} />
-                  <YAxis stroke="oklch(0.75 0.04 275)" fontSize={12} />
+                  <XAxis dataKey="day" stroke="oklch(0.75 0.04 275)" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="oklch(0.75 0.04 275)" fontSize={12} tickLine={false} axisLine={false} />
                   <Tooltip contentStyle={{ background: "oklch(0.2 0.05 278)", border: "1px solid oklch(1 0 0 / 0.1)", borderRadius: 8 }} />
-                  <Line type="monotone" dataKey="engagement" stroke="oklch(0.65 0.22 280)" strokeWidth={2.5} dot={false} />
-                  <Line type="monotone" dataKey="students" stroke="oklch(0.6 0.2 250)" strokeWidth={2.5} dot={false} />
-                </LineChart>
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  <Area
+                    type="linear" dataKey="engagement" name="Engagement %"
+                    stroke="oklch(0.65 0.22 280)" strokeWidth={2.5} fill="url(#engFill)"
+                    dot={false} activeDot={{ r: 4 }}
+                    isAnimationActive animationDuration={1200} animationEasing="ease-out"
+                  />
+                  <Area
+                    type="linear" dataKey="students" name="Students"
+                    stroke="oklch(0.6 0.2 250)" strokeWidth={2.5} fill="url(#stuFill)"
+                    dot={false} activeDot={{ r: 4 }}
+                    isAnimationActive animationDuration={1200} animationBegin={200} animationEasing="ease-out"
+                  />
+                </AreaChart>
               </ResponsiveContainer>
             </Panel>
+
 
             <Panel title="Subject-wise engagement">
               <ResponsiveContainer width="100%" height="100%">
@@ -191,7 +213,7 @@ export function EngagementReports({ teacherId, teams }: { teacherId: string; tea
                   <li key={d.name}>
                     <div className="flex justify-between text-xs"><span>{d.name}</span><span className="text-muted-foreground">{d.value}%</span></div>
                     <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-secondary">
-                      <div className="h-full" style={{ width: `${d.value}%`, background: "var(--gradient-primary)" }} />
+                      <div className="h-full transition-[width] duration-700 ease-out" style={{ width: `${d.value}%`, background: "var(--gradient-primary)" }} />
                     </div>
                   </li>
                 ))}
