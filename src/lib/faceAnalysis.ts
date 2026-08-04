@@ -38,24 +38,32 @@ function toMap(categories: { categoryName: string; score: number }[]): Shapes {
   return m;
 }
 
-/** Classify one face's blendshapes into a coarse expression label. */
+/** Classify one face's blendshapes into a classroom mood label. */
 export function classifyExpression(categories: { categoryName: string; score: number }[]): Expression {
   const s = toMap(categories);
   const g = (k: string) => s[k] ?? 0;
   const smile = (g("mouthSmileLeft") + g("mouthSmileRight")) / 2;
-  const frown = (g("mouthFrownLeft") + g("mouthFrownRight")) / 2;
   const browDown = (g("browDownLeft") + g("browDownRight")) / 2;
-  const browUp = (g("browInnerUp") + g("browOuterUpLeft") + g("browOuterUpRight")) / 3;
-  const eyeWide = (g("eyeWideLeft") + g("eyeWideRight")) / 2;
+  const browInnerUp = g("browInnerUp");
+  const squint = (g("eyeSquintLeft") + g("eyeSquintRight")) / 2;
+  const blink = (g("eyeBlinkLeft") + g("eyeBlinkRight")) / 2;
   const jawOpen = g("jawOpen");
+  const lookAway =
+    Math.max(g("eyeLookOutLeft"), g("eyeLookOutRight"), g("eyeLookUpLeft"), g("eyeLookDownRight")) ;
+  const lookIn = (g("eyeLookInLeft") + g("eyeLookInRight")) / 2;
+  const mouthPucker = g("mouthPucker");
 
   const scores: Record<Expression, number> = {
-    Happy: smile * 1.6,
-    Surprised: (eyeWide + jawOpen + browUp) / 3 * 1.5,
-    Fearful: (eyeWide * 0.6 + browUp * 0.6 + frown * 0.4),
-    Sad: frown * 1.3 + browUp * 0.3,
-    Angry: browDown * 1.4 + frown * 0.3,
-    Neutral: 0.32,
+    // eyes open, gaze forward, calm brow → attentive
+    Focused: (1 - blink) * 0.7 + (1 - lookAway) * 0.6 + lookIn * 0.2 + squint * 0.15,
+    Happy: smile * 1.7,
+    // furrowed / raised inner brow + squint or pursed lips → puzzled
+    Confused: browDown * 0.9 + browInnerUp * 0.8 + squint * 0.5 + mouthPucker * 0.4,
+    // gaze off-camera
+    Distracted: lookAway * 1.5,
+    // droopy eyes, yawning
+    Bored: blink * 1.2 + jawOpen * 0.8,
+    Neutral: 0.55,
   };
   return (Object.entries(scores) as [Expression, number][]).sort((a, b) => b[1] - a[1])[0][0];
 }
