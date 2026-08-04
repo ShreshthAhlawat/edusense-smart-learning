@@ -54,6 +54,7 @@ function Landing() {
             <span className="font-bold text-lg tracking-tight">EduSense</span>
           </Link>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             {user ? (
               <Button onClick={() => navigate({ to: authedHref() })} className="glow" style={{ background: "var(--gradient-primary)" }}>
                 Go to dashboard
