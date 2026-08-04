@@ -3,10 +3,11 @@ import { useEffect, useState } from "react";
 import { GlowBackground } from "@/components/GlowBackground";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
+import { useTheme } from "@/lib/theme";
 import { Button } from "@/components/ui/button";
 import {
   Sparkles, Brain, ShieldCheck, BarChart3, Users, BookOpen,
-  MessageCircle, X, ArrowRight,
+  MessageCircle, X, ArrowRight, Sun, Moon,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -53,6 +54,7 @@ function Landing() {
             <span className="font-bold text-lg tracking-tight">EduSense</span>
           </Link>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             {user ? (
               <Button onClick={() => navigate({ to: authedHref() })} className="glow" style={{ background: "var(--gradient-primary)" }}>
                 Go to dashboard
@@ -151,6 +153,20 @@ function Landing() {
 
       <FaqChatbot />
     </div>
+  );
+}
+
+/* --------------------------- Theme Toggle --------------------------- */
+function ThemeToggle() {
+  const { theme, toggle } = useTheme();
+  return (
+    <button
+      onClick={toggle}
+      aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-secondary/40 text-foreground transition-colors hover:bg-secondary"
+    >
+      {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+    </button>
   );
 }
 
