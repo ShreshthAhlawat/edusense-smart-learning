@@ -14,12 +14,12 @@ import {
 import { Play, Square, Users, Gauge, Loader2, Video, AlertTriangle } from "lucide-react";
 
 const EXPR_COLORS: Record<string, string> = {
+  Focused: "oklch(0.7 0.19 275)",
   Happy: "oklch(0.75 0.18 155)",
   Neutral: "oklch(0.7 0.05 275)",
-  Sad: "oklch(0.65 0.14 250)",
-  Angry: "oklch(0.65 0.24 25)",
-  Surprised: "oklch(0.78 0.17 80)",
-  Fearful: "oklch(0.65 0.18 320)",
+  Confused: "oklch(0.78 0.17 80)",
+  Distracted: "oklch(0.68 0.16 40)",
+  Bored: "oklch(0.6 0.12 300)",
 };
 
 export function EngagementLive({
