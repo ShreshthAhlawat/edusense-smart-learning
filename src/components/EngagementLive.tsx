@@ -6,6 +6,7 @@ import { getFaceLandmarker, analyzeFrame } from "@/lib/faceAnalysis";
 import {
   EXPRESSIONS,
   detectSubject,
+  dominantMood,
   engagementFromDistribution,
   fmtDuration,
   type TimelinePoint,
@@ -179,6 +180,7 @@ export function EngagementLive({
 
   const total = Object.values(dist).reduce((a, b) => a + b, 0);
   const score = engagementFromDistribution(dist);
+  const dominant = dominantMood(dist);
 
   return (
     <div className="space-y-6">
@@ -240,11 +242,11 @@ export function EngagementLive({
             <LiveStat icon={Users} label="Students present" value={String(students)} />
             <LiveStat icon={Users} label="Max detected" value={String(maxStudents)} />
             <LiveStat icon={Gauge} label="Engagement score" value={total ? `${score}%` : "—"} />
-            <LiveStat icon={Gauge} label="Samples" value={String(total)} />
+            <LiveStat icon={Gauge} label="Dominant mood" value={dominant ?? "—"} />
           </div>
 
           <div className="glass rounded-2xl p-5">
-            <h4 className="mb-3 text-sm font-semibold">Expression distribution</h4>
+            <h4 className="mb-3 text-sm font-semibold">Mood distribution</h4>
             <ul className="space-y-2">
               {EXPRESSIONS.map((e) => {
                 const v = dist[e] ?? 0;
@@ -256,7 +258,7 @@ export function EngagementLive({
                       <span className="text-muted-foreground">{pct}%</span>
                     </div>
                     <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-secondary">
-                      <div className="h-full transition-all" style={{ width: `${pct}%`, background: EXPR_COLORS[e] }} />
+                      <div className="h-full transition-[width] duration-700 ease-out" style={{ width: `${pct}%`, background: EXPR_COLORS[e] }} />
                     </div>
                   </li>
                 );
