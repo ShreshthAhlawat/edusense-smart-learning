@@ -15,12 +15,12 @@ export const DAYS = [
 export type Day = (typeof DAYS)[number];
 
 export const EXPRESSIONS = [
+  "Focused",
   "Happy",
   "Neutral",
-  "Sad",
-  "Angry",
-  "Surprised",
-  "Fearful",
+  "Confused",
+  "Distracted",
+  "Bored",
 ] as const;
 export type Expression = (typeof EXPRESSIONS)[number];
 
@@ -57,24 +57,40 @@ export type EngagementSession = {
   timeline: TimelinePoint[];
 };
 
-/** Weight of each expression toward the overall engagement score (0-100). */
+/** Weight of each mood toward the overall engagement score (0-100). */
 const ENGAGEMENT_WEIGHTS: Record<Expression, number> = {
-  Happy: 100,
-  Surprised: 85,
-  Neutral: 65,
-  Sad: 30,
-  Fearful: 25,
-  Angry: 20,
+  Focused: 100,
+  Happy: 88,
+  Neutral: 62,
+  Confused: 40,
+  Distracted: 18,
+  Bored: 8,
 };
 
+/**
+ * Engagement score. The dominant mood carries most of the weight — a class that
+ * is mostly Focused scores high, a class that is mostly Bored/Distracted scores low —
+ * blended with the weighted average of every other mood.
+ */
 export function engagementFromDistribution(dist: Record<string, number>) {
-  const total = Object.values(dist).reduce((a, b) => a + b, 0);
+  const entries = (Object.entries(dist) as [Expression, number][]).filter(([, v]) => v > 0);
+  const total = entries.reduce((a, [, v]) => a + v, 0);
   if (!total) return 0;
-  const sum = (Object.entries(dist) as [Expression, number][]).reduce(
-    (acc, [k, v]) => acc + (ENGAGEMENT_WEIGHTS[k] ?? 50) * v,
-    0,
-  );
-  return Math.round(sum / total);
+  const weighted =
+    entries.reduce((acc, [k, v]) => acc + (ENGAGEMENT_WEIGHTS[k] ?? 50) * v, 0) / total;
+  const [domMood, domCount] = entries.sort((a, b) => b[1] - a[1])[0];
+  const domShare = domCount / total; // 0..1
+  const domWeight = ENGAGEMENT_WEIGHTS[domMood] ?? 50;
+  // the stronger a single mood dominates, the more it pulls the final score
+  const score = weighted * (1 - domShare * 0.6) + domWeight * (domShare * 0.6);
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+/** The mood most present in a distribution. */
+export function dominantMood(dist: Record<string, number>): Expression | null {
+  const entries = (Object.entries(dist) as [Expression, number][]).filter(([, v]) => v > 0);
+  if (!entries.length) return null;
+  return entries.sort((a, b) => b[1] - a[1])[0][0];
 }
 
 export function toMinutes(hhmm: string) {
