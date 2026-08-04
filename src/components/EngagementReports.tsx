@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  BarChart, Bar, LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid,
+  BarChart, Bar, AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, Legend,
 } from "recharts";
 import { downloadCsv, downloadPdf, fmtDuration, EXPRESSIONS, type EngagementSession } from "@/lib/engagement";
 import { Loader2, FileDown, FileText, TrendingUp, TrendingDown } from "lucide-react";
