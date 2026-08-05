@@ -320,7 +320,9 @@ html { scroll-behavior: smooth; }
   from { opacity: 0; transform: translate3d(0, 12px, 0); }
   to { opacity: 1; transform: none; }
 }
-.page-transition { animation: page-enter var(--dur-slow) var(--ease-premium) both; }
+/* `backwards` (not `both`): once finished the element keeps NO transform, so
+   position: fixed children (chat bubble, sidebar drawer) stay viewport-anchored. */
+.page-transition { animation: page-enter var(--dur-slow) var(--ease-premium) backwards; }
 
 /* ---- Staggered reveal helpers ---- */
 .stagger > * { animation: fade-in-up 0.5s var(--ease-premium) both; }
