@@ -65,7 +65,7 @@ function TeacherDashboard() {
   return (
     <DashboardShell role="teacher" greeting="Teacher Dashboard">
       <PageHeader title="Overview" desc="Your classroom at a glance." />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard icon={Users} label="Active Classes" value={activeClasses || 0} hint={activeClasses ? "Distinct subjects" : "Create a quiz to begin"} />
         <StatCard icon={FileQuestion} label="Quizzes Created" value={quizzes.data?.length ?? 0} />
         <StatCard icon={Activity} label="Weekly Engagement" value={`${engagement}%`} hint="Attempts this week" />

@@ -300,3 +300,220 @@ html { scroll-behavior: smooth; }
 .prose hr { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
 .prose a { color: var(--primary); text-decoration: underline; }
 .prose-sm { font-size: 0.875rem; line-height: 1.6; }
+
+/* ============================================================
+   PREMIUM MOTION LAYER
+   Transform/opacity only. Fully respects prefers-reduced-motion
+   (see the global reduce override further above).
+   ============================================================ */
+
+:root {
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 160ms;
+  --dur-base: 260ms;
+  --dur-slow: 520ms;
+}
+
+/* ---- Page transition ---- */
+@keyframes page-enter {
+  from { opacity: 0; transform: translate3d(0, 12px, 0); }
+  to { opacity: 1; transform: none; }
+}
+/* `backwards` (not `both`): once finished the element keeps NO transform, so
+   position: fixed children (chat bubble, sidebar drawer) stay viewport-anchored. */
+.page-transition { animation: page-enter var(--dur-slow) var(--ease-premium) backwards; }
+
+/* ---- Staggered reveal helpers ---- */
+.stagger > * { animation: fade-in-up 0.5s var(--ease-premium) both; }
+.stagger > *:nth-child(1) { animation-delay: 0.04s; }
+.stagger > *:nth-child(2) { animation-delay: 0.09s; }
+.stagger > *:nth-child(3) { animation-delay: 0.14s; }
+.stagger > *:nth-child(4) { animation-delay: 0.19s; }
+.stagger > *:nth-child(5) { animation-delay: 0.24s; }
+.stagger > *:nth-child(6) { animation-delay: 0.29s; }
+.stagger > *:nth-child(7) { animation-delay: 0.34s; }
+.stagger > *:nth-child(8) { animation-delay: 0.39s; }
+
+/* ---- Cards: lift + deeper shadow ---- */
+@media (prefers-reduced-motion: no-preference) {
+  main .glass,
+  main .glass-strong,
+  .card-lift {
+    will-change: transform;
+    transition: transform var(--dur-base) var(--ease-premium),
+                box-shadow var(--dur-base) var(--ease-premium),
+                border-color var(--dur-base) var(--ease-soft);
+  }
+  main .glass:hover,
+  main .glass-strong:hover,
+  .card-lift:hover {
+    transform: translate3d(0, -4px, 0);
+    box-shadow: var(--shadow-elegant), var(--shadow-glow);
+  }
+}
+
+/* ---- Buttons: hover glow, press, ripple ---- */
+@media (prefers-reduced-motion: no-preference) {
+  /* Never override an explicitly positioned button (fixed/absolute/sticky). */
+  button:not([class*="fixed"]):not([class*="absolute"]):not([class*="sticky"]),
+  a[role="button"]:not([class*="fixed"]):not([class*="absolute"]):not([class*="sticky"]),
+  .btn-premium {
+    position: relative;
+    transition: transform var(--dur-fast) var(--ease-premium),
+                box-shadow var(--dur-base) var(--ease-soft),
+                background-color var(--dur-base) var(--ease-soft),
+                color var(--dur-base) var(--ease-soft),
+                filter var(--dur-base) var(--ease-soft);
+  }
+  button:hover:not(:disabled),
+  a[role="button"]:hover { transform: translate3d(0, -1px, 0); filter: brightness(1.06); }
+  button:active:not(:disabled),
+  a[role="button"]:active { transform: scale(0.97); filter: brightness(0.98); }
+  button:disabled { transform: none; filter: none; }
+
+  /* Ripple: expanding radial highlight from the button centre on press */
+  button::after,
+  a[role="button"]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(circle at center, currentColor 10%, transparent 60%);
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  button:active::after,
+  a[role="button"]:active::after { animation: ripple 550ms var(--ease-premium); }
+}
+@keyframes ripple {
+  0% { opacity: 0.22; transform: scale(0.4); }
+  100% { opacity: 0; transform: scale(1.6); }
+}
+
+/* ---- Navigation: animated underline + active indicator ---- */
+.nav-item .nav-indicator {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 0;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--gradient-primary);
+  transform: translateY(-50%);
+  transition: height var(--dur-base) var(--ease-premium), opacity var(--dur-base) var(--ease-soft);
+  opacity: 0;
+}
+.nav-item:hover .nav-indicator { height: 40%; opacity: 0.6; }
+.nav-item.is-active .nav-indicator { height: 65%; opacity: 1; }
+.nav-item { transition: background-color var(--dur-base) var(--ease-soft), color var(--dur-base) var(--ease-soft), transform var(--dur-fast) var(--ease-premium); }
+@media (prefers-reduced-motion: no-preference) {
+  .nav-item:hover { transform: translate3d(2px, 0, 0); }
+}
+
+/* Underline link (public nav) */
+.link-underline { position: relative; }
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -3px;
+  height: 2px; width: 100%;
+  border-radius: 2px;
+  background: var(--gradient-primary);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--dur-base) var(--ease-premium);
+}
+.link-underline:hover::after { transform: scaleX(1); transform-origin: left; }
+
+/* ---- Form fields: focus + validation + success ---- */
+@media (prefers-reduced-motion: no-preference) {
+  input, textarea, select {
+    transition: border-color var(--dur-base) var(--ease-soft),
+                box-shadow var(--dur-base) var(--ease-soft),
+                transform var(--dur-fast) var(--ease-premium);
+  }
+  input:focus-visible, textarea:focus-visible, select:focus-visible {
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 28%, transparent);
+  }
+  input[aria-invalid="true"], textarea[aria-invalid="true"] { animation: shake-x 0.35s var(--ease-soft); }
+}
+@keyframes shake-x {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+@keyframes pop-success {
+  0% { transform: scale(0.85); opacity: 0; }
+  60% { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-success { animation: pop-success 0.45s var(--ease-premium) both; }
+
+/* ---- Progress bars & chart reveals ---- */
+.progress-animated > * { transition: width 700ms var(--ease-premium), transform 700ms var(--ease-premium); }
+@keyframes chart-rise {
+  from { opacity: 0; transform: translate3d(0, 16px, 0) scaleY(0.96); }
+  to { opacity: 1; transform: none; }
+}
+.recharts-responsive-container { animation: chart-rise 0.6s var(--ease-premium) both; transform-origin: bottom; }
+
+/* ---- Skeleton loaders ---- */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: color-mix(in oklab, var(--foreground) 8%, transparent);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--foreground) 12%, transparent), transparent);
+  animation: skeleton-sweep 1.4s var(--ease-soft) infinite;
+}
+@keyframes skeleton-sweep {
+  100% { transform: translateX(100%); }
+}
+
+/* ---- Radix overlays: modals, dropdowns, tooltips, accordions ---- */
+[data-state="open"][data-radix-popper-content-wrapper] > * ,
+[role="dialog"][data-state="open"],
+[data-radix-menu-content][data-state="open"],
+[data-radix-popover-content][data-state="open"],
+[data-radix-tooltip-content][data-state="open"],
+[data-radix-select-content][data-state="open"] {
+  animation: overlay-in 200ms var(--ease-premium) both;
+}
+[role="dialog"][data-state="closed"],
+[data-radix-menu-content][data-state="closed"],
+[data-radix-popover-content][data-state="closed"],
+[data-radix-tooltip-content][data-state="closed"],
+[data-radix-select-content][data-state="closed"] {
+  animation: overlay-out 140ms var(--ease-soft) both;
+}
+@keyframes overlay-in {
+  from { opacity: 0; transform: translate3d(0, 6px, 0) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes overlay-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translate3d(0, 4px, 0) scale(0.98); }
+}
+
+/* Toasts (sonner) */
+[data-sonner-toast] { animation: overlay-in 240ms var(--ease-premium) both; }
+
+/* ---- Gentle floating background motion ---- */
+@keyframes drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(18px, -22px, 0) scale(1.04); }
+  66% { transform: translate3d(-14px, 14px, 0) scale(0.98); }
+}
+.animate-drift { animation: drift 18s var(--ease-soft) infinite; will-change: transform; }
+
+/* Combined ambient motion (both animations run together) */
+.animate-pulse-glow.animate-drift { animation: pulse-glow 4s ease-in-out infinite, drift 18s var(--ease-soft) infinite; }
+.animate-float.animate-drift { animation: float 6s ease-in-out infinite, drift 22s var(--ease-soft) infinite; }

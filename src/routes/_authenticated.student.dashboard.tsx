@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { PAYMENTS_ENABLED } from "@/lib/features";
+import { SkeletonCards } from "@/components/Skeleton";
 import { useAuth } from "@/lib/auth";
 import { DashboardShell, PageHeader, StatCard } from "@/components/DashboardShell";
 import { BookOpen, Target, ListChecks, Crown, Rocket, ChevronLeft, ChevronRight } from "lucide-react";
@@ -43,12 +45,17 @@ function StudentDashboard() {
   return (
     <DashboardShell role="student" greeting="Student Dashboard">
       <PageHeader title="Your progress" desc="Live data from your account." />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={BookOpen} label="Quizzes Taken" value={totalAttempts} />
-        <StatCard icon={Target} label="Average Score" value={`${avg}%`} />
-        <StatCard icon={ListChecks} label="Homework Due" value={due} />
-        <StatCard icon={Crown} label="Current Plan" value={(profile?.plan ?? "free").toUpperCase()} />
-      </div>
+      {attempts.isLoading || homework.isLoading ? (
+        <SkeletonCards />
+      ) : (
+        <div className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard icon={BookOpen} label="Quizzes Taken" value={totalAttempts} />
+          <StatCard icon={Target} label="Average Score" value={`${avg}%`} />
+          <StatCard icon={ListChecks} label="Homework Due" value={due} />
+          <StatCard icon={Crown} label="Current Plan" value={(profile?.plan ?? "free").toUpperCase()} />
+        </div>
+      )}
+
 
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
         <div className="glass rounded-2xl p-6 lg:col-span-2 h-80">
@@ -72,17 +79,19 @@ function StudentDashboard() {
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <HomeworkList user={user} data={homework.data ?? []} refetch={homework.refetch} />
-        <div className="glass rounded-2xl p-6 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-40" style={{ background: "var(--gradient-hero)" }} />
-          <div className="relative">
-            <Rocket className="h-6 w-6 text-primary" />
-            <h3 className="mt-3 font-semibold text-lg">Unlock more tools</h3>
-            <p className="mt-1 text-sm text-muted-foreground">Chatbot, PDF Summarizer, Story Generator and more with Pro.</p>
-            <Link to="/student/plans" className="mt-4 inline-flex rounded-xl px-4 py-2 text-sm font-medium text-primary-foreground glow" style={{ background: "var(--gradient-primary)" }}>
-              See plans
-            </Link>
+        {PAYMENTS_ENABLED && (
+          <div className="glass rounded-2xl p-6 relative overflow-hidden">
+            <div className="absolute inset-0 opacity-40" style={{ background: "var(--gradient-hero)" }} />
+            <div className="relative">
+              <Rocket className="h-6 w-6 text-primary" />
+              <h3 className="mt-3 font-semibold text-lg">Unlock more tools</h3>
+              <p className="mt-1 text-sm text-muted-foreground">Chatbot, PDF Summarizer, Story Generator and more with Pro.</p>
+              <Link to="/student/plans" className="mt-4 inline-flex rounded-xl px-4 py-2 text-sm font-medium text-primary-foreground glow" style={{ background: "var(--gradient-primary)" }}>
+                See plans
+              </Link>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </DashboardShell>
   );

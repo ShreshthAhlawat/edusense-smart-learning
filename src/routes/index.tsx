@@ -61,7 +61,7 @@ function Landing() {
               </Button>
             ) : (
               <>
-                <Link to="/auth" className="text-sm text-muted-foreground hover:text-foreground">Log in</Link>
+                <Link to="/auth" className="link-underline text-sm text-muted-foreground hover:text-foreground">Log in</Link>
                 <Link to="/auth" search={{ mode: "signup" } as never} className="rounded-md px-4 py-2 text-sm font-medium text-primary-foreground glow"
                   style={{ background: "var(--gradient-primary)" }}>
                   Sign up
@@ -101,13 +101,13 @@ function Landing() {
         </div>
 
         {/* Floating orbs */}
-        <div className="pointer-events-none absolute left-8 top-40 h-16 w-16 rounded-full bg-primary/40 blur-2xl animate-float" />
-        <div className="pointer-events-none absolute right-10 top-60 h-24 w-24 rounded-full bg-accent/40 blur-2xl animate-float" style={{ animationDelay: "2s" }} />
+        <div className="pointer-events-none absolute left-8 top-40 h-16 w-16 rounded-full bg-primary/40 blur-2xl animate-float animate-drift" />
+        <div className="pointer-events-none absolute right-10 top-60 h-24 w-24 rounded-full bg-accent/40 blur-2xl animate-float animate-drift" style={{ animationDelay: "2s" }} />
       </section>
 
       {/* FEATURES */}
       <section className="mx-auto max-w-7xl px-6 pb-24">
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <div className="stagger grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f, i) => (
             <Link
               key={f.title}
@@ -134,7 +134,7 @@ function Landing() {
           <div className="absolute inset-0 opacity-40" style={{ background: "var(--gradient-hero)" }} />
           <div className="relative">
             <h2 className="text-3xl md:text-4xl font-bold">Ready to transform your classroom?</h2>
-            <p className="mt-3 text-muted-foreground">Free forever for teachers to try. Upgrade whenever you need more.</p>
+            <p className="mt-3 text-muted-foreground">Free for everyone during our testing phase — every tool unlocked.</p>
             <Link
               to={user ? authedHref() : "/auth"}
               search={user ? undefined : ({ mode: "signup" } as never)}
@@ -174,7 +174,7 @@ function ThemeToggle() {
 const FAQ: { q: string; a: string }[] = [
   { q: "What is EduSense?", a: "EduSense is a privacy-first, AI-assisted classroom platform where teachers create quizzes and get insights, while students practice with adaptive tools." },
   { q: "Is my data private?", a: "Yes. Your data stays in your workspace and is never used to train third-party models." },
-  { q: "How much does it cost?", a: "Free forever for the essentials. Paid Teacher Pro and School plans unlock advanced AI tools." },
+  { q: "How much does it cost?", a: "EduSense is completely free during our testing phase — every tool is unlocked for teachers and students." },
   { q: "Is this for teachers or students?", a: "Both! Teachers and students each get a tailored dashboard designed for their workflow." },
 ];
 

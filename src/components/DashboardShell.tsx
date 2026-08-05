@@ -3,7 +3,9 @@ import { type ReactNode, useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { useAuth, isOwner, type Profile } from "@/lib/auth";
 import { useTheme } from "@/lib/theme";
+import { PAYMENTS_ENABLED } from "@/lib/features";
 import { NotificationBell } from "@/components/NotificationBell";
+import { CountUp } from "@/components/CountUp";
 import {
   LayoutDashboard, FileQuestion, Sparkles, BarChart3, CreditCard,
   UserCircle, Settings, LogOut, TrendingUp, BookOpen, ListChecks,
@@ -64,7 +66,18 @@ const studentGroups: NavGroup[] = [
 
 
 export function isPaidPlan(plan: Profile["plan"] | undefined | null) {
+  // Payments are disabled for the testing phase — everything is unlocked.
+  if (!PAYMENTS_ENABLED) return true;
   return plan === "pro" || plan === "school-pro";
+}
+
+/** Nav entries that belong to the payment system (hidden while disabled). */
+const PAYMENT_ROUTES = ["/teacher/plans", "/student/plans"];
+function stripPaymentNav(groups: NavGroup[]): NavGroup[] {
+  if (PAYMENTS_ENABLED) return groups;
+  return groups
+    .map((g) => ({ ...g, items: g.items.filter((i) => !PAYMENT_ROUTES.includes(i.to)) }))
+    .filter((g) => g.items.length > 0);
 }
 
 export function DashboardShell({
@@ -75,7 +88,7 @@ export function DashboardShell({
   const { theme, toggle } = useTheme();
   const navigate = useNavigate();
   const isPro = isPaidPlan(profile?.plan);
-  const baseGroups = role === "teacher" ? teacherGroups : studentGroups;
+  const baseGroups = stripPaymentNav(role === "teacher" ? teacherGroups : studentGroups);
   const groups: NavGroup[] = isOwner(user)
     ? [...baseGroups, { label: "Internal", items: [{ to: "/owner-dashboard", label: "Owner Dashboard", icon: ShieldCheck }] }]
     : baseGroups;
@@ -101,7 +114,7 @@ export function DashboardShell({
               </div>
             )}
             <div className="space-y-0.5">
-              {g.items.map((item) => {
+              {g.items.map((item, ii) => {
                 const active = pathname === item.to;
                 const showLock = item.locked && !isPro;
                 return (
@@ -109,20 +122,23 @@ export function DashboardShell({
                     key={item.to}
                     to={item.to}
                     onClick={() => setMobileOpen(false)}
+                    style={{ animationDelay: `${gi * 60 + ii * 25}ms` }}
                     className={
-                      "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors " +
+                      "nav-item group relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm animate-fade-in-up " +
                       (active
-                        ? "bg-primary/20 text-foreground font-medium"
+                        ? "is-active bg-primary/20 text-foreground font-medium"
                         : "text-muted-foreground hover:bg-secondary hover:text-foreground")
                     }
                   >
-                    <item.icon className="h-4 w-4" />
+                    <span className="nav-indicator" aria-hidden />
+                    <item.icon className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                     <span className="flex-1 truncate">{item.label}</span>
                     {showLock && <Lock className="h-3.5 w-3.5 text-muted-foreground" />}
                   </Link>
                 );
               })}
             </div>
+
           </div>
         ))}
         <button
@@ -201,15 +217,16 @@ export function StatCard({
     <div className="glass rounded-2xl p-5 transition-all hover:-translate-y-0.5 hover:glow">
       <div className="flex items-center justify-between">
         <div className="text-xs uppercase tracking-wider text-muted-foreground font-medium">{label}</div>
-        <div className="h-9 w-9 rounded-lg flex items-center justify-center" style={{ background: "var(--gradient-primary)" }}>
+        <div className="h-9 w-9 rounded-lg flex items-center justify-center transition-transform duration-300 hover:rotate-6" style={{ background: "var(--gradient-primary)" }}>
           <Icon className="h-4 w-4 text-primary-foreground" />
         </div>
       </div>
-      <div className="mt-3 text-3xl font-bold">{value}</div>
+      <div className="mt-3 text-3xl font-bold"><CountUp value={value} /></div>
       {hint && <div className="mt-1 text-xs text-muted-foreground">{hint}</div>}
     </div>
   );
 }
+
 
 export function PageHeader({ title, desc }: { title: string; desc?: string }) {
   return (
@@ -235,13 +252,16 @@ export function PaidGate({ role, feature }: { role: "teacher" | "student"; featu
       <p className="mt-2 text-sm text-muted-foreground">
         Upgrade your plan to unlock {feature.toLowerCase()} and every other {role === "teacher" ? "teacher" : "premium"} tool in EduSense.
       </p>
-      <Link
-        to={role === "teacher" ? "/teacher/plans" : "/student/plans"}
-        className="mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium text-primary-foreground glow transition-transform hover:-translate-y-0.5"
-        style={{ background: "var(--gradient-primary)" }}
-      >
-        <CreditCard className="h-4 w-4" /> View plans
-      </Link>
+      {PAYMENTS_ENABLED && (
+        <Link
+          to={role === "teacher" ? "/teacher/plans" : "/student/plans"}
+          className="mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium text-primary-foreground glow transition-transform hover:-translate-y-0.5"
+          style={{ background: "var(--gradient-primary)" }}
+        >
+          <CreditCard className="h-4 w-4" /> View plans
+        </Link>
+      )}
+
     </div>
   );
 }
