@@ -508,3 +508,7 @@ html { scroll-behavior: smooth; }
   66% { transform: translate3d(-14px, 14px, 0) scale(0.98); }
 }
 .animate-drift { animation: drift 18s var(--ease-soft) infinite; will-change: transform; }
+
+/* Combined ambient motion (both animations run together) */
+.animate-pulse-glow.animate-drift { animation: pulse-glow 4s ease-in-out infinite, drift 18s var(--ease-soft) infinite; }
+.animate-float.animate-drift { animation: float 6s ease-in-out infinite, drift 22s var(--ease-soft) infinite; }
