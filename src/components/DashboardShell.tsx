@@ -5,6 +5,7 @@ import { useAuth, isOwner, type Profile } from "@/lib/auth";
 import { useTheme } from "@/lib/theme";
 import { PAYMENTS_ENABLED } from "@/lib/features";
 import { NotificationBell } from "@/components/NotificationBell";
+import { CountUp } from "@/components/CountUp";
 import {
   LayoutDashboard, FileQuestion, Sparkles, BarChart3, CreditCard,
   UserCircle, Settings, LogOut, TrendingUp, BookOpen, ListChecks,
@@ -216,15 +217,16 @@ export function StatCard({
     <div className="glass rounded-2xl p-5 transition-all hover:-translate-y-0.5 hover:glow">
       <div className="flex items-center justify-between">
         <div className="text-xs uppercase tracking-wider text-muted-foreground font-medium">{label}</div>
-        <div className="h-9 w-9 rounded-lg flex items-center justify-center" style={{ background: "var(--gradient-primary)" }}>
+        <div className="h-9 w-9 rounded-lg flex items-center justify-center transition-transform duration-300 hover:rotate-6" style={{ background: "var(--gradient-primary)" }}>
           <Icon className="h-4 w-4 text-primary-foreground" />
         </div>
       </div>
-      <div className="mt-3 text-3xl font-bold">{value}</div>
+      <div className="mt-3 text-3xl font-bold"><CountUp value={value} /></div>
       {hint && <div className="mt-1 text-xs text-muted-foreground">{hint}</div>}
     </div>
   );
 }
+
 
 export function PageHeader({ title, desc }: { title: string; desc?: string }) {
   return (
