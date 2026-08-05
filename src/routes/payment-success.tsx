@@ -1,4 +1,5 @@
-import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate, useSearch } from "@tanstack/react-router";
+import { PAYMENTS_ENABLED } from "@/lib/features";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +11,10 @@ const search = z.object({ plan: z.string().optional() });
 
 export const Route = createFileRoute("/payment-success")({
   validateSearch: search,
+  // Payments disabled during testing — keep the code, block the route.
+  beforeLoad: () => {
+    if (!PAYMENTS_ENABLED) throw redirect({ to: "/" });
+  },
   head: () => ({ meta: [
     { title: "Payment Successful — EduSense" },
     { name: "description", content: "Your EduSense plan is being activated." },
