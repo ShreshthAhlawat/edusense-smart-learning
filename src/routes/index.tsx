@@ -134,7 +134,7 @@ function Landing() {
           <div className="absolute inset-0 opacity-40" style={{ background: "var(--gradient-hero)" }} />
           <div className="relative">
             <h2 className="text-3xl md:text-4xl font-bold">Ready to transform your classroom?</h2>
-            <p className="mt-3 text-muted-foreground">Free forever for teachers to try. Upgrade whenever you need more.</p>
+            <p className="mt-3 text-muted-foreground">Free for everyone during our testing phase — every tool unlocked.</p>
             <Link
               to={user ? authedHref() : "/auth"}
               search={user ? undefined : ({ mode: "signup" } as never)}
@@ -174,7 +174,7 @@ function ThemeToggle() {
 const FAQ: { q: string; a: string }[] = [
   { q: "What is EduSense?", a: "EduSense is a privacy-first, AI-assisted classroom platform where teachers create quizzes and get insights, while students practice with adaptive tools." },
   { q: "Is my data private?", a: "Yes. Your data stays in your workspace and is never used to train third-party models." },
-  { q: "How much does it cost?", a: "Free forever for the essentials. Paid Teacher Pro and School plans unlock advanced AI tools." },
+  { q: "How much does it cost?", a: "EduSense is completely free during our testing phase — every tool is unlocked for teachers and students." },
   { q: "Is this for teachers or students?", a: "Both! Teachers and students each get a tailored dashboard designed for their workflow." },
 ];
 
