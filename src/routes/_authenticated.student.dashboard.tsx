@@ -44,12 +44,17 @@ function StudentDashboard() {
   return (
     <DashboardShell role="student" greeting="Student Dashboard">
       <PageHeader title="Your progress" desc="Live data from your account." />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={BookOpen} label="Quizzes Taken" value={totalAttempts} />
-        <StatCard icon={Target} label="Average Score" value={`${avg}%`} />
-        <StatCard icon={ListChecks} label="Homework Due" value={due} />
-        <StatCard icon={Crown} label="Current Plan" value={(profile?.plan ?? "free").toUpperCase()} />
-      </div>
+      {attempts.isLoading || homework.isLoading ? (
+        <SkeletonCards />
+      ) : (
+        <div className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard icon={BookOpen} label="Quizzes Taken" value={totalAttempts} />
+          <StatCard icon={Target} label="Average Score" value={`${avg}%`} />
+          <StatCard icon={ListChecks} label="Homework Due" value={due} />
+          <StatCard icon={Crown} label="Current Plan" value={(profile?.plan ?? "free").toUpperCase()} />
+        </div>
+      )}
+
 
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
         <div className="glass rounded-2xl p-6 lg:col-span-2 h-80">
