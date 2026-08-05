@@ -64,7 +64,18 @@ const studentGroups: NavGroup[] = [
 
 
 export function isPaidPlan(plan: Profile["plan"] | undefined | null) {
+  // Payments are disabled for the testing phase — everything is unlocked.
+  if (!PAYMENTS_ENABLED) return true;
   return plan === "pro" || plan === "school-pro";
+}
+
+/** Nav entries that belong to the payment system (hidden while disabled). */
+const PAYMENT_ROUTES = ["/teacher/plans", "/student/plans"];
+function stripPaymentNav(groups: NavGroup[]): NavGroup[] {
+  if (PAYMENTS_ENABLED) return groups;
+  return groups
+    .map((g) => ({ ...g, items: g.items.filter((i) => !PAYMENT_ROUTES.includes(i.to)) }))
+    .filter((g) => g.items.length > 0);
 }
 
 export function DashboardShell({
