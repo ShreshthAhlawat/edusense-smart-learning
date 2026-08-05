@@ -3,6 +3,7 @@ import { type ReactNode, useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { useAuth, isOwner, type Profile } from "@/lib/auth";
 import { useTheme } from "@/lib/theme";
+import { PAYMENTS_ENABLED } from "@/lib/features";
 import { NotificationBell } from "@/components/NotificationBell";
 import {
   LayoutDashboard, FileQuestion, Sparkles, BarChart3, CreditCard,
@@ -86,7 +87,7 @@ export function DashboardShell({
   const { theme, toggle } = useTheme();
   const navigate = useNavigate();
   const isPro = isPaidPlan(profile?.plan);
-  const baseGroups = role === "teacher" ? teacherGroups : studentGroups;
+  const baseGroups = stripPaymentNav(role === "teacher" ? teacherGroups : studentGroups);
   const groups: NavGroup[] = isOwner(user)
     ? [...baseGroups, { label: "Internal", items: [{ to: "/owner-dashboard", label: "Owner Dashboard", icon: ShieldCheck }] }]
     : baseGroups;
