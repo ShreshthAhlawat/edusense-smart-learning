@@ -252,13 +252,16 @@ export function PaidGate({ role, feature }: { role: "teacher" | "student"; featu
       <p className="mt-2 text-sm text-muted-foreground">
         Upgrade your plan to unlock {feature.toLowerCase()} and every other {role === "teacher" ? "teacher" : "premium"} tool in EduSense.
       </p>
-      <Link
-        to={role === "teacher" ? "/teacher/plans" : "/student/plans"}
-        className="mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium text-primary-foreground glow transition-transform hover:-translate-y-0.5"
-        style={{ background: "var(--gradient-primary)" }}
-      >
-        <CreditCard className="h-4 w-4" /> View plans
-      </Link>
+      {PAYMENTS_ENABLED && (
+        <Link
+          to={role === "teacher" ? "/teacher/plans" : "/student/plans"}
+          className="mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium text-primary-foreground glow transition-transform hover:-translate-y-0.5"
+          style={{ background: "var(--gradient-primary)" }}
+        >
+          <CreditCard className="h-4 w-4" /> View plans
+        </Link>
+      )}
+
     </div>
   );
 }
