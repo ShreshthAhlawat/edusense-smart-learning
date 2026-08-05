@@ -61,7 +61,7 @@ function Landing() {
               </Button>
             ) : (
               <>
-                <Link to="/auth" className="text-sm text-muted-foreground hover:text-foreground">Log in</Link>
+                <Link to="/auth" className="link-underline text-sm text-muted-foreground hover:text-foreground">Log in</Link>
                 <Link to="/auth" search={{ mode: "signup" } as never} className="rounded-md px-4 py-2 text-sm font-medium text-primary-foreground glow"
                   style={{ background: "var(--gradient-primary)" }}>
                   Sign up
@@ -101,13 +101,13 @@ function Landing() {
         </div>
 
         {/* Floating orbs */}
-        <div className="pointer-events-none absolute left-8 top-40 h-16 w-16 rounded-full bg-primary/40 blur-2xl animate-float" />
-        <div className="pointer-events-none absolute right-10 top-60 h-24 w-24 rounded-full bg-accent/40 blur-2xl animate-float" style={{ animationDelay: "2s" }} />
+        <div className="pointer-events-none absolute left-8 top-40 h-16 w-16 rounded-full bg-primary/40 blur-2xl animate-float animate-drift" />
+        <div className="pointer-events-none absolute right-10 top-60 h-24 w-24 rounded-full bg-accent/40 blur-2xl animate-float animate-drift" style={{ animationDelay: "2s" }} />
       </section>
 
       {/* FEATURES */}
       <section className="mx-auto max-w-7xl px-6 pb-24">
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <div className="stagger grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f, i) => (
             <Link
               key={f.title}
