@@ -113,7 +113,7 @@ export function DashboardShell({
               </div>
             )}
             <div className="space-y-0.5">
-              {g.items.map((item) => {
+              {g.items.map((item, ii) => {
                 const active = pathname === item.to;
                 const showLock = item.locked && !isPro;
                 return (
@@ -121,20 +121,23 @@ export function DashboardShell({
                     key={item.to}
                     to={item.to}
                     onClick={() => setMobileOpen(false)}
+                    style={{ animationDelay: `${gi * 60 + ii * 25}ms` }}
                     className={
-                      "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors " +
+                      "nav-item group relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm animate-fade-in-up " +
                       (active
-                        ? "bg-primary/20 text-foreground font-medium"
+                        ? "is-active bg-primary/20 text-foreground font-medium"
                         : "text-muted-foreground hover:bg-secondary hover:text-foreground")
                     }
                   >
-                    <item.icon className="h-4 w-4" />
+                    <span className="nav-indicator" aria-hidden />
+                    <item.icon className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                     <span className="flex-1 truncate">{item.label}</span>
                     {showLock && <Lock className="h-3.5 w-3.5 text-muted-foreground" />}
                   </Link>
                 );
               })}
             </div>
+
           </div>
         ))}
         <button
