@@ -355,7 +355,10 @@ html { scroll-behavior: smooth; }
 
 /* ---- Buttons: hover glow, press, ripple ---- */
 @media (prefers-reduced-motion: no-preference) {
-  button, a[role="button"], .btn-premium {
+  /* Never override an explicitly positioned button (fixed/absolute/sticky). */
+  button:not([class*="fixed"]):not([class*="absolute"]):not([class*="sticky"]),
+  a[role="button"]:not([class*="fixed"]):not([class*="absolute"]):not([class*="sticky"]),
+  .btn-premium {
     position: relative;
     transition: transform var(--dur-fast) var(--ease-premium),
                 box-shadow var(--dur-base) var(--ease-soft),
