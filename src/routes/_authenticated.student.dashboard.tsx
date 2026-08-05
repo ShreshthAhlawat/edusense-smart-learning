@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PAYMENTS_ENABLED } from "@/lib/features";
+import { SkeletonCards } from "@/components/Skeleton";
 import { useAuth } from "@/lib/auth";
 import { DashboardShell, PageHeader, StatCard } from "@/components/DashboardShell";
 import { BookOpen, Target, ListChecks, Crown, Rocket, ChevronLeft, ChevronRight } from "lucide-react";
