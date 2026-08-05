@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { DashboardShell, PageHeader, isPaidPlan } from "@/components/DashboardShell";
+import { PAYMENTS_ENABLED } from "@/lib/features";
 import { useAuth } from "@/lib/auth";
 import { Crown, Zap } from "lucide-react";
 
@@ -33,9 +34,11 @@ function MyPlan() {
         <p className="mt-5 text-sm text-muted-foreground">
           {isPro ? "You have full access to all EduSense student tools." : "Upgrade to unlock all AI-powered learning tools."}
         </p>
+        {PAYMENTS_ENABLED && (
         <Link to="/student/plans" className="mt-6 inline-flex rounded-xl px-5 py-2.5 text-sm font-medium text-primary-foreground glow" style={{ background: "var(--gradient-primary)" }}>
           {isPro ? "Manage plan" : "Upgrade"}
         </Link>
+        )}
       </div>
     </DashboardShell>
   );
