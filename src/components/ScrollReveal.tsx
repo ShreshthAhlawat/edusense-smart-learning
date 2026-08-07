@@ -8,7 +8,7 @@ import { useRouterState } from "@tanstack/react-router";
  * Re-scans on every route change and on DOM mutations.
  */
 const SELECTOR =
-  "[data-reveal], main section, main .glass, main .glass-strong, main .recharts-responsive-container";
+  "[data-reveal], section, main .glass, main .glass-strong, main .recharts-responsive-container";
 
 export function ScrollReveal() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -33,6 +33,10 @@ export function ScrollReveal() {
     const scan = () => {
       document.querySelectorAll<HTMLElement>(SELECTOR).forEach((el, i) => {
         if (el.dataset["revealBound"]) return;
+        // Never animate viewport-anchored chrome (nav, chat bubble, drawers)
+        const pos = getComputedStyle(el).position;
+        if (pos === "fixed" || pos === "sticky") return;
+        if (el.closest("nav, header, [data-no-reveal]")) return;
         el.dataset["revealBound"] = "1";
         el.classList.add("reveal");
         el.style.setProperty("--reveal-delay", `${Math.min(i % 8, 7) * 55}ms`);
