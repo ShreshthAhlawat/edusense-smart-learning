@@ -15,6 +15,7 @@ import { AuthProvider } from "@/lib/auth";
 import { ThemeProvider } from "@/lib/theme";
 import { Toaster } from "sonner";
 import { PageTransition } from "@/components/PageTransition";
+import { ScrollReveal } from "@/components/ScrollReveal";
 
 function NotFoundComponent() {
   return (
@@ -116,11 +117,14 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
+          <div className="scroll-progress" aria-hidden />
+          <ScrollReveal />
           <PageTransition>
             <Outlet />
           </PageTransition>
           <Toaster theme="dark" position="top-right" richColors />
         </AuthProvider>
+
       </ThemeProvider>
     </QueryClientProvider>
   );

@@ -11,4 +11,4 @@
  *  - Upgrade / Subscribe / Buy CTAs are hidden
  *  - Every premium feature is unlocked for all users
  */
-export const PAYMENTS_ENABLED = false;
+export const PAYMENTS_ENABLED = true;
