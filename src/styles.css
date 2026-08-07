@@ -523,7 +523,7 @@ html { scroll-behavior: smooth; }
    Driven by <ScrollReveal /> which toggles `.is-revealed`.
    ============================================================ */
 @media (prefers-reduced-motion: no-preference) {
-  .reveal {
+  [data-reveal-bound] {
     opacity: 0;
     transform: translate3d(0, 34px, 0) scale(0.965);
     filter: blur(6px);
@@ -533,19 +533,19 @@ html { scroll-behavior: smooth; }
       transform 720ms var(--ease-premium) var(--reveal-delay, 0ms),
       filter 620ms var(--ease-soft) var(--reveal-delay, 0ms);
   }
-  .reveal.is-revealed {
+  [data-reveal-bound][data-revealed] {
     opacity: 1;
     transform: none;
     filter: none;
   }
 
   /* Directional variants */
-  .reveal-left { transform: translate3d(-42px, 0, 0) scale(0.97); }
-  .reveal-right { transform: translate3d(42px, 0, 0) scale(0.97); }
-  .reveal-zoom { transform: scale(0.9); }
-  .reveal-left.is-revealed,
-  .reveal-right.is-revealed,
-  .reveal-zoom.is-revealed { transform: none; }
+  [data-reveal-bound].reveal-left { transform: translate3d(-42px, 0, 0) scale(0.97); }
+  [data-reveal-bound].reveal-right { transform: translate3d(42px, 0, 0) scale(0.97); }
+  [data-reveal-bound].reveal-zoom { transform: scale(0.9); }
+  [data-reveal-bound][data-revealed].reveal-left,
+  [data-reveal-bound][data-revealed].reveal-right,
+  [data-reveal-bound][data-revealed].reveal-zoom { transform: none; }
 
   /* Expanding underline/divider that grows as its section reveals */
   .reveal-expand {
@@ -553,7 +553,7 @@ html { scroll-behavior: smooth; }
     transform: scaleX(0);
     transition: transform 800ms var(--ease-premium) var(--reveal-delay, 0ms);
   }
-  .reveal-expand.is-revealed { transform: scaleX(1); }
+  [data-reveal-bound][data-revealed].reveal-expand { transform: scaleX(1); }
 }
 
 /* Scroll-driven progress bar for the whole document */

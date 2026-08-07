@@ -22,7 +22,7 @@ export function ScrollReveal() {
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            entry.target.classList.add("is-revealed");
+            (entry.target as HTMLElement).dataset["revealed"] = "1";
             observer.unobserve(entry.target);
           }
         }
@@ -38,12 +38,11 @@ export function ScrollReveal() {
         if (pos === "fixed" || pos === "sticky") return;
         if (el.closest("nav, header, [data-no-reveal]")) return;
         el.dataset["revealBound"] = "1";
-        el.classList.add("reveal");
         el.style.setProperty("--reveal-delay", `${Math.min(i % 8, 7) * 55}ms`);
         // Already on screen at mount → reveal immediately (no flash of hidden content)
         const rect = el.getBoundingClientRect();
         if (rect.top < window.innerHeight * 0.92 && rect.bottom > 0) {
-          el.classList.add("is-revealed");
+          el.dataset["revealed"] = "1";
           return;
         }
         observer.observe(el);
