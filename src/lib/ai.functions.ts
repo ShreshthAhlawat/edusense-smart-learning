@@ -96,7 +96,9 @@ No prose, no markdown, no code fences — only the raw JSON object.`;
         options: t === "mcq" && Array.isArray(q.options) ? q.options.slice(0, 4).map((o: any) => String(o)) : [],
         correct: t === "mcq" ? Math.max(0, Math.min(3, Number(q.correct ?? 0))) : 0,
         subtopic: String(q.subtopic ?? data.subject).trim() || data.subject,
+        explanation: String(q.explanation ?? "").trim(),
         sample_answer: t === "written" ? String(q.sample_answer ?? "") : undefined,
+
       };
     }).filter((q) => q.question && (q.type === "written" || q.options.length === 4));
 
