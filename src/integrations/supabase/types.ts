@@ -14,6 +14,68 @@ export type Database = {
   }
   public: {
     Tables: {
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          persona: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          persona?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          persona?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       class_timetables: {
         Row: {
           created_at: string
@@ -238,7 +300,10 @@ export type Database = {
       }
       quiz_attempts: {
         Row: {
+          answer_detail: Json
+          completion_rate: number
           correct_count: number
+          duration_seconds: number
           guest_name: string | null
           id: string
           quiz_id: string | null
@@ -251,7 +316,10 @@ export type Database = {
           written_answers: Json
         }
         Insert: {
+          answer_detail?: Json
+          completion_rate?: number
           correct_count?: number
+          duration_seconds?: number
           guest_name?: string | null
           id?: string
           quiz_id?: string | null
@@ -264,7 +332,10 @@ export type Database = {
           written_answers?: Json
         }
         Update: {
+          answer_detail?: Json
+          completion_rate?: number
           correct_count?: number
+          duration_seconds?: number
           guest_name?: string | null
           id?: string
           quiz_id?: string | null
@@ -363,9 +434,14 @@ export type Database = {
           active: boolean
           code: string
           created_at: string
+          duration_months: number
+          expires_at: string | null
           id: string
+          label: string | null
           max_students: number
           max_teachers: number
+          request_id: string | null
+          revoked: boolean
           students_redeemed: number
           teachers_redeemed: number
         }
@@ -373,9 +449,14 @@ export type Database = {
           active?: boolean
           code: string
           created_at?: string
+          duration_months?: number
+          expires_at?: string | null
           id?: string
+          label?: string | null
           max_students?: number
           max_teachers?: number
+          request_id?: string | null
+          revoked?: boolean
           students_redeemed?: number
           teachers_redeemed?: number
         }
@@ -383,9 +464,14 @@ export type Database = {
           active?: boolean
           code?: string
           created_at?: string
+          duration_months?: number
+          expires_at?: string | null
           id?: string
+          label?: string | null
           max_students?: number
           max_teachers?: number
+          request_id?: string | null
+          revoked?: boolean
           students_redeemed?: number
           teachers_redeemed?: number
         }
@@ -397,9 +483,12 @@ export type Database = {
           contact_person: string
           contact_phone: string | null
           created_at: string
+          decision_note: string | null
+          duration_months: number
           estimated_students: number | null
           estimated_teachers: number | null
           id: string
+          license_id: string | null
           notes: string | null
           school_name: string
           status: string
@@ -409,9 +498,12 @@ export type Database = {
           contact_person: string
           contact_phone?: string | null
           created_at?: string
+          decision_note?: string | null
+          duration_months?: number
           estimated_students?: number | null
           estimated_teachers?: number | null
           id?: string
+          license_id?: string | null
           notes?: string | null
           school_name: string
           status?: string
@@ -421,9 +513,12 @@ export type Database = {
           contact_person?: string
           contact_phone?: string | null
           created_at?: string
+          decision_note?: string | null
+          duration_months?: number
           estimated_students?: number | null
           estimated_teachers?: number | null
           id?: string
+          license_id?: string | null
           notes?: string | null
           school_name?: string
           status?: string
@@ -594,6 +689,42 @@ export type Database = {
           join_code?: string
           name?: string
           teacher_id?: string
+        }
+        Relationships: []
+      }
+      usage_sessions: {
+        Row: {
+          created_at: string
+          duration_seconds: number
+          ended_at: string | null
+          id: string
+          role: string | null
+          route: string
+          started_at: string
+          tool: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number
+          ended_at?: string | null
+          id?: string
+          role?: string | null
+          route: string
+          started_at?: string
+          tool?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number
+          ended_at?: string | null
+          id?: string
+          role?: string | null
+          route?: string
+          started_at?: string
+          tool?: string
+          user_id?: string
         }
         Relationships: []
       }
