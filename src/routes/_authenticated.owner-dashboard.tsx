@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Copy, Loader2, ShieldCheck, Building2, Mail, Users } from "lucide-react";
+import { Copy, Loader2, ShieldCheck, Building2, Users } from "lucide-react";
+import { SchoolRequests, LicenseManager } from "@/components/OwnerSchool";
 
 export const Route = createFileRoute("/_authenticated/owner-dashboard")({
   head: () => ({ meta: [
@@ -102,10 +103,10 @@ function OwnerDashboard() {
         </div>
 
         <div className="glass rounded-2xl p-6">
-          <h2 className="font-semibold mb-3">Active codes</h2>
+          <h2 className="font-semibold mb-3">Recent codes</h2>
           {licenses.data && licenses.data.length > 0 ? (
             <ul className="space-y-2 max-h-96 overflow-y-auto">
-              {licenses.data.map((c: any) => (
+              {licenses.data.slice(0, 6).map((c: any) => (
                 <li key={c.id} className="rounded-lg bg-secondary/40 border border-border p-3">
                   <div className="flex items-center justify-between">
                     <div className="font-mono font-bold tracking-widest">{c.code}</div>
@@ -128,33 +129,11 @@ function OwnerDashboard() {
         </div>
       </div>
 
+      <SchoolRequests />
+      <LicenseManager />
+
       <UserManagement />
 
-      <div className="mt-6 glass rounded-2xl p-6">
-        <h2 className="font-semibold mb-4 flex items-center gap-2"><Mail className="h-4 w-4 text-primary" /> School license enquiries</h2>
-        {requests.data && requests.data.length > 0 ? (
-          <ul className="space-y-3 max-h-[500px] overflow-y-auto">
-            {requests.data.map((r: any) => (
-              <li key={r.id} className="rounded-lg bg-secondary/40 border border-border p-4">
-                <div className="flex justify-between items-start gap-3">
-                  <div>
-                    <div className="font-semibold">{r.school_name}</div>
-                    <div className="text-xs text-muted-foreground">{r.contact_person} · <a className="text-primary hover:underline" href={`mailto:${r.contact_email}`}>{r.contact_email}</a>{r.contact_phone ? ` · ${r.contact_phone}` : ""}</div>
-                  </div>
-                  <span className="text-[10px] rounded-full bg-primary/20 border border-primary/40 px-2 py-0.5">{r.status}</span>
-                </div>
-                <div className="mt-2 text-xs">
-                  Students: <strong>{r.estimated_students ?? "—"}</strong> · Teachers: <strong>{r.estimated_teachers ?? "—"}</strong>
-                </div>
-                {r.notes && <p className="mt-2 text-sm text-muted-foreground whitespace-pre-wrap">{r.notes}</p>}
-                <div className="mt-1 text-[10px] text-muted-foreground">Submitted {new Date(r.created_at).toLocaleString()}</div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm text-muted-foreground">No enquiries yet.</p>
-        )}
-      </div>
     </DashboardShell>
   );
 }
