@@ -53,17 +53,6 @@ function OwnerDashboard() {
   });
 
   if (!allowed) {
-      // Redirect to their regular dashboard, no admin badge/UI shown.
-      const to = profile?.role === "teacher" ? "/teacher/dashboard" : "/student/dashboard";
-      navigate({ to });
-    }
-  }, [loading, user, allowed, profile, navigate]);
-
-  const licenses = useQuery({
-    queryKey: ["owner-licenses"],
-    queryFn: async () => (await supabase.from("school_licenses").select("*").order("created_at", { ascending: false })).data ?? [],
-    enabled: allowed,
-  });
 
   const requests = useQuery({
     queryKey: ["owner-school-requests"],
