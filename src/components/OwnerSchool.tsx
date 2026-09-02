@@ -219,7 +219,7 @@ export function LicenseManager() {
   });
 
   const patch = async (id: string, values: Record<string, unknown>) => {
-    const { error } = await supabase.from("school_licenses").update(values).eq("id", id);
+    const { error } = await supabase.from("school_licenses").update(values as never).eq("id", id);
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["owner-licenses"] });
     toast.success("Code updated");
