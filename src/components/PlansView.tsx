@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/lib/auth";
-import { createRazorpayOrder, confirmDemoPayment, redeemSchoolCode, submitSchoolRequest } from "@/lib/payments.functions";
+import { createRazorpayOrder, confirmDemoPayment, redeemSchoolCode, submitSchoolRequest, PRICES } from "@/lib/payments.functions";
 import { isPaidPlan } from "@/components/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +33,7 @@ export function PlansView({ role }: { role: Role }) {
   const redeem = useServerFn(redeemSchoolCode);
   const requestSchool = useServerFn(submitSchoolRequest);
 
+  const [cycle, setCycle] = useState<"monthly" | "yearly">("monthly");
   const [order, setOrder] = useState<null | { orderId: string; qrUrl: string; upiIntent: string; amountInr: number; mode: string; plan: "student-pro" | "teacher-pro" }>(null);
   const [loading, setLoading] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
@@ -49,7 +50,7 @@ export function PlansView({ role }: { role: Role }) {
   const upgrade = async (planKey: "student-pro" | "teacher-pro") => {
     setLoading(planKey);
     try {
-      const o = await createOrder({ data: { plan: planKey } });
+      const o = await createOrder({ data: { plan: planKey, cycle } });
       setOrder(o);
     } catch (e: any) {
       toast.error(e.message ?? "Could not start payment");
@@ -122,6 +123,25 @@ export function PlansView({ role }: { role: Role }) {
 
   return (
     <>
+      <div className="mb-6 flex justify-center">
+        <div className="glass relative inline-flex rounded-full p-1 text-sm">
+          <span
+            className="absolute inset-y-1 w-1/2 rounded-full transition-transform duration-300 ease-out"
+            style={{ background: "var(--gradient-primary)", transform: cycle === "yearly" ? "translateX(100%)" : "translateX(0)" }}
+          />
+          {(["monthly", "yearly"] as const).map((c) => (
+            <button
+              key={c}
+              onClick={() => setCycle(c)}
+              className={"relative z-10 min-w-[110px] rounded-full px-4 py-1.5 capitalize transition-colors " + (cycle === c ? "text-primary-foreground font-medium" : "text-muted-foreground hover:text-foreground")}
+            >
+              {c}
+              {c === "yearly" && <span className="ml-1 text-[10px] opacity-80">save 16%</span>}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="grid gap-6 md:grid-cols-3">
         {plans.map((p) => {
           const active = currentPlan === p.key || (p.key === "pro" && pro && currentPlan !== "school-pro");
@@ -133,7 +153,14 @@ export function PlansView({ role }: { role: Role }) {
                 </div>
               )}
               <div className="text-sm text-muted-foreground">{p.name}</div>
-              <div className="mt-1 text-3xl font-bold">{p.price}</div>
+              <div className="mt-1 text-3xl font-bold">
+                {p.upgradeKey ? (
+                  <span key={cycle} className="inline-block animate-fade-in">
+                    ₹{PRICES[p.upgradeKey][cycle]}
+                    <span className="text-sm font-normal text-muted-foreground">/{cycle === "monthly" ? "mo" : "yr"}</span>
+                  </span>
+                ) : p.price}
+              </div>
               <ul className="mt-4 space-y-2 text-sm">
                 {p.features.map((f) => <li key={f} className="flex items-start gap-2"><Check className="h-4 w-4 text-primary mt-0.5" />{f}</li>)}
               </ul>
