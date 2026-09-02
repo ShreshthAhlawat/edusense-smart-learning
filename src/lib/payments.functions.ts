@@ -6,13 +6,19 @@ const DEMO_VPA = "edusense@upi";
 
 const OrderInput = z.object({
   plan: z.enum(["student-pro", "teacher-pro"]),
+  cycle: z.enum(["monthly", "yearly"]).default("monthly"),
 });
+
+export const PRICES = {
+  "student-pro": { monthly: 99, yearly: 999 },
+  "teacher-pro": { monthly: 149, yearly: 1499 },
+} as const;
 
 export const createRazorpayOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => OrderInput.parse(d))
   .handler(async ({ data, context }) => {
-    const amountInr = data.plan === "student-pro" ? 99 : 149;
+    const amountInr = PRICES[data.plan][data.cycle];
     const amountPaise = amountInr * 100;
 
     const keyId = process.env.RAZORPAY_KEY_ID;
