@@ -15,6 +15,7 @@ import {
   Lock, MessageSquare, FileText, BookMarked, Rocket, Compass, Glasses, Send,
   Loader2, Sparkles, Copy, Upload, Printer,
 } from "lucide-react";
+import { PrintDocHeader, PrintDocFooter, CopyTextButton } from "@/components/PrintDoc";
 
 
 const TOOLS: Record<string, { title: string; desc: string; icon: any }> = {
@@ -223,13 +224,17 @@ function PdfSummarizer() {
           {summary && (
             <div className="flex items-center gap-2">
               <SpeechPlayer text={summary} label="Listen" />
-              <Button size="sm" variant="secondary" onClick={() => { navigator.clipboard.writeText(summary); toast.success("Copied"); }}><Copy className="h-4 w-4 mr-1" /> Copy</Button>
-              <Button size="sm" variant="secondary" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Print</Button>
+              <CopyTextButton text={summary} />
+              <Button size="sm" variant="secondary" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Print / Download</Button>
             </div>
           )}
         </div>
         {summary ? (
-          <Markdown>{summary}</Markdown>
+          <>
+            <PrintDocHeader title={file || "Document summary"} subtitle={`${length === "short" ? "Short" : "Detailed"} summary`} />
+            <Markdown>{summary}</Markdown>
+            <PrintDocFooter />
+          </>
         ) : (
           <p className="text-sm text-muted-foreground">Upload a document and hit "Summarize" to see key concepts here.</p>
         )}
@@ -266,9 +271,14 @@ function StoryGen() {
       {story && (
         <div className="glass rounded-2xl p-6 print-area">
           <div className="mb-3 flex justify-end no-print"><SpeechPlayer text={story} label="Listen to story" /></div>
+          <PrintDocHeader title={topic} subtitle="Story" />
           <Markdown>{story}</Markdown>
+          <PrintDocFooter />
           <div className="mt-4 flex justify-between no-print">
-            <Button size="sm" variant="secondary" onClick={() => { navigator.clipboard.writeText(story); toast.success("Copied"); }}><Copy className="h-4 w-4 mr-1" /> Copy</Button>
+            <div className="flex gap-2">
+              <CopyTextButton text={story} />
+              <Button size="sm" variant="secondary" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Print / Download</Button>
+            </div>
             <Button size="sm" onClick={() => generate(variant + 1)} disabled={busy} style={{ background: "var(--gradient-primary)" }} className="glow">
               {busy ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Sparkles className="h-4 w-4 mr-1" />}
               Generate another version
@@ -335,11 +345,18 @@ function Explainer() {
           {out && (
             <div className="flex items-center gap-2">
               <SpeechPlayer text={out} label="Listen" />
-              <Button size="sm" variant="secondary" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Print</Button>
+              <CopyTextButton text={out} />
+              <Button size="sm" variant="secondary" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Print / Download</Button>
             </div>
           )}
         </div>
-        {out ? <Markdown>{out}</Markdown>
+        {out ? (
+          <>
+            <PrintDocHeader title={file || "Topic explanation"} subtitle={language} />
+            <Markdown>{out}</Markdown>
+            <PrintDocFooter />
+          </>
+        )
           : <p className="text-sm text-muted-foreground">Your conversational explanation will appear here.</p>}
       </div>
 

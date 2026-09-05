@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Loader2, Printer, Copy, Sparkles } from "lucide-react";
+import { Loader2, Printer, Sparkles } from "lucide-react";
+import { PrintDocHeader, PrintDocFooter, CopyTextButton } from "@/components/PrintDoc";
 
 export function SamplePaperTool({ shareable = false }: { shareable?: boolean }) {
   const run = useServerFn(generateSamplePaper);
@@ -87,12 +88,14 @@ export function SamplePaperTool({ shareable = false }: { shareable?: boolean }) 
             <div className="flex flex-wrap items-center justify-between gap-2 mb-4 no-print">
               <SpeechPlayer text={markdown} label="Listen" />
               <div className="flex flex-wrap gap-2">
-                <Button size="sm" variant="secondary" onClick={() => { navigator.clipboard.writeText(markdown); toast.success("Copied"); }}><Copy className="h-4 w-4 mr-1" /> Copy</Button>
+                <CopyTextButton text={markdown} />
                 {shareable && <ShareWithTeam contentType="sample_paper" contentId={savedId} />}
-                <Button size="sm" onClick={() => window.print()} style={{ background: "var(--gradient-primary)" }} className="glow"><Printer className="h-4 w-4 mr-1" /> Print</Button>
+                <Button size="sm" onClick={() => window.print()} style={{ background: "var(--gradient-primary)" }} className="glow"><Printer className="h-4 w-4 mr-1" /> Print / Download</Button>
               </div>
             </div>
+            <PrintDocHeader title={topics} subtitle={`${classLevel} · ${language} · ${count} questions`} />
             <Markdown>{markdown}</Markdown>
+            <PrintDocFooter />
           </>
         ) : (
           <div className="text-center py-16 text-sm text-muted-foreground">Your printable sample paper will appear here.</div>

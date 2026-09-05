@@ -14,6 +14,7 @@ import { Markdown } from "@/components/Markdown";
 import { SpeechPlayer } from "@/components/SpeechPlayer";
 import { ShareWithTeam } from "@/components/ShareWithTeam";
 import { FileText, BookMarked, Sparkles, Loader2, Printer, Share2, Copy } from "lucide-react";
+import { PrintDocHeader, PrintDocFooter, CopyTextButton } from "@/components/PrintDoc";
 
 
 export const Route = createFileRoute("/_authenticated/teacher/content")({
@@ -111,14 +112,17 @@ function ContentGenerator() {
                 <div className="text-sm text-muted-foreground truncate max-w-md">{result.link}</div>
                 <div className="flex flex-wrap gap-2 items-center">
                   <SpeechPlayer text={result.markdown} label="Listen" />
-                  <Button size="sm" variant="secondary" onClick={() => { navigator.clipboard.writeText(result.link); toast.success("Copied"); }}><Copy className="h-4 w-4 mr-1" /> Copy</Button>
+                  <CopyTextButton text={result.markdown} />
+                  <Button size="sm" variant="secondary" onClick={() => { navigator.clipboard.writeText(result.link); toast.success("Link copied"); }}><Copy className="h-4 w-4 mr-1" /> Copy link</Button>
                   <Button size="sm" variant="secondary" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Print</Button>
                   <ShareWithTeam contentType="worksheet" contentId={result.id} />
                   <Button size="sm" onClick={() => { navigator.clipboard.writeText(result.link); toast.success("Share link copied!"); }} style={{ background: "var(--gradient-primary)" }} className="glow"><Share2 className="h-4 w-4 mr-1" /> Share</Button>
                 </div>
               </div>
-              <h2 className="text-2xl font-bold mb-4">{result.title}</h2>
+              <PrintDocHeader title={form.topic || result.title} subtitle={`${form.class_level} · ${form.subject} · ${form.language}`} />
+              <h2 className="text-2xl font-bold mb-4 no-print">{result.title}</h2>
               <Markdown>{result.markdown}</Markdown>
+              <PrintDocFooter />
 
             </div>
           )}

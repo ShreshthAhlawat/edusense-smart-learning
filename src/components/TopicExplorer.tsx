@@ -6,6 +6,7 @@ import { SpeechPlayer } from "@/components/SpeechPlayer";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Compass, Info, Printer } from "lucide-react";
+import { PrintDocHeader, PrintDocFooter, CopyTextButton } from "@/components/PrintDoc";
 
 const CLASSES = ["Class 6", "Class 7", "Class 8", "Class 9", "Class 10", "Class 11", "Class 12"];
 
@@ -117,14 +118,15 @@ export function TopicExplorer() {
       </div>
 
       {(busy || result) && (
-        <div className="glass rounded-2xl p-6 print-area animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div className="glass rounded-2xl p-6 print-area">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4 no-print">
             <h3 className="font-semibold">{active}</h3>
             {!busy && result && (
               <div className="flex items-center gap-2">
                 <SpeechPlayer text={result} />
+                <CopyTextButton text={result} />
                 <Button size="sm" variant="secondary" onClick={() => window.print()}>
-                  <Printer className="h-4 w-4 mr-1" /> Print
+                  <Printer className="h-4 w-4 mr-1" /> Print / Download
                 </Button>
               </div>
             )}
@@ -134,7 +136,11 @@ export function TopicExplorer() {
               <Loader2 className="h-4 w-4 animate-spin" /> Generating an overview of “{active}”…
             </div>
           ) : (
-            <Markdown>{result}</Markdown>
+            <>
+              <PrintDocHeader title={active ?? ""} subtitle={`${classLevel} · ${currentSubject}`} />
+              <Markdown>{result}</Markdown>
+              <PrintDocFooter />
+            </>
           )}
         </div>
       )}

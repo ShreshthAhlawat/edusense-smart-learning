@@ -5,6 +5,7 @@ import { GlowBackground } from "@/components/GlowBackground";
 import { Logo } from "@/components/Logo";
 import ReactMarkdown from "react-markdown";
 import { Loader2, Printer } from "lucide-react";
+import { PrintDocHeader, PrintDocFooter, CopyTextButton } from "@/components/PrintDoc";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/content/$id")({
@@ -29,7 +30,7 @@ function ContentView() {
       <GlowBackground />
       <header className="sticky top-0 z-10 backdrop-blur-xl bg-background/40 border-b border-border h-16 flex items-center justify-between px-4 md:px-8 no-print">
         <Link to="/"><Logo className="h-8 w-auto" /></Link>
-        <Button size="sm" variant="secondary" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Print</Button>
+        <Button size="sm" variant="secondary" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Print / Download</Button>
       </header>
       <main className="max-w-3xl mx-auto px-4 md:px-8 py-10">
         {q.isLoading ? (
@@ -38,11 +39,16 @@ function ContentView() {
           <div className="text-center py-20 text-muted-foreground">Content not found or has been removed.</div>
         ) : (
           <div className="glass rounded-2xl p-8 print-area">
-            <div className="text-xs uppercase tracking-wider text-primary mb-2">{q.data.kind}</div>
-            <h1 className="text-3xl font-bold mb-6">{q.data.title}</h1>
+            <PrintDocHeader title={q.data.topic || q.data.title} subtitle={[q.data.class_level, q.data.language].filter(Boolean).join(" · ")} />
+            <div className="text-xs uppercase tracking-wider text-primary mb-2 no-print">{q.data.kind}</div>
+            <div className="flex items-start justify-between gap-3 mb-6 no-print">
+              <h1 className="text-3xl font-bold">{q.data.title}</h1>
+              <CopyTextButton text={q.data.content_markdown} />
+            </div>
             <article className="prose prose-invert max-w-none prose-headings:text-foreground prose-strong:text-foreground prose-p:text-foreground/90 prose-li:text-foreground/90">
               <ReactMarkdown>{q.data.content_markdown}</ReactMarkdown>
             </article>
+            <PrintDocFooter />
           </div>
         )}
       </main>

@@ -13,6 +13,20 @@ import { toast } from "sonner";
 import { ShareWithTeam } from "@/components/ShareWithTeam";
 import { MathText } from "@/components/Markdown";
 import { Copy, Link as LinkIcon, Loader2, FileQuestion, Printer, Share2, Sparkles } from "lucide-react";
+import { PrintDocHeader, PrintDocFooter, CopyTextButton } from "@/components/PrintDoc";
+
+/** Plain-text version of a generated quiz, for the Copy text button. */
+function quizAsText(quiz: any) {
+  const lines = [quiz.title, ""];
+  quiz.questions.forEach((q: any, i: number) => {
+    lines.push(`${i + 1}. ${q.question}`);
+    (q.options ?? []).forEach((o: string, oi: number) => lines.push(`   ${String.fromCharCode(65 + oi)}. ${o}`));
+    if (q.options?.length) lines.push(`   Answer: ${String.fromCharCode(65 + q.correct)}`);
+    lines.push("");
+  });
+  return lines.join("\n");
+}
+
 
 
 export const Route = createFileRoute("/_authenticated/teacher/quizzes")({
@@ -132,12 +146,14 @@ function QuizGenerator() {
               <button onClick={() => { navigator.clipboard.writeText(lastQuiz.link); toast.success("Copied"); }} className="text-muted-foreground hover:text-primary"><Copy className="h-4 w-4" /></button>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button size="sm" variant="secondary" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Print</Button>
+              <CopyTextButton text={quizAsText(lastQuiz)} />
+              <Button size="sm" variant="secondary" onClick={() => window.print()}><Printer className="h-4 w-4 mr-1" /> Print / Download</Button>
               <ShareWithTeam contentType="quiz" contentId={lastQuiz.id} />
               <Button size="sm" onClick={share} style={{ background: "var(--gradient-primary)" }} className="glow"><Share2 className="h-4 w-4 mr-1" /> Share</Button>
             </div>
           </div>
-          <h2 className="text-xl font-bold mb-4">{lastQuiz.title}</h2>
+          <PrintDocHeader title={form.topic || lastQuiz.title} subtitle={`${form.class_level} · ${form.subject} · ${form.difficulty}`} />
+          <h2 className="text-xl font-bold mb-4 no-print">{lastQuiz.title}</h2>
           <ol className="space-y-4 list-decimal pl-5">
             {lastQuiz.questions.map((q: any, i: number) => (
               <li key={i}>
@@ -160,6 +176,8 @@ function QuizGenerator() {
               </li>
             ))}
           </ol>
+          <PrintDocFooter />
+
 
         </div>
       )}
