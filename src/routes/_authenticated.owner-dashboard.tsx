@@ -52,9 +52,8 @@ function OwnerDashboard() {
     enabled: allowed,
   });
 
-  if (!allowed) {
-
   const requests = useQuery({
+
     queryKey: ["owner-school-requests"],
     queryFn: async () => (await supabase.from("school_requests").select("*").order("created_at", { ascending: false })).data ?? [],
     enabled: allowed,
