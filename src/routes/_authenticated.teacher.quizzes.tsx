@@ -163,6 +163,8 @@ function QuizGenerator() {
               </li>
             ))}
           </ol>
+          <PrintDocFooter />
+
 
         </div>
       )}
