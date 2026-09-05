@@ -268,6 +268,10 @@ html { scroll-behavior: smooth; }
 .animate-checkmark { stroke-dasharray: 100; animation: checkmark-draw 0.7s ease-out 0.2s both; }
 .animate-success-burst { animation: success-burst 0.9s ease-out both; }
 
+/* Margin 0 on the page box makes Chrome/Edge drop their own date + URL
+   headers; the padding below keeps the document from touching the edges. */
+@page { size: A4; margin: 0; }
+
 @media print {
   body { background: white !important; color: black !important; }
   .no-print, header, aside, nav, footer { display: none !important; }
@@ -277,8 +281,24 @@ html { scroll-behavior: smooth; }
   main { padding: 0 !important; }
   article.prose { color: black !important; }
   article.prose * { color: black !important; }
+
+  /* No entrance/fade animations in printed output */
+  *, *::before, *::after { animation: none !important; transition: none !important; opacity: 1 !important; transform: none !important; }
+
+  .print-area { padding: 14mm 13mm !important; margin: 0 !important; border-radius: 0 !important; }
+
+  .print-doc-header {
+    display: flex !important; align-items: center; gap: 14px;
+    border-bottom: 1.5px solid #e2e2ea; padding-bottom: 10px; margin-bottom: 18px;
+  }
+  .print-doc-logo { height: 34px; width: auto; }
+  .print-doc-title h1 { font-size: 20px; font-weight: 700; margin: 0; color: black !important; }
+  .print-doc-title p { font-size: 12px; margin: 2px 0 0; color: #555 !important; }
+  .print-doc-footer { margin-top: 22px; padding-top: 8px; border-top: 1px solid #e2e2ea; text-align: center; }
+  .print-doc-footer img { height: 20px; width: auto; opacity: 0.35; display: inline-block; }
 }
 .print-only { display: none; }
+
 
 /* Lightweight prose styles for markdown rendering */
 .prose { font-size: 0.95rem; line-height: 1.7; }
