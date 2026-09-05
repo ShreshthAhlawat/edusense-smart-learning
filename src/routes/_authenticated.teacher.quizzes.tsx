@@ -15,6 +15,19 @@ import { MathText } from "@/components/Markdown";
 import { Copy, Link as LinkIcon, Loader2, FileQuestion, Printer, Share2, Sparkles } from "lucide-react";
 import { PrintDocHeader, PrintDocFooter, CopyTextButton } from "@/components/PrintDoc";
 
+/** Plain-text version of a generated quiz, for the Copy text button. */
+function quizAsText(quiz: any) {
+  const lines = [quiz.title, ""];
+  quiz.questions.forEach((q: any, i: number) => {
+    lines.push(`${i + 1}. ${q.question}`);
+    (q.options ?? []).forEach((o: string, oi: number) => lines.push(`   ${String.fromCharCode(65 + oi)}. ${o}`));
+    if (q.options?.length) lines.push(`   Answer: ${String.fromCharCode(65 + q.correct)}`);
+    lines.push("");
+  });
+  return lines.join("\n");
+}
+
+
 
 export const Route = createFileRoute("/_authenticated/teacher/quizzes")({
   head: () => ({ meta: [
