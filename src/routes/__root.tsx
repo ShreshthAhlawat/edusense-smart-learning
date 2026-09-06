@@ -120,6 +120,7 @@ function RootComponent() {
         <AuthProvider>
           <div className="scroll-progress" aria-hidden />
           <ScrollReveal />
+          <UsageTracker />
           <PageTransition>
             <Outlet />
           </PageTransition>
