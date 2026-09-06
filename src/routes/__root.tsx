@@ -16,6 +16,7 @@ import { ThemeProvider } from "@/lib/theme";
 import { Toaster } from "sonner";
 import { PageTransition } from "@/components/PageTransition";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { UsageTracker } from "@/lib/usage";
 
 function NotFoundComponent() {
   return (
