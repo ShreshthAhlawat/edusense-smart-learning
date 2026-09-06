@@ -8,7 +8,7 @@ import { useRouterState } from "@tanstack/react-router";
  * Re-scans on every route change and on DOM mutations.
  */
 const SELECTOR =
-  "[data-reveal], section, main .glass, main .glass-strong, main .recharts-responsive-container";
+  "[data-reveal], section, main .glass:not(.print-area), main .glass-strong:not(.print-area), main .recharts-responsive-container";
 
 export function ScrollReveal() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
