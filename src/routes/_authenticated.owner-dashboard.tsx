@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Copy, Loader2, ShieldCheck, Building2, Users } from "lucide-react";
 import { SchoolRequests, LicenseManager } from "@/components/OwnerSchool";
+import { PlatformAnalytics } from "@/components/PlatformAnalytics";
 
 export const Route = createFileRoute("/_authenticated/owner-dashboard")({
   head: () => ({ meta: [
@@ -129,6 +130,8 @@ function OwnerDashboard() {
           )}
         </div>
       </div>
+
+      <PlatformAnalytics />
 
       <SchoolRequests />
       <LicenseManager />
