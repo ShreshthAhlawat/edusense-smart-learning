@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TeamRouteImport } from './routes/team'
 import { Route as PaymentSuccessRouteImport } from './routes/payment-success'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
@@ -46,6 +47,11 @@ import { Route as AuthenticatedStudentToolSlugRouteImport } from './routes/_auth
 import { Route as AuthenticatedStudentTeamTeamIdRouteImport } from './routes/_authenticated.student.team.$teamId'
 import { Route as AuthenticatedStudentQuizQuizIdRouteImport } from './routes/_authenticated.student.quiz.$quizId'
 
+const TeamRoute = TeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PaymentSuccessRoute = PaymentSuccessRouteImport.update({
   id: '/payment-success',
   path: '/payment-success',
@@ -257,6 +263,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/payment-success': typeof PaymentSuccessRoute
+  '/team': typeof TeamRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/owner-dashboard': typeof AuthenticatedOwnerDashboardRoute
   '/select-role': typeof AuthenticatedSelectRoleRoute
@@ -294,6 +301,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/payment-success': typeof PaymentSuccessRoute
+  '/team': typeof TeamRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/owner-dashboard': typeof AuthenticatedOwnerDashboardRoute
   '/select-role': typeof AuthenticatedSelectRoleRoute
@@ -333,6 +341,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
   '/payment-success': typeof PaymentSuccessRoute
+  '/team': typeof TeamRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/owner-dashboard': typeof AuthenticatedOwnerDashboardRoute
   '/_authenticated/select-role': typeof AuthenticatedSelectRoleRoute
@@ -372,6 +381,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/payment-success'
+    | '/team'
     | '/dashboard'
     | '/owner-dashboard'
     | '/select-role'
@@ -409,6 +419,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/payment-success'
+    | '/team'
     | '/dashboard'
     | '/owner-dashboard'
     | '/select-role'
@@ -447,6 +458,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/payment-success'
+    | '/team'
     | '/_authenticated/dashboard'
     | '/_authenticated/owner-dashboard'
     | '/_authenticated/select-role'
@@ -486,12 +498,20 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
   PaymentSuccessRoute: typeof PaymentSuccessRoute
+  TeamRoute: typeof TeamRoute
   ContentIdRoute: typeof ContentIdRoute
   QuizQuizIdRoute: typeof QuizQuizIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/team': {
+      id: '/team'
+      path: '/team'
+      fullPath: '/team'
+      preLoaderRoute: typeof TeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/payment-success': {
       id: '/payment-success'
       path: '/payment-success'
@@ -825,6 +845,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
   PaymentSuccessRoute: PaymentSuccessRoute,
+  TeamRoute: TeamRoute,
   ContentIdRoute: ContentIdRoute,
   QuizQuizIdRoute: QuizQuizIdRoute,
 }

@@ -17,6 +17,7 @@ import { Toaster } from "sonner";
 import { PageTransition } from "@/components/PageTransition";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { UsageTracker } from "@/lib/usage";
+import { CursorTrail } from "@/components/CursorTrail";
 
 function NotFoundComponent() {
   return (
@@ -120,6 +121,7 @@ function RootComponent() {
         <AuthProvider>
           <div className="scroll-progress" aria-hidden />
           <ScrollReveal />
+          <CursorTrail />
           <UsageTracker />
           <PageTransition>
             <Outlet />
