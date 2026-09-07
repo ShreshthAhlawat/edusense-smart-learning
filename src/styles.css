@@ -630,15 +630,15 @@ html { scroll-behavior: smooth; }
   margin: -3.5px 0 0 -3.5px;
   border-radius: 9999px;
   background: var(--gradient-primary);
-  box-shadow: 0 0 12px hsl(var(--primary) / 0.8);
+  box-shadow: 0 0 12px color-mix(in oklab, var(--primary) 80%, transparent);
 }
 .cursor-ring {
   width: 34px;
   height: 34px;
   margin: -17px 0 0 -17px;
   border-radius: 9999px;
-  border: 1px solid hsl(var(--primary) / 0.55);
-  background: hsl(var(--primary) / 0.06);
+  border: 1px solid color-mix(in oklab, var(--primary) 55%, transparent);
+  background: color-mix(in oklab, var(--primary) 8%, transparent);
   backdrop-filter: blur(1px);
 }
 .cursor-dot.is-active,
@@ -647,7 +647,7 @@ html { scroll-behavior: smooth; }
   width: 22px;
   height: 22px;
   margin: -11px 0 0 -11px;
-  border-color: hsl(var(--primary) / 0.9);
+  border-color: color-mix(in oklab, var(--primary) 90%, transparent);
 }
 @media (pointer: coarse) {
   .cursor-dot, .cursor-ring { display: none; }
