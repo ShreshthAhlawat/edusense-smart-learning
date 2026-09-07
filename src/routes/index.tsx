@@ -7,7 +7,7 @@ import { useTheme } from "@/lib/theme";
 import { Button } from "@/components/ui/button";
 import {
   Sparkles, Brain, ShieldCheck, BarChart3, Users, BookOpen,
-  MessageCircle, X, ArrowRight, Sun, Moon,
+  MessageCircle, X, ArrowRight, Sun, Moon, UsersRound,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -31,6 +31,21 @@ const FEATURES = [
   { icon: Sparkles, title: "Premium AI Tools", desc: "PDF summarizer, story generator, confidence booster, AR learning & more." },
 ];
 
+const MARQUEE_ITEMS = [
+  "AI Quiz Generator",
+  "Struggling-topic Insights",
+  "Adaptive Practice",
+  "Privacy-first Classroom",
+  "Team Collaboration",
+  "Lesson Planning Assistant",
+  "PDF Summarizer",
+  "Story Generator",
+  "Confidence Booster",
+  "AR Learning",
+  "Engagement Analytics",
+  "Sample Paper Generator",
+];
+
 function Landing() {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
@@ -41,8 +56,9 @@ function Landing() {
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen overflow-x-hidden">
       <GlowBackground />
+      <FloatingOrbs />
 
       {/* NAV */}
       <nav className="sticky top-0 z-30 backdrop-blur-xl bg-background/40 border-b border-border">
@@ -54,6 +70,9 @@ function Landing() {
             <span className="font-bold text-lg tracking-tight">EduSense</span>
           </Link>
           <div className="flex items-center gap-3">
+            <Link to="/team" className="hidden sm:inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <UsersRound className="h-4 w-4" /> Meet the team
+            </Link>
             <ThemeToggle />
             {user ? (
               <Button onClick={() => navigate({ to: authedHref() })} className="glow" style={{ background: "var(--gradient-primary)" }}>
@@ -90,23 +109,47 @@ function Landing() {
           <Link
             to={user ? authedHref() : "/auth"}
             search={user ? undefined : ({ mode: "signup" } as never)}
-            className="inline-flex items-center gap-2 rounded-xl px-6 py-3 font-medium text-primary-foreground glow"
+            className="inline-flex items-center gap-2 rounded-xl px-6 py-3 font-medium text-primary-foreground glow hover:scale-105 transition-transform"
             style={{ background: "var(--gradient-primary)" }}
           >
             Get started free <ArrowRight className="h-4 w-4" />
           </Link>
-          <Link to="/auth" className="inline-flex items-center gap-2 rounded-xl border border-border glass px-6 py-3 font-medium">
+          <Link to="/auth" className="inline-flex items-center gap-2 rounded-xl border border-border glass px-6 py-3 font-medium hover:bg-secondary transition-colors">
             Log in
           </Link>
         </div>
 
-        {/* Floating orbs */}
-        <div className="pointer-events-none absolute left-8 top-40 h-16 w-16 rounded-full bg-primary/40 blur-2xl animate-float animate-drift" />
-        <div className="pointer-events-none absolute right-10 top-60 h-24 w-24 rounded-full bg-accent/40 blur-2xl animate-float animate-drift" style={{ animationDelay: "2s" }} />
+        {/* 3D floating decorative elements */}
+        <div className="pointer-events-none absolute left-[5%] top-1/4 hidden md:block" style={{ perspective: "800px" }}>
+          <div className="hero-orb orb-3d w-24 h-24 rounded-2xl" style={{ background: "var(--gradient-primary)", opacity: 0.15 }} />
+        </div>
+        <div className="pointer-events-none absolute right-[8%] top-1/3 hidden md:block" style={{ perspective: "800px" }}>
+          <div className="hero-orb orb-3d w-16 h-16 rounded-full" style={{ background: "var(--accent)", opacity: 0.2 }} />
+        </div>
+        <div className="pointer-events-none absolute left-[12%] bottom-[10%] hidden md:block" style={{ perspective: "800px" }}>
+          <div className="hero-orb orb-3d w-20 h-20 rounded-xl" style={{ background: "linear-gradient(135deg, oklch(0.6 0.2 250), oklch(0.55 0.24 285))", opacity: 0.12 }} />
+        </div>
+        <div className="pointer-events-none absolute right-[15%] bottom-[15%] hidden md:block" style={{ perspective: "800px" }}>
+          <div className="hero-orb orb-3d w-28 h-28 rounded-3xl" style={{ background: "linear-gradient(135deg, oklch(0.5 0.22 300), oklch(0.6 0.2 245))", opacity: 0.1 }} />
+        </div>
+      </section>
+
+      {/* Glassmorphism infinite text carousel */}
+      <section className="relative py-6 overflow-hidden">
+        <div className="carousel-row left">
+          {MARQUEE_ITEMS.map((t, i) => (
+            <span key={`l-${i}`} className="carousel-item glass">{t}</span>
+          ))}
+        </div>
+        <div className="carousel-row right mt-3">
+          {MARQUEE_ITEMS.map((t, i) => (
+            <span key={`r-${i}`} className="carousel-item glass-strong">{t}</span>
+          ))}
+        </div>
       </section>
 
       {/* FEATURES */}
-      <section className="mx-auto max-w-7xl px-6 pb-24">
+      <section className="mx-auto max-w-7xl px-6 pb-24 pt-10">
         <div className="stagger grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f, i) => (
             <Link
@@ -138,7 +181,7 @@ function Landing() {
             <Link
               to={user ? authedHref() : "/auth"}
               search={user ? undefined : ({ mode: "signup" } as never)}
-              className="mt-6 inline-flex rounded-xl px-8 py-3 font-medium text-primary-foreground glow"
+              className="mt-6 inline-flex rounded-xl px-8 py-3 font-medium text-primary-foreground glow hover:scale-105 transition-transform"
               style={{ background: "var(--gradient-primary)" }}
             >
               Start now
@@ -147,8 +190,13 @@ function Landing() {
         </div>
       </section>
 
-      <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} EduSense · Built with care for classrooms
+      <footer className="border-t border-border py-8">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted-foreground">
+          <span>© {new Date().getFullYear()} EduSense · Built with care for classrooms</span>
+          <Link to="/team" className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors">
+            <UsersRound className="h-4 w-4" /> Meet the team
+          </Link>
+        </div>
       </footer>
 
       <FaqChatbot />
@@ -167,6 +215,17 @@ function ThemeToggle() {
     >
       {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
     </button>
+  );
+}
+
+/* --------------------------- 3D Floating Orbs --------------------------- */
+function FloatingOrbs() {
+  return (
+    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden hidden lg:block" aria-hidden>
+      <div className="absolute top-[18%] left-[12%] w-40 h-40 rounded-full bg-primary/10 blur-[60px] animate-float-3d" style={{ animationDelay: "0s" }} />
+      <div className="absolute top-[45%] right-[10%] w-56 h-56 rounded-full bg-accent/10 blur-[80px] animate-float-3d" style={{ animationDelay: "2.5s" }} />
+      <div className="absolute bottom-[20%] left-[22%] w-48 h-48 rounded-full bg-primary/10 blur-[70px] animate-float-3d" style={{ animationDelay: "5s" }} />
+    </div>
   );
 }
 
