@@ -611,3 +611,47 @@ html { scroll-behavior: smooth; }
     }
   }
 }
+
+/* ---- Trailing cursor ---- */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 200ms var(--ease-premium), width 200ms var(--ease-premium), height 200ms var(--ease-premium);
+  will-change: transform;
+}
+.cursor-dot {
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 9999px;
+  background: var(--gradient-primary);
+  box-shadow: 0 0 12px color-mix(in oklab, var(--primary) 80%, transparent);
+}
+.cursor-ring {
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in oklab, var(--primary) 55%, transparent);
+  background: color-mix(in oklab, var(--primary) 8%, transparent);
+  backdrop-filter: blur(1px);
+}
+.cursor-dot.is-active,
+.cursor-ring.is-active { opacity: 1; }
+.cursor-ring.is-press {
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border-color: color-mix(in oklab, var(--primary) 90%, transparent);
+}
+@media (pointer: coarse) {
+  .cursor-dot, .cursor-ring { display: none; }
+}
+@media print {
+  .cursor-dot, .cursor-ring { display: none !important; }
+}
