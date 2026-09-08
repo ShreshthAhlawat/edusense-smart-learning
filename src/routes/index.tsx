@@ -137,12 +137,12 @@ function Landing() {
       {/* Glassmorphism infinite text carousel */}
       <section className="relative py-6 overflow-hidden">
         <div className="carousel-row left">
-          {MARQUEE_ITEMS.map((t, i) => (
+          {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((t, i) => (
             <span key={`l-${i}`} className="carousel-item glass">{t}</span>
           ))}
         </div>
         <div className="carousel-row right mt-3">
-          {MARQUEE_ITEMS.map((t, i) => (
+          {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((t, i) => (
             <span key={`r-${i}`} className="carousel-item glass-strong">{t}</span>
           ))}
         </div>
