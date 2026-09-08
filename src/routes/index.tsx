@@ -148,16 +148,17 @@ function Landing() {
         </div>
       </section>
 
+      {/* INTERACTIVE STATS */}
+      <StatsStrip />
+
+      {/* ROLE SWITCHER */}
+      <RoleSwitcher authedHref={authedHref()} />
+
       {/* FEATURES */}
       <section className="mx-auto max-w-7xl px-6 pb-24 pt-10">
         <div className="stagger grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f, i) => (
-            <Link
-              key={f.title}
-              to={authedHref()}
-              className="group glass rounded-2xl p-6 transition-all hover:-translate-y-1 hover:glow animate-fade-in-up"
-              style={{ animationDelay: `${0.05 * i}s` }}
-            >
+            <TiltCard key={f.title} to={authedHref()} delay={0.05 * i}>
               <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl" style={{ background: "var(--gradient-primary)" }}>
                 <f.icon className="h-6 w-6 text-primary-foreground" />
               </div>
@@ -166,10 +167,11 @@ function Landing() {
               <div className="mt-4 text-sm font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
                 Explore →
               </div>
-            </Link>
+            </TiltCard>
           ))}
         </div>
       </section>
+
 
       {/* CTA */}
       <section className="mx-auto max-w-5xl px-6 pb-24">
