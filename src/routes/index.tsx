@@ -341,17 +341,15 @@ function TiltCard({ to, delay, children }: { to: string; delay: number; children
 
 /* --------------------------- Interactive stats --------------------------- */
 const STATS = [
-  { label: "Quiz questions generated", value: 12500, suffix: "+" },
-  { label: "Average setup time", value: 30, suffix: "s" },
-  { label: "Tools unlocked", value: 12, suffix: "" },
-  { label: "Data shared with 3rd parties", value: 0, suffix: "%" },
+  { label: "Users", value: 30, suffix: "+" },
+  { label: "AI tool for better learning", value: 15, suffix: "+" },
 ];
 
 function StatsStrip() {
   const [active, setActive] = useState<number | null>(null);
   return (
     <section className="mx-auto max-w-6xl px-6 py-12">
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-2">
         {STATS.map((s, i) => (
           <button
             key={s.label}
@@ -368,7 +366,6 @@ function StatsStrip() {
           </button>
         ))}
       </div>
-      <p className="mt-3 text-center text-xs text-muted-foreground">Hover a card to replay the numbers</p>
     </section>
   );
 }
