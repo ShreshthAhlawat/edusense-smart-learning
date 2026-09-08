@@ -655,3 +655,62 @@ html { scroll-behavior: smooth; }
 @media print {
   .cursor-dot, .cursor-ring { display: none !important; }
 }
+
+/* ---- 3D floating hero orbs ---- */
+@keyframes float-3d {
+  0%, 100% { transform: translate3d(0, 0, 0) rotateX(12deg) rotateY(-10deg); }
+  50% { transform: translate3d(0, -22px, 40px) rotateX(-8deg) rotateY(14deg); }
+}
+.animate-float-3d { animation: float-3d 9s ease-in-out infinite; will-change: transform; }
+
+@keyframes orb-3d-spin {
+  0% { transform: rotateX(18deg) rotateY(0deg) translateY(0); }
+  50% { transform: rotateX(-10deg) rotateY(180deg) translateY(-14px); }
+  100% { transform: rotateX(18deg) rotateY(360deg) translateY(0); }
+}
+.orb-3d {
+  transform-style: preserve-3d;
+  animation: orb-3d-spin 16s ease-in-out infinite;
+  box-shadow: 0 18px 50px -12px color-mix(in oklch, var(--primary) 45%, transparent);
+  will-change: transform;
+}
+.hero-orb { backdrop-filter: blur(4px); }
+
+/* ---- Glassmorphism marquee carousels ---- */
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.carousel-row {
+  display: flex;
+  gap: 0.75rem;
+  width: max-content;
+  will-change: transform;
+}
+.carousel-row.left { animation: marquee-left 36s linear infinite; }
+.carousel-row.right { animation: marquee-right 42s linear infinite; }
+.carousel-row:hover { animation-play-state: paused; }
+.carousel-row > * { flex-shrink: 0; }
+/* duplicate content trick: rows render one set; JS-free loop via duplicated items */
+.carousel-item {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: transform var(--dur-base) var(--ease-premium), box-shadow var(--dur-base) var(--ease-premium);
+}
+.carousel-item:hover { transform: translateY(-2px) scale(1.03); }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-3d, .orb-3d, .carousel-row { animation: none !important; }
+}
+@media print {
+  .carousel-row, .orb-3d, .hero-orb { display: none !important; }
+}
