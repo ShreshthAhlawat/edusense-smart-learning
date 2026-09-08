@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode, type CSSProperties, type MouseEvent } from "react";
+import { CountUp } from "@/components/CountUp";
 import { GlowBackground } from "@/components/GlowBackground";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
@@ -304,5 +305,137 @@ function FaqChatbot() {
         </div>
       )}
     </>
+  );
+}
+
+/* --------------------------- Interactive tilt card --------------------------- */
+function TiltCard({ to, delay, children }: { to: string; delay: number; children: ReactNode }) {
+  const [style, setStyle] = useState<CSSProperties>({ animationDelay: `${delay}s` });
+
+  const onMove = (e: MouseEvent<HTMLAnchorElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width;
+    const y = (e.clientY - r.top) / r.height;
+    setStyle({
+      animationDelay: `${delay}s`,
+      ["--tx" as string]: (x - 0.5) * 2,
+      ["--ty" as string]: (y - 0.5) * 2,
+      ["--mx" as string]: `${x * 100}%`,
+      ["--my" as string]: `${y * 100}%`,
+    });
+  };
+
+  return (
+    <Link
+      to={to}
+      onMouseMove={onMove}
+      onMouseLeave={() => setStyle({ animationDelay: `${delay}s` })}
+      className="group tilt-card relative overflow-hidden glass rounded-2xl p-6 animate-fade-in-up"
+      style={style}
+    >
+      <span className="tilt-shine" aria-hidden />
+      <div className="relative">{children}</div>
+    </Link>
+  );
+}
+
+/* --------------------------- Interactive stats --------------------------- */
+const STATS = [
+  { label: "Quiz questions generated", value: 12500, suffix: "+" },
+  { label: "Average setup time", value: 30, suffix: "s" },
+  { label: "Tools unlocked", value: 12, suffix: "" },
+  { label: "Data shared with 3rd parties", value: 0, suffix: "%" },
+];
+
+function StatsStrip() {
+  const [active, setActive] = useState<number | null>(null);
+  return (
+    <section className="mx-auto max-w-6xl px-6 py-12">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        {STATS.map((s, i) => (
+          <button
+            key={s.label}
+            onMouseEnter={() => setActive(i)}
+            onFocus={() => setActive(i)}
+            onMouseLeave={() => setActive(null)}
+            onBlur={() => setActive(null)}
+            className={`glass rounded-2xl p-5 text-left transition-all hover:-translate-y-1 hover:glow ${active === i ? "border-primary/40" : ""}`}
+          >
+            <div className="text-3xl font-bold gradient-text">
+              {active === i ? <CountUp value={`${s.value}${s.suffix}`} /> : `${s.value}${s.suffix}`}
+            </div>
+            <div className="mt-1 text-xs text-muted-foreground">{s.label}</div>
+          </button>
+        ))}
+      </div>
+      <p className="mt-3 text-center text-xs text-muted-foreground">Hover a card to replay the numbers</p>
+    </section>
+  );
+}
+
+/* --------------------------- Role switcher --------------------------- */
+const ROLE_CONTENT = {
+  teacher: {
+    icon: Users,
+    points: [
+      "Generate a full MCQ or written quiz in under a minute",
+      "See exactly which subtopics your class keeps missing",
+      "Share worksheets and quizzes straight to your team",
+      "Track weekly engagement with live analytics",
+    ],
+  },
+  student: {
+    icon: BookOpen,
+    points: [
+      "Practice with quizzes tailored to your weak areas",
+      "Get instant feedback and clear explanations",
+      "Summarize PDFs, explore topics, boost confidence",
+      "Keep homework and notes in one calm place",
+    ],
+  },
+} as const;
+
+function RoleSwitcher({ authedHref }: { authedHref: string }) {
+  const [role, setRole] = useState<"teacher" | "student">("teacher");
+  const data = ROLE_CONTENT[role];
+  return (
+    <section className="mx-auto max-w-4xl px-6 py-8">
+      <div className="glass-strong rounded-3xl p-8">
+        <div className="mx-auto mb-6 inline-flex w-full max-w-xs items-center rounded-full border border-border bg-secondary/40 p-1">
+          {(["teacher", "student"] as const).map((r) => (
+            <button
+              key={r}
+              onClick={() => setRole(r)}
+              className={`flex-1 rounded-full px-4 py-2 text-sm font-medium capitalize transition-all ${
+                role === r ? "text-primary-foreground glow" : "text-muted-foreground hover:text-foreground"
+              }`}
+              style={role === r ? { background: "var(--gradient-primary)" } : undefined}
+            >
+              I'm a {r}
+            </button>
+          ))}
+        </div>
+        <div key={role} className="animate-fade-in-up">
+          <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl" style={{ background: "var(--gradient-primary)" }}>
+            <data.icon className="h-5 w-5 text-primary-foreground" />
+          </div>
+          <ul className="space-y-3">
+            {data.points.map((p) => (
+              <li key={p} className="flex items-start gap-3 text-sm">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                <span>{p}</span>
+              </li>
+            ))}
+          </ul>
+          <Link
+            to={authedHref}
+            className="mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium text-primary-foreground glow hover:scale-105 transition-transform"
+            style={{ background: "var(--gradient-primary)" }}
+          >
+            Start as a {role} <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
+    </section>
   );
 }
