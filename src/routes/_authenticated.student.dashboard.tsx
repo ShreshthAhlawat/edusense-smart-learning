@@ -5,11 +5,10 @@ import { PAYMENTS_ENABLED } from "@/lib/features";
 import { SkeletonCards } from "@/components/Skeleton";
 import { useAuth } from "@/lib/auth";
 import { DashboardShell, PageHeader, StatCard } from "@/components/DashboardShell";
-import { BookOpen, Target, ListChecks, Crown, Rocket, ChevronLeft, ChevronRight } from "lucide-react";
+import { BookOpen, Target, ListChecks, Crown, Rocket } from "lucide-react";
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
+import { SmartExamPlanner } from "@/components/SmartExamPlanner";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -19,6 +18,8 @@ export const Route = createFileRoute("/_authenticated/student/dashboard")({
     { name: "description", content: "Track your quiz progress, homework and personal notes." },
     { property: "og:title", content: "Student Dashboard — EduSense" },
     { property: "og:description", content: "Track your quiz progress and homework." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
   ] }),
   component: StudentDashboard,
 });
@@ -74,7 +75,7 @@ function StudentDashboard() {
             <div className="h-full flex items-center justify-center text-muted-foreground text-sm">Take a quiz to see your trend.</div>
           )}
         </div>
-        <MiniCalendar user={user} profile={profile} refreshProfile={refreshProfile} />
+        <SmartExamPlanner userId={user?.id} profile={profile} refreshProfile={refreshProfile} />
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
@@ -94,83 +95,6 @@ function StudentDashboard() {
         )}
       </div>
     </DashboardShell>
-  );
-}
-
-function MiniCalendar({ user, profile, refreshProfile }: any) {
-  const [month, setMonth] = useState(() => {
-    const d = new Date(); d.setDate(1); return d;
-  });
-  const [openDate, setOpenDate] = useState<string | null>(null);
-  const notes: Record<string, string> = profile?.calendar_notes ?? {};
-
-  const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
-  const firstDay = new Date(month.getFullYear(), month.getMonth(), 1).getDay();
-  const cells: (number | null)[] = [];
-  for (let i = 0; i < firstDay; i++) cells.push(null);
-  for (let i = 1; i <= daysInMonth; i++) cells.push(i);
-
-  const fmt = (d: number) => `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-
-  return (
-    <>
-      <div className="glass rounded-2xl p-5">
-        <div className="flex items-center justify-between mb-3">
-          <button onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))} className="rounded p-1 hover:bg-secondary"><ChevronLeft className="h-4 w-4" /></button>
-          <div className="font-semibold text-sm">{month.toLocaleString("default", { month: "long", year: "numeric" })}</div>
-          <button onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))} className="rounded p-1 hover:bg-secondary"><ChevronRight className="h-4 w-4" /></button>
-        </div>
-        <div className="grid grid-cols-7 gap-1 text-center text-[10px] text-muted-foreground mb-1">
-          {["S","M","T","W","T","F","S"].map((d, i) => <div key={i}>{d}</div>)}
-        </div>
-        <div className="grid grid-cols-7 gap-1">
-          {cells.map((c, i) => (
-            <button
-              key={i}
-              disabled={!c}
-              onClick={() => c && setOpenDate(fmt(c))}
-              className={
-                "aspect-square rounded text-xs flex items-center justify-center relative " +
-                (!c ? "" : "hover:bg-primary/20 transition-colors " + (notes[fmt(c)] ? "bg-primary/25 font-semibold" : "bg-secondary/40"))
-              }
-            >
-              {c ?? ""}
-              {c && notes[fmt(c)] && <div className="absolute bottom-0.5 h-1 w-1 rounded-full bg-primary" />}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <NoteDialog date={openDate} onClose={() => setOpenDate(null)}
-        note={openDate ? notes[openDate] ?? "" : ""}
-        onSave={async (val) => {
-          if (!openDate || !user) return;
-          const next = { ...notes };
-          if (val.trim()) next[openDate] = val; else delete next[openDate];
-          const { error } = await supabase.from("profiles").update({ calendar_notes: next }).eq("id", user.id);
-          if (error) return toast.error(error.message);
-          await refreshProfile();
-          toast.success("Note saved");
-          setOpenDate(null);
-        }}
-      />
-    </>
-  );
-}
-
-function NoteDialog({ date, note, onClose, onSave }: { date: string | null; note: string; onClose: () => void; onSave: (v: string) => void }) {
-  const [val, setVal] = useState(note);
-  return (
-    <Dialog open={!!date} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="glass-strong">
-        <DialogHeader><DialogTitle>Note for {date}</DialogTitle></DialogHeader>
-        <Textarea value={val} onChange={(e) => setVal(e.target.value)} onFocus={() => setVal(note)} placeholder="Study reminder, exam, homework due…" rows={5} />
-        <div className="flex justify-between gap-2">
-          <Button variant="ghost" onClick={() => onSave("")}>Delete</Button>
-          <Button onClick={() => onSave(val)} style={{ background: "var(--gradient-primary)" }} className="glow">Save</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
   );
 }
 

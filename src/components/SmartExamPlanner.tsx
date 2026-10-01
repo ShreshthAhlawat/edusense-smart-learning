@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { format, addDays, startOfDay, differenceInCalendarDays } from "date-fns";
+import { format, addDays, startOfDay } from "date-fns";
 import { CalendarDays, Clock3, Plus, Trash2, Check, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
