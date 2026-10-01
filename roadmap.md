@@ -1,0 +1,2 @@
+- [ ] Upgrade student dashboard calendar with synced revision sessions, exam countdowns, and 30-day completion heatmap.
+- [ ] Apply concise dashboard styling and completion rings; verify the result.
