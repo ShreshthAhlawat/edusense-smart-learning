@@ -7,6 +7,14 @@ import { GraduationCap, Users, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/select-role")({
+  head: () => ({ meta: [
+    { title: "Choose Your Role — EduSense" },
+    { name: "description", content: "Choose how you will use EduSense as a teacher or student." },
+    { property: "og:title", content: "Choose Your Role — EduSense" },
+    { property: "og:description", content: "Choose how you will use EduSense as a teacher or student." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: SelectRole,
 });
 
