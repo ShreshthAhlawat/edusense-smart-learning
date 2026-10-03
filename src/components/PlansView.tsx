@@ -1,3 +1,4 @@
+import { DraftPlans } from "@/components/RoleRequest";
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -189,6 +190,8 @@ export function PlansView({ role }: { role: Role }) {
           );
         })}
       </div>
+
+      <DraftPlans role={role} />
 
       {/* School code redemption — works for both teachers and students */}
       <div className="mt-8 glass rounded-2xl p-6 max-w-xl">

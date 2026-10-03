@@ -1,3 +1,4 @@
+import { RoleRequestsAdmin } from "@/components/RoleRequest";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -132,6 +133,7 @@ function OwnerDashboard() {
       </div>
 
       <PlatformAnalytics />
+      <RoleRequestsAdmin />
 
       <SchoolRequests />
       <LicenseManager />

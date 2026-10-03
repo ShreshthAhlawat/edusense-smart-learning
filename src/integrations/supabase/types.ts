@@ -393,6 +393,45 @@ export type Database = {
         }
         Relationships: []
       }
+      role_change_requests: {
+        Row: {
+          created_at: string
+          decided_at: string | null
+          email: string | null
+          from_role: string | null
+          id: string
+          reason: string | null
+          requested_role: Database["public"]["Enums"]["user_role"]
+          status: string
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          decided_at?: string | null
+          email?: string | null
+          from_role?: string | null
+          id?: string
+          reason?: string | null
+          requested_role: Database["public"]["Enums"]["user_role"]
+          status?: string
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          decided_at?: string | null
+          email?: string | null
+          from_role?: string | null
+          id?: string
+          reason?: string | null
+          requested_role?: Database["public"]["Enums"]["user_role"]
+          status?: string
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
       saved_models: {
         Row: {
           created_at: string
@@ -736,6 +775,10 @@ export type Database = {
       content_shared_with_user: {
         Args: { _content_id: string; _user_id: string }
         Returns: boolean
+      }
+      decide_role_request: {
+        Args: { _decision: string; _id: string }
+        Returns: Json
       }
       get_public_quiz: { Args: { _quiz_id: string }; Returns: Json }
       is_team_member: {
