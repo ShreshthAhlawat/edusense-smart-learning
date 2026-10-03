@@ -1,3 +1,4 @@
+import { RoleChangeRequestCard } from "@/components/RoleRequest";
 import { createFileRoute } from "@tanstack/react-router";
 import { DashboardShell, PageHeader } from "@/components/DashboardShell";
 import { useAuth } from "@/lib/auth";
@@ -44,6 +45,7 @@ function StudentSettings() {
           {saving ? "Saving…" : "Save changes"}
         </Button>
       </div>
+      <RoleChangeRequestCard />
     </DashboardShell>
   );
 }
