@@ -15,7 +15,6 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/lib/auth";
 import { ThemeProvider } from "@/lib/theme";
 import { Toaster } from "sonner";
-import { PageTransition } from "@/components/PageTransition";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { UsageTracker } from "@/lib/usage";
 import { CursorTrail } from "@/components/CursorTrail";
@@ -124,9 +123,7 @@ function RootComponent() {
           <ScrollReveal />
           <CursorTrail />
           <UsageTracker />
-          <PageTransition>
-            <Outlet />
-          </PageTransition>
+          <Outlet />
           <Toaster theme="dark" position="top-right" richColors />
         </AuthProvider>
 
