@@ -4,6 +4,14 @@ import { useAuth } from "@/lib/auth";
 import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  head: () => ({ meta: [
+    { title: "Dashboard — EduSense" },
+    { name: "description", content: "Open your EduSense teacher or student dashboard." },
+    { property: "og:title", content: "Dashboard — EduSense" },
+    { property: "og:description", content: "Open your EduSense teacher or student dashboard." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: DashboardRouter,
 });
 
