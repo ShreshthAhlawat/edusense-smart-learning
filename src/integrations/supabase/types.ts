@@ -247,6 +247,132 @@ export type Database = {
         }
         Relationships: []
       }
+      meeting_attendance: {
+        Row: {
+          display_name: string
+          duration_seconds: number
+          id: string
+          joined_at: string
+          left_at: string | null
+          meeting_id: string
+          user_id: string
+        }
+        Insert: {
+          display_name: string
+          duration_seconds?: number
+          id?: string
+          joined_at?: string
+          left_at?: string | null
+          meeting_id: string
+          user_id: string
+        }
+        Update: {
+          display_name?: string
+          duration_seconds?: number
+          id?: string
+          joined_at?: string
+          left_at?: string | null
+          meeting_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_attendance_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meeting_messages: {
+        Row: {
+          author_name: string
+          body: string
+          created_at: string
+          id: string
+          meeting_id: string
+          user_id: string
+        }
+        Insert: {
+          author_name: string
+          body: string
+          created_at?: string
+          id?: string
+          meeting_id: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          body?: string
+          created_at?: string
+          id?: string
+          meeting_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_messages_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meetings: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          host_id: string
+          id: string
+          room_code: string
+          scheduled_at: string | null
+          started_at: string
+          status: string
+          subject: string | null
+          summary: string | null
+          team_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          host_id: string
+          id?: string
+          room_code: string
+          scheduled_at?: string | null
+          started_at?: string
+          status?: string
+          subject?: string | null
+          summary?: string | null
+          team_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          host_id?: string
+          id?: string
+          room_code?: string
+          scheduled_at?: string | null
+          started_at?: string
+          status?: string
+          subject?: string | null
+          summary?: string | null
+          team_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meetings_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_state: {
         Row: {
           last_seen_at: string
