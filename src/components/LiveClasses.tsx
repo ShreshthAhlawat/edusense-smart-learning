@@ -61,14 +61,14 @@ export function LiveClasses({ teamId, isHost }: { teamId: string; isHost: boolea
     if (!title.trim()) return toast.error("Give the class a title first.");
     setBusy(true);
     const detected = detectSubject(title) || subject.trim() || null;
-    const values: Record<string, unknown> = {
+    const values = {
       team_id: teamId,
       title: title.trim(),
       subject: detected,
       room_code: makeRoomCode(),
       status: mode === "live" ? "live" : "scheduled",
+      scheduled_at: mode === "scheduled" && scheduleAt ? new Date(scheduleAt).toISOString() : null,
     };
-    if (mode === "scheduled") values.scheduled_at = scheduleAt ? new Date(scheduleAt).toISOString() : null;
     const { data, error } = await supabase.from("meetings").insert(values).select("*").single();
     setBusy(false);
     if (error) return toast.error(error.message);
