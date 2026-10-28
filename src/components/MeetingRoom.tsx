@@ -216,7 +216,7 @@ export function MeetingRoom({ meeting, isHost, onClose }: { meeting: Meeting; is
           <div className="flex items-center gap-2 text-xs font-semibold text-primary mb-1">
             <Sparkles className="h-3.5 w-3.5" /> AI class summary
           </div>
-          <div className="text-xs max-h-40 overflow-y-auto print-area"><Markdown content={summary} /></div>
+          <div className="text-xs max-h-40 overflow-y-auto print-area"><Markdown>{summary}</Markdown></div>
         </div>
       ) : null}
 
