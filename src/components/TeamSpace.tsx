@@ -4,12 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { LiveClasses } from "@/components/LiveClasses";
 import { toast } from "sonner";
 import {
   Loader2, FileQuestion, FileText, ScrollText, MessageCircle, Send, CornerDownRight, Users2,
 } from "lucide-react";
 
-type Tab = "shared" | "chat";
+type Tab = "shared" | "live" | "chat";
 
 export type SharedItem = {
   id: string;
@@ -72,8 +73,8 @@ export function useTeamShares(teamId: string | undefined) {
   });
 }
 
-/** Shared content + community doubt board for a single team. */
-export function TeamSpace({ teamId, teamName }: { teamId: string; teamName: string }) {
+/** Shared content + live classes + community doubt board for a single team. */
+export function TeamSpace({ teamId, teamName, isHost = false }: { teamId: string; teamName: string; isHost?: boolean }) {
   const [tab, setTab] = useState<Tab>("shared");
   const shares = useTeamShares(teamId);
 
@@ -89,8 +90,8 @@ export function TeamSpace({ teamId, teamName }: { teamId: string; teamName: stri
         </div>
       </div>
 
-      <div className="flex gap-2">
-        {(["shared", "chat"] as Tab[]).map((t) => (
+      <div className="flex gap-2 flex-wrap">
+        {(["shared", "live", "chat"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -99,12 +100,14 @@ export function TeamSpace({ teamId, teamName }: { teamId: string; teamName: stri
               (tab === t ? "border-primary bg-primary/15 text-foreground" : "border-border bg-secondary/40 text-muted-foreground hover:bg-secondary")
             }
           >
-            {t === "shared" ? "Shared with team" : "Doubts & discussion"}
+            {t === "shared" ? "Shared with team" : t === "live" ? "Live classes" : "Doubts & discussion"}
           </button>
         ))}
       </div>
 
-      {tab === "shared" ? (
+      {tab === "live" ? (
+        <LiveClasses teamId={teamId} isHost={isHost} />
+      ) : tab === "shared" ? (
         shares.isLoading ? (
           <div className="flex justify-center py-16"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
         ) : shares.data && shares.data.length ? (
