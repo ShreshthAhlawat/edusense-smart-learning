@@ -90,8 +90,8 @@ export function TeamSpace({ teamId, teamName, isHost = false }: { teamId: string
         </div>
       </div>
 
-      <div className="flex gap-2">
-        {(["shared", "chat"] as Tab[]).map((t) => (
+      <div className="flex gap-2 flex-wrap">
+        {(["shared", "live", "chat"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -100,7 +100,7 @@ export function TeamSpace({ teamId, teamName, isHost = false }: { teamId: string
               (tab === t ? "border-primary bg-primary/15 text-foreground" : "border-border bg-secondary/40 text-muted-foreground hover:bg-secondary")
             }
           >
-            {t === "shared" ? "Shared with team" : "Doubts & discussion"}
+            {t === "shared" ? "Shared with team" : t === "live" ? "Live classes" : "Doubts & discussion"}
           </button>
         ))}
       </div>
