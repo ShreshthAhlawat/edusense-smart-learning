@@ -105,7 +105,9 @@ export function TeamSpace({ teamId, teamName, isHost = false }: { teamId: string
         ))}
       </div>
 
-      {tab === "shared" ? (
+      {tab === "live" ? (
+        <LiveClasses teamId={teamId} isHost={isHost} />
+      ) : tab === "shared" ? (
         shares.isLoading ? (
           <div className="flex justify-center py-16"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
         ) : shares.data && shares.data.length ? (
