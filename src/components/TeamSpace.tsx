@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { LiveClasses } from "@/components/LiveClasses";
 import { toast } from "sonner";
 import {
-  Loader2, FileQuestion, FileText, ScrollText, MessageCircle, Send, CornerDownRight, Users2, Video,
+  Loader2, FileQuestion, FileText, ScrollText, MessageCircle, Send, CornerDownRight, Users2,
 } from "lucide-react";
 
 type Tab = "shared" | "live" | "chat";

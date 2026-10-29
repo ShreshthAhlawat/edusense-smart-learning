@@ -27,7 +27,7 @@ function TeacherTeamSpace() {
   const team = useQuery({
     queryKey: ["team", teamId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("teams").select("id, name, join_code").eq("id", teamId).maybeSingle();
+      const { data, error } = await supabase.from("teams").select("id, name, join_code, teacher_id").eq("id", teamId).maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -51,7 +51,7 @@ function TeacherTeamSpace() {
       {team.isLoading ? (
         <div className="flex justify-center py-16"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
       ) : team.data ? (
-        <TeamSpace teamId={teamId} teamName={team.data.name} />
+        <TeamSpace teamId={teamId} teamName={team.data.name} isHost={team.data.teacher_id === user?.id} />
       ) : (
         <div className="glass rounded-2xl p-12 text-center text-sm text-muted-foreground">Team not found.</div>
       )}
