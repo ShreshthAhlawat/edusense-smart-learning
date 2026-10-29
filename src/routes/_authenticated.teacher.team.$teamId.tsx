@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_authenticated/teacher/team/$teamId")({
 
 function TeacherTeamSpace() {
   const { teamId } = Route.useParams();
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
 
   const team = useQuery({
     queryKey: ["team", teamId],
