@@ -160,7 +160,7 @@ export function MeetingRoom({ meeting, isHost, onClose }: { meeting: Meeting; is
     if (error) toast.error(error.message);
     setEnded(true);
     try {
-      const { summary: s } = await summarizeMeeting({ data: { meetingId: meeting.id } } as any);
+      const { summary: s } = await summarizeMeeting({ data: { meetingId: meeting.id } });
       setSummary(s ?? null);
     } catch (e: any) {
       toast.error(e?.message ?? "Summary could not be generated.");

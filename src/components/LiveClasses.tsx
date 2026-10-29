@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MeetingRoom, type Meeting } from "@/components/MeetingRoom";
@@ -38,6 +39,7 @@ function makeRoomCode() {
 /** "Live classes" tab content inside a Team Space. Host = the teacher who owns the team. */
 export function LiveClasses({ teamId, isHost }: { teamId: string; isHost: boolean }) {
   const qc = useQueryClient();
+  const { user } = useAuth();
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState("");
   const [scheduleAt, setScheduleAt] = useState("");
@@ -58,11 +60,13 @@ export function LiveClasses({ teamId, isHost }: { teamId: string; isHost: boolea
   });
 
   const createMeeting = async (mode: "live" | "scheduled") => {
+    if (!user) return toast.error("Please sign in again.");
     if (!title.trim()) return toast.error("Give the class a title first.");
     setBusy(true);
     const detected = detectSubject(title) || subject.trim() || null;
     const values = {
       team_id: teamId,
+      host_id: user.id,
       title: title.trim(),
       subject: detected,
       room_code: makeRoomCode(),
