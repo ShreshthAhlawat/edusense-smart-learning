@@ -13,7 +13,7 @@ import {
 
 const SUBJECT_KEYWORDS: Array<[string, string[]]> = [
   ["Physics", ["physics", "motion", "force", "optics", "electricity", "magnetism"]],
-  ["Chemistry", ["chemistry", "acid", " mole", "reaction", "organic", "periodic"]],
+  ["Chemistry", ["chemistry", "acid", "mole", "reaction", "organic", "periodic"]],
   ["Biology", ["biology", "cell", "photosynthesis", "genetics", "human body", "plant"]],
   ["Mathematics", ["math", "maths", "algebra", "geometry", "trigonometry", "calculus", "probability"]],
   ["English", ["english", "grammar", "essay", "literature", "poem"]],

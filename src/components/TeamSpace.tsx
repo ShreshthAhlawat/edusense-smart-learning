@@ -74,7 +74,7 @@ export function useTeamShares(teamId: string | undefined) {
 }
 
 /** Shared content + live classes + community doubt board for a single team. */
-export function TeamSpace({ teamId, teamName, isHost = false }: { teamId: string; teamName: string; isHost?: boolean }) {
+export function TeamSpace({ teamId, teamName, isTeacher = false }: { teamId: string; teamName: string; isTeacher?: boolean }) {
   const [tab, setTab] = useState<Tab>("shared");
   const shares = useTeamShares(teamId);
 
@@ -106,7 +106,7 @@ export function TeamSpace({ teamId, teamName, isHost = false }: { teamId: string
       </div>
 
       {tab === "live" ? (
-        <LiveClasses teamId={teamId} isHost={isHost} />
+        <LiveClasses teamId={teamId} isTeacher={isTeacher} />
       ) : tab === "shared" ? (
         shares.isLoading ? (
           <div className="flex justify-center py-16"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
