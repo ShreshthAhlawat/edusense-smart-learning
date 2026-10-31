@@ -149,7 +149,7 @@ export function LiveClasses({ teamId, isTeacher = false }: { teamId: string; isT
             const isMeetingHost = m.host_id === user?.id;
             const live = m.status === "live";
             const scheduled = m.status === "scheduled";
-            const studyGroup = (m as any).kind === "study_group";
+            const studyGroup = m.kind === "study_group";
             return (
               <div key={m.id} className="glass rounded-2xl p-4">
                 <div className="flex items-start gap-3">
@@ -174,7 +174,7 @@ export function LiveClasses({ teamId, isTeacher = false }: { teamId: string; isT
                     </div>
                     <div className="text-xs text-muted-foreground mt-0.5">
                       {m.subject ? `${m.subject} · ` : ""}
-                      Hosted by {(m as any).host_name || "a team member"} ·{" "}
+                      Hosted by {m.host_name || "a team member"} ·{" "}
                       {new Date(m.started_at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}
                     </div>
                     {m.summary ? (
