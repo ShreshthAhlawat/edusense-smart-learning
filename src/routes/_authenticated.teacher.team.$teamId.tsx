@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_authenticated/teacher/team/$teamId")({
 
 function TeacherTeamSpace() {
   const { teamId } = Route.useParams();
-  const { user, profile } = useAuth();
+  const { profile } = useAuth();
 
   const team = useQuery({
     queryKey: ["team", teamId],
@@ -51,7 +51,7 @@ function TeacherTeamSpace() {
       {team.isLoading ? (
         <div className="flex justify-center py-16"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
       ) : team.data ? (
-        <TeamSpace teamId={teamId} teamName={team.data.name} isHost={team.data.teacher_id === user?.id} />
+        <TeamSpace teamId={teamId} teamName={team.data.name} isTeacher />
       ) : (
         <div className="glass rounded-2xl p-12 text-center text-sm text-muted-foreground">Team not found.</div>
       )}

@@ -15,6 +15,20 @@
       "when": 1793166527294,
       "tag": "0001_meetings_attendance_chat",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793421041349,
+      "tag": "0002_study_group_hosting",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793421068499,
+      "tag": "0003_meeting_host_metadata",
+      "breakpoints": true
     }
   ]
 }

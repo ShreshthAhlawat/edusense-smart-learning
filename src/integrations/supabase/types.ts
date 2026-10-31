@@ -325,7 +325,9 @@ export type Database = {
           created_at: string
           ended_at: string | null
           host_id: string
+          host_name: string | null
           id: string
+          kind: string
           room_code: string
           scheduled_at: string | null
           started_at: string
@@ -339,7 +341,9 @@ export type Database = {
           created_at?: string
           ended_at?: string | null
           host_id: string
+          host_name?: string | null
           id?: string
+          kind?: string
           room_code: string
           scheduled_at?: string | null
           started_at?: string
@@ -353,7 +357,9 @@ export type Database = {
           created_at?: string
           ended_at?: string | null
           host_id?: string
+          host_name?: string | null
           id?: string
+          kind?: string
           room_code?: string
           scheduled_at?: string | null
           started_at?: string

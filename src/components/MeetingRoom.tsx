@@ -40,6 +40,8 @@ export type Meeting = {
   id: string;
   team_id: string;
   host_id: string;
+  host_name?: string | null;
+  kind?: string | null;
   title: string;
   subject: string | null;
   room_code: string;
@@ -199,13 +201,13 @@ export function MeetingRoom({ meeting, isHost, onClose }: { meeting: Meeting; is
           <div className="text-sm font-semibold truncate">{meeting.title}</div>
           <div className="text-[11px] text-muted-foreground">
             {meeting.subject ? `${meeting.subject} · ` : ""}
-            {ended ? "Class ended" : "Live"} · {participants.length + 1} in room
+            {ended ? (meeting.kind === "study_group" ? "Session ended" : "Class ended") : "Live"} · {participants.length + 1} in room
           </div>
         </div>
         {isHost && !ended ? (
           <Button size="sm" variant="destructive" onClick={endClass} disabled={ending}>
             {ending ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <LogOut className="h-4 w-4 mr-1" />}
-            End class
+            {meeting.kind === "study_group" ? "End session" : "End class"}
           </Button>
         ) : null}
         <Button size="sm" variant="ghost" onClick={leaveClass}><X className="h-4 w-4" /></Button>
