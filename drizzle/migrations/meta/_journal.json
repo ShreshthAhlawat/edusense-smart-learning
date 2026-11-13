@@ -29,6 +29,13 @@
       "when": 1793421068499,
       "tag": "0003_meeting_host_metadata",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794586504099,
+      "tag": "0004_add_second_admin",
+      "breakpoints": true
     }
   ]
 }
