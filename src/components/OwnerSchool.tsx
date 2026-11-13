@@ -43,6 +43,33 @@ export function SchoolRequests() {
     qc.invalidateQueries({ queryKey: ["owner-school-requests"] });
   };
 
+  const quickGenerate = async (r: Req) => {
+    setBusy(true);
+    const code = randomCode();
+    const months = r.duration_months ?? 12;
+    const expires = new Date(Date.now() + months * 30 * 24 * 3600 * 1000).toISOString();
+    const { data: lic, error } = await supabase
+      .from("school_licenses")
+      .insert({ code, max_students: r.estimated_students ?? 0, max_teachers: r.estimated_teachers ?? 0, duration_months: months, expires_at: expires, label: r.school_name, request_id: r.id })
+      .select()
+      .single();
+    if (error) { setBusy(false); return toast.error(error.message); }
+    const { error: e2 } = await supabase.from("school_requests").update({ status: "accepted", license_id: lic!.id }).eq("id", r.id);
+    setBusy(false);
+    if (e2) return toast.error(e2.message);
+    navigator.clipboard?.writeText(code).catch(() => {});
+    toast.success(`Code ${code} generated and copied`);
+    qc.invalidateQueries({ queryKey: ["owner-school-requests"] });
+    qc.invalidateQueries({ queryKey: ["owner-licenses"] });
+  };
+
+  const copyCode = async (r: Req) => {
+    const { data, error } = await supabase.from("school_licenses").select("code").eq("id", r.license_id).maybeSingle();
+    if (error || !data) return toast.error("Code not found");
+    navigator.clipboard?.writeText(data.code).catch(() => {});
+    toast.success(`Copied ${data.code}`);
+  };
+
   return (
     <div className="mt-6 glass rounded-2xl p-6" data-reveal>
       <h2 className="font-semibold mb-4 flex items-center gap-2">
@@ -81,12 +108,19 @@ export function SchoolRequests() {
                   <td className="py-2 pr-3 text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</td>
                   <td className="py-2">
                     {r.status === "pending" ? (
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
+                        <Button size="sm" variant="outline" disabled={busy} onClick={() => quickGenerate(r)} title="Use requested seats and duration">
+                          <KeyRound className="h-3.5 w-3.5 mr-1" /> Generate code
+                        </Button>
                         <Button size="sm" disabled={busy} onClick={() => setAccepting(r)} className="glow" style={{ background: "var(--gradient-primary)" }}>
                           <Check className="h-3.5 w-3.5 mr-1" /> Accept
                         </Button>
                         <Button size="sm" variant="secondary" disabled={busy} onClick={() => reject(r)}>Reject</Button>
                       </div>
+                    ) : r.license_id ? (
+                      <Button size="sm" variant="secondary" onClick={() => copyCode(r)}>
+                        <Copy className="h-3.5 w-3.5 mr-1" /> Copy code
+                      </Button>
                     ) : (
                       <span className="text-xs text-muted-foreground">—</span>
                     )}
@@ -243,6 +277,33 @@ export function LicenseManager() {
     : s === "Expired" ? "bg-amber-500/20 border-amber-500/40 text-amber-400"
     : s === "Revoked" ? "bg-destructive/20 border-destructive/40 text-destructive"
     : "bg-secondary border-border text-muted-foreground";
+
+  const quickGenerate = async (r: Req) => {
+    setBusy(true);
+    const code = randomCode();
+    const months = r.duration_months ?? 12;
+    const expires = new Date(Date.now() + months * 30 * 24 * 3600 * 1000).toISOString();
+    const { data: lic, error } = await supabase
+      .from("school_licenses")
+      .insert({ code, max_students: r.estimated_students ?? 0, max_teachers: r.estimated_teachers ?? 0, duration_months: months, expires_at: expires, label: r.school_name, request_id: r.id })
+      .select()
+      .single();
+    if (error) { setBusy(false); return toast.error(error.message); }
+    const { error: e2 } = await supabase.from("school_requests").update({ status: "accepted", license_id: lic!.id }).eq("id", r.id);
+    setBusy(false);
+    if (e2) return toast.error(e2.message);
+    navigator.clipboard?.writeText(code).catch(() => {});
+    toast.success(`Code ${code} generated and copied`);
+    qc.invalidateQueries({ queryKey: ["owner-school-requests"] });
+    qc.invalidateQueries({ queryKey: ["owner-licenses"] });
+  };
+
+  const copyCode = async (r: Req) => {
+    const { data, error } = await supabase.from("school_licenses").select("code").eq("id", r.license_id).maybeSingle();
+    if (error || !data) return toast.error("Code not found");
+    navigator.clipboard?.writeText(data.code).catch(() => {});
+    toast.success(`Copied ${data.code}`);
+  };
 
   return (
     <div className="mt-6 glass rounded-2xl p-6" data-reveal>

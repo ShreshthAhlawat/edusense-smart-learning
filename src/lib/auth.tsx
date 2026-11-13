@@ -85,6 +85,7 @@ export function useAuth() {
 }
 
 export const OWNER_EMAIL = "shreshthahlawat2012@gmail.com";
+export const OWNER_EMAILS = [OWNER_EMAIL, "admin23@gmail.com"];
 export function isOwner(user: { email?: string | null } | null | undefined) {
-  return !!user?.email && user.email.toLowerCase() === OWNER_EMAIL;
+  return !!user?.email && OWNER_EMAILS.includes(user.email.toLowerCase());
 }
