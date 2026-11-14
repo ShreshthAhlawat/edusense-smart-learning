@@ -650,6 +650,7 @@ export type Database = {
       }
       school_requests: {
         Row: {
+          applicant_user_id: string | null
           contact_email: string
           contact_person: string
           contact_phone: string | null
@@ -665,6 +666,7 @@ export type Database = {
           status: string
         }
         Insert: {
+          applicant_user_id?: string | null
           contact_email: string
           contact_person: string
           contact_phone?: string | null
@@ -680,6 +682,7 @@ export type Database = {
           status?: string
         }
         Update: {
+          applicant_user_id?: string | null
           contact_email?: string
           contact_person?: string
           contact_phone?: string | null
