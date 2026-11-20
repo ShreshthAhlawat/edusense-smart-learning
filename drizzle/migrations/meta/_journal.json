@@ -43,6 +43,13 @@
       "when": 1794649122912,
       "tag": "0005_school_request_account_visibility",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795147505456,
+      "tag": "0006_restrict_quiz_reads_to_owner_and_team_shares",
+      "breakpoints": true
     }
   ]
 }
