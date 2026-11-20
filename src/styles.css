@@ -765,3 +765,6 @@ main .glass:hover, main .glass-strong:hover {
 .planner-heat:hover { outline: 1px solid var(--planner-cyan); }
 @keyframes planner-breathe { 50% { box-shadow: 0 0 14px color-mix(in oklab, var(--planner-cyan) 18%, transparent); } }
 @media (prefers-reduced-motion: reduce) { .planner-chip { animation: none; } .planner-ring { transition: none; } }
+
+/* Remove CSS transitions site-wide so interactive state changes render immediately. */
+*, *::before, *::after { transition: none !important; }
